@@ -98,10 +98,10 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-[99999] overflow-hidden">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/75 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
 
