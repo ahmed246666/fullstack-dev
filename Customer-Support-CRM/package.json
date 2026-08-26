@@ -10,7 +10,7 @@
     "server:db:push": "cd server && npm run prisma:push",
     "server:db:generate": "cd server && npm run prisma:generate",
     "server:db:seed": "cd server && npm run prisma:seed",
-    "server:db:verify": "cd server && tsx prisma/verify-db.ts",
+    "server:db:verify": "cd server && npm run prisma:verify",
     "server:db:studio": "cd server && npx prisma studio",
     "jira:list": "node jira.js list",
     "jira:sprints": "node jira.js sprints",
