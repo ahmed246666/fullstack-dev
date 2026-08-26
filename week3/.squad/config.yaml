@@ -1,0 +1,14 @@
+version: 1
+project:
+  name: week3-fullstack
+  primaryLanguage: typescript
+  projectRoots:
+    - .
+tracker:
+  type: jira
+  workspace: ahmedosamaengineering.atlassian.net
+naming:
+  includeTrackerId: true
+  globalSequence: true
+agents:
+  - gemini
