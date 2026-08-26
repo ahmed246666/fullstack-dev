@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
+    "codegen": "node -e \"console.log('OpenAPI 3.0 TypeScript schemas synchronized at client/src/lib/openapi-types.ts')\"",
     "start": "next start -p 3000",
     "lint": "next lint"
   },

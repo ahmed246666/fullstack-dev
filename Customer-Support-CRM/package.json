@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "npm run server:dev",
     "build": "npm run server:build && npm run client:build",
+    "codegen": "cd client && npm run codegen",
     "client:install": "cd client && npm install",
     "client:dev": "cd client && npm run dev",
     "client:build": "cd client && npm run build",

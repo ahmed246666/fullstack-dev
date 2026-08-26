@@ -12,4 +12,5 @@
 | `crm-kb` | Knowledge Base Management & Helpfulness Voting | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-kb/00-overview.md) | Done |
 | `crm-analytics` | Executive Analytics Dashboard & SLA Compliance | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-analytics/00-overview.md) | Done |
 | `crm-ai` | AI Support Copilot & Sentiment Analysis | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-ai/00-overview.md) | Done |
-| `crm-rbac` | Security, RBAC & Public Customer Portal | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-rbac/00-overview.md) | In Progress |
+| `crm-rbac` | Security, RBAC & Public Customer Portal | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-rbac/00-overview.md) | Done |
+| `crm-typegen` | OpenAPI 3.0 TypeScript Client & React Query Hooks | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-typegen/00-overview.md) | In Progress |
