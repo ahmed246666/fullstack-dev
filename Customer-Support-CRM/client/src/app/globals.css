@@ -22,8 +22,8 @@ body {
   overflow-x: hidden;
 }
 
-[dir="rtl"] body,
-[dir="rtl"] {
+[dir='rtl'] body,
+[dir='rtl'] {
   font-family: var(--font-cairo);
 }
 

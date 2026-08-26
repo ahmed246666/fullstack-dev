@@ -17,7 +17,13 @@ export default function KnowledgeBasePage() {
     queryFn: () => api.getKnowledgeArticles({ search, category })
   });
 
-  const categories = ['ALL', 'Getting Started', 'API & Integrations', 'Account & Billing', 'Troubleshooting'];
+  const categories = [
+    'ALL',
+    'Getting Started',
+    'API & Integrations',
+    'Account & Billing',
+    'Troubleshooting'
+  ];
 
   return (
     <div className="space-y-6">
@@ -27,7 +33,9 @@ export default function KnowledgeBasePage() {
             <BookOpen className="w-6 h-6 text-emerald-400" />
             <span>{t('navKnowledge')}</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">Searchable bilingual self-service guides, FAQs, and integration docs.</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Searchable bilingual self-service guides, FAQs, and integration docs.
+          </p>
         </div>
       </div>
 
@@ -50,7 +58,9 @@ export default function KnowledgeBasePage() {
               key={c}
               onClick={() => setCategory(c)}
               className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${
-                category === c ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-white'
+                category === c
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-white'
               }`}
             >
               {c}
@@ -61,7 +71,9 @@ export default function KnowledgeBasePage() {
 
       {/* Articles Grid */}
       {isLoading ? (
-        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">Loading articles...</div>
+        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
+          Loading articles...
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {(data?.data || []).map((article: any) => (

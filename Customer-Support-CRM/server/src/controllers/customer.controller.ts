@@ -91,7 +91,9 @@ export async function getCustomerById(req: Request, res: Response): Promise<void
     const stats = {
       totalTickets: ticketsList.length,
       openTickets: ticketsList.filter((t: any) => t.status === 'OPEN' || t.status === 'NEW').length,
-      resolvedTickets: ticketsList.filter((t: any) => t.status === 'RESOLVED' || t.status === 'CLOSED').length
+      resolvedTickets: ticketsList.filter(
+        (t: any) => t.status === 'RESOLVED' || t.status === 'CLOSED'
+      ).length
     };
 
     res.json({
@@ -109,7 +111,16 @@ export async function getCustomerById(req: Request, res: Response): Promise<void
 
 export async function createCustomer(req: Request, res: Response): Promise<void> {
   try {
-    const { name, nameAr, email, phone, company, tier = 'STANDARD', preferredLang = 'en', avatarUrl } = req.body;
+    const {
+      name,
+      nameAr,
+      email,
+      phone,
+      company,
+      tier = 'STANDARD',
+      preferredLang = 'en',
+      avatarUrl
+    } = req.body;
 
     if (!name || !email) {
       res.status(400).json({ success: false, error: 'Name and email are required fields' });

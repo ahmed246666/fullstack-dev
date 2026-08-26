@@ -2,11 +2,7 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-export function Card({
-  children,
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+export function Card({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={twMerge(
@@ -27,7 +23,10 @@ export function CardHeader({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={twMerge('flex items-center justify-between pb-4 mb-4 border-b border-slate-800', className)}
+      className={twMerge(
+        'flex items-center justify-between pb-4 mb-4 border-b border-slate-800',
+        className
+      )}
       {...props}
     >
       {children}

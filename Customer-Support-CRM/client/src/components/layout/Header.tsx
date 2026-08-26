@@ -54,7 +54,9 @@ export function Header() {
                 {lang === 'ar' ? currentAgent.nameAr : currentAgent.name}
                 <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
               </div>
-              <div className="text-[10px] text-slate-400 font-medium">{currentAgent.department} • {currentAgent.role}</div>
+              <div className="text-[10px] text-slate-400 font-medium">
+                {currentAgent.department} • {currentAgent.role}
+              </div>
             </div>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 mr-1 rtl:ml-1 rtl:mr-0" />
           </div>
@@ -64,18 +66,22 @@ export function Header() {
             <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
               {t('activeAgent')}
             </div>
-            {agents.map(a => (
+            {agents.map((a) => (
               <button
                 key={a.id}
                 onClick={() => switchAgent(a.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-left rtl:text-right transition-colors ${
-                  currentAgent.id === a.id ? 'bg-indigo-600/20 text-indigo-300 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                  currentAgent.id === a.id
+                    ? 'bg-indigo-600/20 text-indigo-300 font-bold'
+                    : 'text-slate-300 hover:bg-slate-800'
                 }`}
               >
                 <img src={a.avatarUrl} alt={a.name} className="w-6 h-6 rounded-full object-cover" />
                 <div>
                   <div>{lang === 'ar' ? a.nameAr : a.name}</div>
-                  <div className="text-[10px] text-slate-400">{a.department} ({a.role})</div>
+                  <div className="text-[10px] text-slate-400">
+                    {a.department} ({a.role})
+                  </div>
                 </div>
               </button>
             ))}

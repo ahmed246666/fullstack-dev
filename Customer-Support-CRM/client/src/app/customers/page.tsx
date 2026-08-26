@@ -27,7 +27,9 @@ export default function CustomersPage() {
             <Users className="w-6 h-6 text-purple-400" />
             <span>{t('navCustomers')}</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">Directory of customer profiles, contact details, company tiers, and interaction history.</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Directory of customer profiles, contact details, company tiers, and interaction history.
+          </p>
         </div>
       </div>
 
@@ -50,7 +52,9 @@ export default function CustomersPage() {
                 key={tierOption}
                 onClick={() => setTier(tierOption)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${
-                  tier === tierOption ? 'bg-purple-600 text-white border-purple-500' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                  tier === tierOption
+                    ? 'bg-purple-600 text-white border-purple-500'
+                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
                 }`}
               >
                 {tierOption}
@@ -62,7 +66,9 @@ export default function CustomersPage() {
 
       {/* Customers List Grid */}
       {isLoading ? (
-        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">Loading customer directory...</div>
+        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
+          Loading customer directory...
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {(data?.data || []).map((customer: any) => (
@@ -70,9 +76,18 @@ export default function CustomersPage() {
               <div>
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-3">
-                    <img src={customer.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'} alt={customer.name} className="w-12 h-12 rounded-2xl object-cover ring-2 ring-purple-500/20" />
+                    <img
+                      src={
+                        customer.avatarUrl ||
+                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+                      }
+                      alt={customer.name}
+                      className="w-12 h-12 rounded-2xl object-cover ring-2 ring-purple-500/20"
+                    />
                     <div>
-                      <h4 className="font-bold text-slate-100 text-sm">{lang === 'ar' ? customer.nameAr || customer.name : customer.name}</h4>
+                      <h4 className="font-bold text-slate-100 text-sm">
+                        {lang === 'ar' ? customer.nameAr || customer.name : customer.name}
+                      </h4>
                       <div className="text-[11px] text-slate-400 flex items-center gap-1">
                         <Building2 className="w-3 h-3 text-slate-500" />
                         <span>{customer.company || 'Independent'}</span>
@@ -97,7 +112,9 @@ export default function CustomersPage() {
               </div>
 
               <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <span className="text-slate-400 font-medium">{customer._count?.tickets || 0} Tickets</span>
+                <span className="text-slate-400 font-medium">
+                  {customer._count?.tickets || 0} Tickets
+                </span>
                 <span className="text-purple-400 font-semibold flex items-center gap-1">
                   <span>360 Profile</span>
                   <ExternalLink className="w-3 h-3" />

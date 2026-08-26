@@ -43,7 +43,9 @@ export function Sidebar() {
           <div>
             <h1 className="font-extrabold text-sm text-slate-100 tracking-tight flex items-center gap-1.5">
               <span>AZM SQUAD</span>
-              <span className="px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 text-[10px] font-bold">CRM</span>
+              <span className="px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 text-[10px] font-bold">
+                CRM
+              </span>
             </h1>
             <p className="text-[11px] text-slate-400 font-medium">Customer Support Platform</p>
           </div>
@@ -51,9 +53,10 @@ export function Sidebar() {
 
         {/* Navigation Items */}
         <nav className="space-y-1.5">
-          {navItems.map(item => {
+          {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+            const isActive =
+              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
 
             return (
               <Link

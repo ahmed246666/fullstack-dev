@@ -1,0 +1,7 @@
+node_modules/
+.next/
+dist/
+.squad/
+*.db
+*.db-journal
+package-lock.json

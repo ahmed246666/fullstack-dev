@@ -16,7 +16,10 @@ interface LanguageContextType {
 const translations: Record<string, { en: string; ar: string }> = {
   // Branding
   appTitle: { en: 'AZM Support CRM', ar: 'منصة دعم عملاء عزم' },
-  appSubtitle: { en: 'Enterprise Omnichannel Platform', ar: 'المنصة المؤسسية الشاملة لخدمة العملاء' },
+  appSubtitle: {
+    en: 'Enterprise Omnichannel Platform',
+    ar: 'المنصة المؤسسية الشاملة لخدمة العملاء'
+  },
 
   // Navigation
   navDashboard: { en: 'Dashboard', ar: 'لوحة التحكم' },
@@ -62,7 +65,10 @@ const translations: Record<string, { en: string; ar: string }> = {
   recentTicketsTitle: { en: 'Recent Omnichannel Tickets', ar: 'أحدث التذاكر متعددة القنوات' },
   quickActions: { en: 'Quick Actions', ar: 'إجراءات سريعة' },
   newTicketBtn: { en: 'New Ticket', ar: 'إنشاء تذكرة' },
-  searchPlaceholder: { en: 'Search tickets, customers, or articles...', ar: 'ابحث عن التذاكر، العملاء، أو المقالات...' },
+  searchPlaceholder: {
+    en: 'Search tickets, customers, or articles...',
+    ar: 'ابحث عن التذاكر، العملاء، أو المقالات...'
+  },
   activeAgent: { en: 'Active Agent', ar: 'الوكيل الحالي' },
   switchLang: { en: 'العربية', ar: 'English' }
 };
@@ -80,7 +86,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [lang, dir]);
 
   const toggleLanguage = () => {
-    setLang(prev => (prev === 'en' ? 'ar' : 'en'));
+    setLang((prev) => (prev === 'en' ? 'ar' : 'en'));
   };
 
   const setLanguage = (newLang: Language) => {

@@ -37,9 +37,9 @@ if (!baseUrl || !email || !apiToken) {
 
 const auth = Buffer.from(`${email}:${apiToken}`).toString('base64');
 const headers = {
-  'Authorization': `Basic ${auth}`,
+  Authorization: `Basic ${auth}`,
   'Content-Type': 'application/json',
-  'Accept': 'application/json'
+  Accept: 'application/json'
 };
 
 async function listIssues() {
@@ -90,10 +90,15 @@ async function transitionIssue(issueKey, targetStatus) {
   // 1. Get available transitions
   const transRes = await fetch(`${baseUrl}/rest/api/3/issue/${issueKey}/transitions`, { headers });
   const transData = await transRes.json();
-  const transition = transData.transitions?.find(t => t.name.toLowerCase() === targetStatus.toLowerCase());
-  
+  const transition = transData.transitions?.find(
+    (t) => t.name.toLowerCase() === targetStatus.toLowerCase()
+  );
+
   if (!transition) {
-    console.error(`Transition '${targetStatus}' not found for ${issueKey}. Available:`, transData.transitions?.map(t => t.name));
+    console.error(
+      `Transition '${targetStatus}' not found for ${issueKey}. Available:`,
+      transData.transitions?.map((t) => t.name)
+    );
     return;
   }
 
@@ -127,7 +132,10 @@ async function listSprints() {
 }
 
 async function listSprintIssues(sprintId = 1) {
-  const res = await fetch(`${baseUrl}/rest/agile/1.0/sprint/${sprintId}/issue?fields=summary,status,issuetype`, { headers });
+  const res = await fetch(
+    `${baseUrl}/rest/agile/1.0/sprint/${sprintId}/issue?fields=summary,status,issuetype`,
+    { headers }
+  );
   const data = await res.json();
   console.log(`\n📋 Issues in Sprint [${sprintId}] (Total: ${data.total || 0}):\n`);
   console.log('Key'.padEnd(12) + 'Type'.padEnd(10) + 'Status'.padEnd(16) + 'Summary');
@@ -174,7 +182,7 @@ async function startSprint(sprintId, name, goal) {
 }
 
 async function main() {
-  const [,, cmd, ...args] = process.argv;
+  const [, , cmd, ...args] = process.argv;
   if (!cmd || cmd === 'list') {
     await listIssues();
   } else if (cmd === 'create') {
@@ -202,7 +210,9 @@ async function main() {
     const [sprintId, name, goal] = args;
     await startSprint(sprintId || 1, name, goal);
   } else {
-    console.log('Commands: list, create, transition, sprints, sprint-issues, sprint-add, sprint-start');
+    console.log(
+      'Commands: list, create, transition, sprints, sprint-issues, sprint-add, sprint-start'
+    );
   }
 }
 

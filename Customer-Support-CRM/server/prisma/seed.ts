@@ -25,7 +25,8 @@ async function main() {
       email: 'admin@azmsquad.com',
       role: 'ADMIN',
       department: 'Management',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
       status: 'ACTIVE'
     }
   });
@@ -37,7 +38,8 @@ async function main() {
       email: 'sara.ghamdi@azmsquad.com',
       role: 'AGENT',
       department: 'Technical',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
       status: 'ACTIVE'
     }
   });
@@ -49,7 +51,8 @@ async function main() {
       email: 'khalid.mansoor@azmsquad.com',
       role: 'AGENT',
       department: 'Billing',
-      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
       status: 'ACTIVE'
     }
   });
@@ -61,7 +64,8 @@ async function main() {
       email: 'noura.shehri@azmsquad.com',
       role: 'AGENT',
       department: 'Support',
-      avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
       status: 'ACTIVE'
     }
   });
@@ -71,10 +75,30 @@ async function main() {
   // 3. Seed SLA Policies
   await prisma.sLAConfig.createMany({
     data: [
-      { priority: 'URGENT', responseTimeHours: 1.0, resolutionTimeHours: 4.0, escalationRole: 'ADMIN' },
-      { priority: 'HIGH', responseTimeHours: 2.0, resolutionTimeHours: 8.0, escalationRole: 'ADMIN' },
-      { priority: 'MEDIUM', responseTimeHours: 4.0, resolutionTimeHours: 24.0, escalationRole: 'AGENT' },
-      { priority: 'LOW', responseTimeHours: 8.0, resolutionTimeHours: 48.0, escalationRole: 'AGENT' }
+      {
+        priority: 'URGENT',
+        responseTimeHours: 1.0,
+        resolutionTimeHours: 4.0,
+        escalationRole: 'ADMIN'
+      },
+      {
+        priority: 'HIGH',
+        responseTimeHours: 2.0,
+        resolutionTimeHours: 8.0,
+        escalationRole: 'ADMIN'
+      },
+      {
+        priority: 'MEDIUM',
+        responseTimeHours: 4.0,
+        resolutionTimeHours: 24.0,
+        escalationRole: 'AGENT'
+      },
+      {
+        priority: 'LOW',
+        responseTimeHours: 8.0,
+        resolutionTimeHours: 48.0,
+        escalationRole: 'AGENT'
+      }
     ]
   });
 
@@ -87,7 +111,8 @@ async function main() {
         shortcut: '/greet',
         title: 'Standard Greeting',
         titleAr: 'الترحيب القياسي',
-        content: 'Hello! Thank you for reaching out to AZM Squad Support. How may I assist you today?',
+        content:
+          'Hello! Thank you for reaching out to AZM Squad Support. How may I assist you today?',
         contentAr: 'أهلاً بك! شكراً لتواصلك مع دعم عزم. كيف يمكنني مساعدتك اليوم؟',
         category: 'Greetings'
       },
@@ -95,7 +120,8 @@ async function main() {
         shortcut: '/investigating',
         title: 'Issue Under Investigation',
         titleAr: 'جاري فحص المشكلة',
-        content: 'We are currently investigating your request with our engineering team and will update you shortly.',
+        content:
+          'We are currently investigating your request with our engineering team and will update you shortly.',
         contentAr: 'نحن نعمل حالياً على متابعة طلبك مع الفريق التقني وسنزودك بالتحديث في أقرب وقت.',
         category: 'Troubleshooting'
       },
@@ -103,7 +129,8 @@ async function main() {
         shortcut: '/invoice',
         title: 'Invoice & Billing Clarification',
         titleAr: 'توضيح الفاتورة والمدفوعات',
-        content: 'Your billing receipt has been generated and attached. Please let us know if you have any questions.',
+        content:
+          'Your billing receipt has been generated and attached. Please let us know if you have any questions.',
         contentAr: 'تم إصدار إيصال الدفع وإرفاقه. يرجى إعلامنا إذا كان لديك أي استفسار إضافي.',
         category: 'Billing'
       },
@@ -111,7 +138,8 @@ async function main() {
         shortcut: '/resolve',
         title: 'Resolution Confirmation',
         titleAr: 'تأكيد إغلاق التذكرة',
-        content: 'We are glad to inform you that your issue has been resolved! Please feel free to rate our support service.',
+        content:
+          'We are glad to inform you that your issue has been resolved! Please feel free to rate our support service.',
         contentAr: 'يسعدنا إبلاغك بأنه تم حل مشكلتك بنجاح! يسعدنا تقييمك لمستوى الخدمة المقدمة.',
         category: 'Closures'
       }
@@ -127,8 +155,10 @@ async function main() {
         slug: 'getting-started-guide',
         title: 'Quick Start: Setting Up Your AZM Portal Account',
         titleAr: 'دليل البدء السريع: إعداد حسابك في بوابة عزم',
-        content: 'Learn how to configure your account settings, invite team members, and set up your initial notification preferences in less than 5 minutes.',
-        contentAr: 'تعرف على كيفية ضبط إعدادات حسابك، ودعوة أعضاء الفريق، وإعداد تفضيلات التنبيهات في أقل من 5 دقائق.',
+        content:
+          'Learn how to configure your account settings, invite team members, and set up your initial notification preferences in less than 5 minutes.',
+        contentAr:
+          'تعرف على كيفية ضبط إعدادات حسابك، ودعوة أعضاء الفريق، وإعداد تفضيلات التنبيهات في أقل من 5 دقائق.',
         category: 'Getting Started',
         tags: 'onboarding, account, setup',
         helpfulVotes: 42,
@@ -138,8 +168,10 @@ async function main() {
         slug: 'managing-api-keys',
         title: 'How to Generate and Rotate OpenAPI API Keys',
         titleAr: 'كيفية إنشاء وتدوير مفاتيح واجهة برمجة التطبيقات (API)',
-        content: 'Detailed documentation on generating secure OAuth & Bearer tokens for our REST and OpenAPI contract endpoints.',
-        contentAr: 'دليل مفصل حول إنشاء وتدوير رموز الوصول الآمنة للتكامل مع واجهات برمجة التطبيقات وOpenAPI.',
+        content:
+          'Detailed documentation on generating secure OAuth & Bearer tokens for our REST and OpenAPI contract endpoints.',
+        contentAr:
+          'دليل مفصل حول إنشاء وتدوير رموز الوصول الآمنة للتكامل مع واجهات برمجة التطبيقات وOpenAPI.',
         category: 'API & Integrations',
         tags: 'api, security, keys',
         helpfulVotes: 35,
@@ -149,8 +181,10 @@ async function main() {
         slug: 'sla-tiers-explained',
         title: 'Understanding SLA Response & Resolution Guarantees',
         titleAr: 'فهم اتفاقيات مستوى الخدمة (SLA) وأوقات الاستجابة',
-        content: 'Overview of response target times for Urgent (1h), High (2h), Medium (4h), and Low (8h) priorities.',
-        contentAr: 'نظرة عامة على الأوقات المستهدفة للاستجابة والحل للأولويات العاجلة والعالية والمتوسطة.',
+        content:
+          'Overview of response target times for Urgent (1h), High (2h), Medium (4h), and Low (8h) priorities.',
+        contentAr:
+          'نظرة عامة على الأوقات المستهدفة للاستجابة والحل للأولويات العاجلة والعالية والمتوسطة.',
         category: 'Account & Billing',
         tags: 'sla, support, policy',
         helpfulVotes: 28,
@@ -171,7 +205,8 @@ async function main() {
       company: 'PetroTech Solutions',
       tier: 'ENTERPRISE',
       preferredLang: 'ar',
-      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
       status: 'ACTIVE'
     }
   });
@@ -185,7 +220,8 @@ async function main() {
       company: 'Riyadh FinTech Labs',
       tier: 'VIP',
       preferredLang: 'en',
-      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
       status: 'ACTIVE'
     }
   });
@@ -199,7 +235,8 @@ async function main() {
       company: 'Najd Cloud Services',
       tier: 'STANDARD',
       preferredLang: 'ar',
-      avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
       status: 'ACTIVE'
     }
   });
@@ -213,7 +250,8 @@ async function main() {
       company: 'Gulf Express Logistics',
       tier: 'VIP',
       preferredLang: 'en',
-      avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
       status: 'ACTIVE'
     }
   });
@@ -228,7 +266,8 @@ async function main() {
     data: {
       ticketNumber: 'TCK-1001',
       title: 'Database connection timeout on production cluster',
-      description: 'Our ERP integration suddenly failed with error ETIMEDOUT when querying warehouse stocks.',
+      description:
+        'Our ERP integration suddenly failed with error ETIMEDOUT when querying warehouse stocks.',
       status: 'OPEN',
       priority: 'URGENT',
       channel: 'WHATSAPP',
@@ -247,7 +286,8 @@ async function main() {
     data: {
       ticketNumber: 'TCK-1002',
       title: 'Discrepancy in monthly enterprise subscription invoice #INV-2026-08',
-      description: 'The calculated VAT on invoice #INV-2026-08 shows an unexpected debit charge for extra user seats.',
+      description:
+        'The calculated VAT on invoice #INV-2026-08 shows an unexpected debit charge for extra user seats.',
       status: 'NEW',
       priority: 'HIGH',
       channel: 'EMAIL',
@@ -265,7 +305,8 @@ async function main() {
     data: {
       ticketNumber: 'TCK-1003',
       title: 'Need assistance setting up RTL Arabic typography in PDF reports',
-      description: 'When exporting monthly summary PDFs, Arabic text appears disconnected or left-aligned.',
+      description:
+        'When exporting monthly summary PDFs, Arabic text appears disconnected or left-aligned.',
       status: 'PENDING',
       priority: 'MEDIUM',
       channel: 'LIVE_CHAT',
@@ -306,7 +347,8 @@ async function main() {
     data: {
       ticketNumber: 'TCK-1005',
       title: 'SMS Alert: API rate limit threshold reached (95%)',
-      description: 'Automated webhook alert: Gateway API consumed 95% of allocated monthly rate limits.',
+      description:
+        'Automated webhook alert: Gateway API consumed 95% of allocated monthly rate limits.',
       status: 'NEW',
       priority: 'URGENT',
       channel: 'SMS',
@@ -336,7 +378,8 @@ async function main() {
         ticketId: t1.id,
         authorId: agentSara.id,
         authorName: 'Sara Al-Ghamdi',
-        content: 'Dear Tariq, we identified a temporary replica failover and have rerouted your connection pool.',
+        content:
+          'Dear Tariq, we identified a temporary replica failover and have rerouted your connection pool.',
         isInternal: false,
         channel: 'WHATSAPP'
       },
@@ -344,7 +387,8 @@ async function main() {
         ticketId: t3.id,
         authorId: agentNoura.id,
         authorName: 'Noura Al-Shehri',
-        content: 'Provided customer with Cairo/Amiri font configuration snippet for the PDF exporter.',
+        content:
+          'Provided customer with Cairo/Amiri font configuration snippet for the PDF exporter.',
         isInternal: false,
         channel: 'LIVE_CHAT'
       }

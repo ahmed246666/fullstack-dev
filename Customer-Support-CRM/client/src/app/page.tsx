@@ -22,7 +22,13 @@ import { useAgent } from '@/context/AgentContext';
 import { api } from '@/lib/api';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StatusBadge, PriorityBadge, ChannelBadge, SLABadge, TierBadge } from '@/components/ui/Badge';
+import {
+  StatusBadge,
+  PriorityBadge,
+  ChannelBadge,
+  SLABadge,
+  TierBadge
+} from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 
@@ -45,7 +51,11 @@ export default function DashboardPage() {
     queryFn: () => api.getAnalytics()
   });
 
-  const { data: ticketsData, isLoading: isTicketsLoading, refetch: refetchTickets } = useQuery({
+  const {
+    data: ticketsData,
+    isLoading: isTicketsLoading,
+    refetch: refetchTickets
+  } = useQuery({
     queryKey: ['recent-tickets'],
     queryFn: () => api.getTickets({ limit: 6 })
   });
@@ -130,7 +140,9 @@ export default function DashboardPage() {
         {/* KPI 1 */}
         <Card className="glass-panel-hover border-slate-800/80">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('kpiTotalTickets')}</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              {t('kpiTotalTickets')}
+            </span>
             <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
               <Ticket className="w-4 h-4" />
             </div>
@@ -144,7 +156,9 @@ export default function DashboardPage() {
         {/* KPI 2 */}
         <Card className="glass-panel-hover border-slate-800/80">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('kpiOpenTickets')}</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              {t('kpiOpenTickets')}
+            </span>
             <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
@@ -158,13 +172,17 @@ export default function DashboardPage() {
         {/* KPI 3 */}
         <Card className="glass-panel-hover border-slate-800/80">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('kpiSLACompliance')}</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              {t('kpiSLACompliance')}
+            </span>
             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-emerald-400">{stats.slaComplianceRate}%</span>
+            <span className="text-3xl font-extrabold text-emerald-400">
+              {stats.slaComplianceRate}%
+            </span>
             <span className="text-xs text-emerald-400 font-medium">Target: &gt;90%</span>
           </div>
         </Card>
@@ -172,13 +190,17 @@ export default function DashboardPage() {
         {/* KPI 4 */}
         <Card className="glass-panel-hover border-slate-800/80">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('kpiCSATAverage')}</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              {t('kpiCSATAverage')}
+            </span>
             <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-purple-300">{stats.averageCSAT} / 5.0</span>
+            <span className="text-3xl font-extrabold text-purple-300">
+              {stats.averageCSAT} / 5.0
+            </span>
             <span className="text-xs text-purple-400 font-medium">⭐ 98% Positive</span>
           </div>
         </Card>
@@ -196,7 +218,10 @@ export default function DashboardPage() {
           </CardHeader>
           <div className="space-y-3">
             {Object.entries(stats.channelDistribution || {}).map(([chan, count]) => (
-              <div key={chan} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/60">
+              <div
+                key={chan}
+                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/60"
+              >
                 <ChannelBadge channel={chan} />
                 <span className="text-xs font-bold text-slate-200">{count as number} tickets</span>
               </div>
@@ -213,7 +238,9 @@ export default function DashboardPage() {
                   <Users className="w-5 h-5" />
                 </div>
                 <h4 className="font-bold text-slate-100 text-sm">{t('navCustomers')}</h4>
-                <p className="text-xs text-slate-400 mt-1">View customer 360 touchpoint timeline, tiers, contact details, and open tickets.</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  View customer 360 touchpoint timeline, tiers, contact details, and open tickets.
+                </p>
               </div>
               <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-purple-400 group-hover:underline">
                 <span>Explore Customers</span>
@@ -229,7 +256,10 @@ export default function DashboardPage() {
                   <Headphones className="w-5 h-5" />
                 </div>
                 <h4 className="font-bold text-slate-100 text-sm">{t('navWorkspace')}</h4>
-                <p className="text-xs text-slate-400 mt-1">Agent reply console with 1-click canned responses, internal notes thread, and SLA alerts.</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Agent reply console with 1-click canned responses, internal notes thread, and SLA
+                  alerts.
+                </p>
               </div>
               <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-cyan-400 group-hover:underline">
                 <span>Open Workspace</span>
@@ -247,14 +277,19 @@ export default function DashboardPage() {
             <Ticket className="w-4 h-4 text-indigo-400" />
             <span>{t('recentTicketsTitle')}</span>
           </CardTitle>
-          <Link href="/tickets" className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+          <Link
+            href="/tickets"
+            className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+          >
             <span>{lang === 'ar' ? 'عرض الكل' : 'View All'}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </CardHeader>
 
         {isTicketsLoading ? (
-          <div className="py-8 text-center text-xs text-slate-400 animate-pulse">Loading live tickets...</div>
+          <div className="py-8 text-center text-xs text-slate-400 animate-pulse">
+            Loading live tickets...
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left rtl:text-right text-xs">
@@ -274,10 +309,16 @@ export default function DashboardPage() {
                   <tr key={ticket.id} className="hover:bg-slate-900/60 transition-colors">
                     <td className="px-4 py-3 font-semibold text-slate-200">
                       <div className="font-bold text-indigo-400">{ticket.ticketNumber}</div>
-                      <div className="truncate max-w-xs text-slate-300 font-normal">{ticket.title}</div>
+                      <div className="truncate max-w-xs text-slate-300 font-normal">
+                        {ticket.title}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-semibold text-slate-200">{lang === 'ar' ? ticket.customer?.nameAr || ticket.customer?.name : ticket.customer?.name}</div>
+                      <div className="font-semibold text-slate-200">
+                        {lang === 'ar'
+                          ? ticket.customer?.nameAr || ticket.customer?.name
+                          : ticket.customer?.name}
+                      </div>
                       <div className="text-[10px] text-slate-400">{ticket.customer?.company}</div>
                     </td>
                     <td className="px-4 py-3">
@@ -294,7 +335,11 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-4 py-3 text-right rtl:text-left">
                       <span className="text-slate-300 font-medium">
-                        {ticket.assignedAgent ? (lang === 'ar' ? ticket.assignedAgent.nameAr : ticket.assignedAgent.name) : '—'}
+                        {ticket.assignedAgent
+                          ? lang === 'ar'
+                            ? ticket.assignedAgent.nameAr
+                            : ticket.assignedAgent.name
+                          : '—'}
                       </span>
                     </td>
                   </tr>
@@ -306,7 +351,12 @@ export default function DashboardPage() {
       </Card>
 
       {/* Create Ticket Modal */}
-      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('newTicketBtn')} maxWidth="lg">
+      <Modal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        title={t('newTicketBtn')}
+        maxWidth="lg"
+      >
         <form onSubmit={handleCreateTicket} className="space-y-4">
           <Input
             label="Ticket Subject"
@@ -337,7 +387,9 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Priority</label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                Priority
+              </label>
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value)}
@@ -350,7 +402,9 @@ export default function DashboardPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Channel</label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                Channel
+              </label>
               <select
                 value={newChannel}
                 onChange={(e) => setNewChannel(e.target.value)}

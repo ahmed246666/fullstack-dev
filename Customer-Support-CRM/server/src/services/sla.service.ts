@@ -5,7 +5,8 @@ export interface SLADeadlines {
   resolutionDueAt: Date;
 }
 
-export type SLAStatusType = 'ON_TRACK' | 'APPROACHING_BREACH' | 'BREACHED' | 'RESOLVED_ON_TIME' | 'RESOLVED_LATE';
+export type SLAStatusType =
+  'ON_TRACK' | 'APPROACHING_BREACH' | 'BREACHED' | 'RESOLVED_ON_TIME' | 'RESOLVED_LATE';
 
 export async function calculateSLADeadlines(priority: string): Promise<SLADeadlines> {
   const config = await prisma.sLAConfig.findUnique({
@@ -13,8 +14,12 @@ export async function calculateSLADeadlines(priority: string): Promise<SLADeadli
   });
 
   const now = new Date();
-  const responseHours = config?.responseTimeHours ?? (priority === 'URGENT' ? 1 : priority === 'HIGH' ? 2 : priority === 'MEDIUM' ? 4 : 8);
-  const resolutionHours = config?.resolutionTimeHours ?? (priority === 'URGENT' ? 4 : priority === 'HIGH' ? 8 : priority === 'MEDIUM' ? 24 : 48);
+  const responseHours =
+    config?.responseTimeHours ??
+    (priority === 'URGENT' ? 1 : priority === 'HIGH' ? 2 : priority === 'MEDIUM' ? 4 : 8);
+  const resolutionHours =
+    config?.resolutionTimeHours ??
+    (priority === 'URGENT' ? 4 : priority === 'HIGH' ? 8 : priority === 'MEDIUM' ? 24 : 48);
 
   const responseDueAt = new Date(now.getTime() + responseHours * 3600 * 1000);
   const resolutionDueAt = new Date(now.getTime() + resolutionHours * 3600 * 1000);

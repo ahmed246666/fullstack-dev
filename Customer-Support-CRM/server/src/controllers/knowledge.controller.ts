@@ -67,7 +67,9 @@ export async function voteArticle(req: Request, res: Response): Promise<void> {
     const article = await prisma.knowledgeArticle.update({
       where: { id },
       data: {
-        ...(type === 'HELPFUL' ? { helpfulVotes: { increment: 1 } } : { unhelpfulVotes: { increment: 1 } })
+        ...(type === 'HELPFUL'
+          ? { helpfulVotes: { increment: 1 } }
+          : { unhelpfulVotes: { increment: 1 } })
       }
     });
 

@@ -65,10 +65,25 @@ export async function getTickets(req: Request, res: Response): Promise<void> {
         orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
         include: {
           customer: {
-            select: { id: true, name: true, nameAr: true, email: true, company: true, tier: true, avatarUrl: true }
+            select: {
+              id: true,
+              name: true,
+              nameAr: true,
+              email: true,
+              company: true,
+              tier: true,
+              avatarUrl: true
+            }
           },
           assignedAgent: {
-            select: { id: true, name: true, nameAr: true, email: true, department: true, avatarUrl: true }
+            select: {
+              id: true,
+              name: true,
+              nameAr: true,
+              email: true,
+              department: true,
+              avatarUrl: true
+            }
           },
           _count: {
             select: { notes: true }
@@ -77,7 +92,7 @@ export async function getTickets(req: Request, res: Response): Promise<void> {
       })
     ]);
 
-    const tickets = rawTickets.map(t => ({
+    const tickets = rawTickets.map((t) => ({
       ...t,
       slaStatus: computeSLAStatus(t)
     }));
@@ -109,7 +124,15 @@ export async function getTicketById(req: Request, res: Response): Promise<void> 
       include: {
         customer: true,
         assignedAgent: {
-          select: { id: true, name: true, nameAr: true, email: true, department: true, role: true, avatarUrl: true }
+          select: {
+            id: true,
+            name: true,
+            nameAr: true,
+            email: true,
+            department: true,
+            role: true,
+            avatarUrl: true
+          }
         },
         notes: {
           orderBy: { createdAt: 'asc' },
@@ -156,7 +179,9 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
     } = req.body;
 
     if (!title || !description || !customerId) {
-      res.status(400).json({ success: false, error: 'Title, description, and customerId are required' });
+      res
+        .status(400)
+        .json({ success: false, error: 'Title, description, and customerId are required' });
       return;
     }
 
@@ -228,7 +253,9 @@ export async function updateTicketStatus(req: Request, res: Response): Promise<v
 
     const allowedStatuses = ['NEW', 'OPEN', 'PENDING', 'RESOLVED', 'CLOSED'];
     if (!status || !allowedStatuses.includes(status.toUpperCase())) {
-      res.status(400).json({ success: false, error: `Status must be one of: ${allowedStatuses.join(', ')}` });
+      res
+        .status(400)
+        .json({ success: false, error: `Status must be one of: ${allowedStatuses.join(', ')}` });
       return;
     }
 
@@ -342,7 +369,9 @@ export async function submitCSAT(req: Request, res: Response): Promise<void> {
 
     const ratingNum = parseInt(csatRating, 10);
     if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
-      res.status(400).json({ success: false, error: 'CSAT rating must be an integer between 1 and 5' });
+      res
+        .status(400)
+        .json({ success: false, error: 'CSAT rating must be an integer between 1 and 5' });
       return;
     }
 

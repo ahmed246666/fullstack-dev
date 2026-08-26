@@ -27,7 +27,9 @@ export default function TicketsPage() {
             <Ticket className="w-6 h-6 text-indigo-400" />
             <span>{t('navTickets')}</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">Detailed omnichannel data table view with multi-column sorting and filtering.</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Detailed omnichannel data table view with multi-column sorting and filtering.
+          </p>
         </div>
       </div>
 
@@ -79,7 +81,9 @@ export default function TicketsPage() {
       {/* Data Table */}
       <Card>
         {isLoading ? (
-          <div className="py-12 text-center text-xs text-slate-400 animate-pulse">Loading tickets...</div>
+          <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
+            Loading tickets...
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left rtl:text-right text-xs">
@@ -100,13 +104,29 @@ export default function TicketsPage() {
                   <tr key={ticket.id} className="hover:bg-slate-900/60 transition-colors">
                     <td className="px-4 py-3 font-bold text-indigo-400">{ticket.ticketNumber}</td>
                     <td className="px-4 py-3 font-semibold text-slate-200">{ticket.title}</td>
-                    <td className="px-4 py-3 text-slate-300">{lang === 'ar' ? ticket.customer?.nameAr || ticket.customer?.name : ticket.customer?.name}</td>
-                    <td className="px-4 py-3"><ChannelBadge channel={ticket.channel} /></td>
-                    <td className="px-4 py-3"><PriorityBadge priority={ticket.priority} /></td>
-                    <td className="px-4 py-3"><StatusBadge status={ticket.status} /></td>
-                    <td className="px-4 py-3"><SLABadge slaStatus={ticket.slaStatus} /></td>
+                    <td className="px-4 py-3 text-slate-300">
+                      {lang === 'ar'
+                        ? ticket.customer?.nameAr || ticket.customer?.name
+                        : ticket.customer?.name}
+                    </td>
+                    <td className="px-4 py-3">
+                      <ChannelBadge channel={ticket.channel} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <PriorityBadge priority={ticket.priority} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={ticket.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <SLABadge slaStatus={ticket.slaStatus} />
+                    </td>
                     <td className="px-4 py-3 text-right rtl:text-left text-slate-300">
-                      {ticket.assignedAgent ? (lang === 'ar' ? ticket.assignedAgent.nameAr : ticket.assignedAgent.name) : '—'}
+                      {ticket.assignedAgent
+                        ? lang === 'ar'
+                          ? ticket.assignedAgent.nameAr
+                          : ticket.assignedAgent.name
+                        : '—'}
                     </td>
                   </tr>
                 ))}

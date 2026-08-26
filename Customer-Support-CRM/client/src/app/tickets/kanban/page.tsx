@@ -33,12 +33,16 @@ export default function KanbanPage() {
             <Kanban className="w-6 h-6 text-indigo-400" />
             <span>{t('navKanban')}</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">Interactive drag-and-drop workflow across status columns.</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Interactive drag-and-drop workflow across status columns.
+          </p>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">Loading board...</div>
+        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
+          Loading board...
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
           {columns.map((col) => {
@@ -57,12 +61,19 @@ export default function KanbanPage() {
 
                 <div className="space-y-3 min-h-[300px]">
                   {colTickets.map((t: any) => (
-                    <Card key={t.id} className="p-3.5 glass-panel-hover border-slate-800 cursor-grab active:cursor-grabbing">
+                    <Card
+                      key={t.id}
+                      className="p-3.5 glass-panel-hover border-slate-800 cursor-grab active:cursor-grabbing"
+                    >
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="text-[11px] font-bold text-indigo-400">{t.ticketNumber}</span>
+                        <span className="text-[11px] font-bold text-indigo-400">
+                          {t.ticketNumber}
+                        </span>
                         <PriorityBadge priority={t.priority} />
                       </div>
-                      <h4 className="text-xs font-semibold text-slate-100 line-clamp-2 mb-2.5">{t.title}</h4>
+                      <h4 className="text-xs font-semibold text-slate-100 line-clamp-2 mb-2.5">
+                        {t.title}
+                      </h4>
                       <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[10px]">
                         <ChannelBadge channel={t.channel} />
                         <SLABadge slaStatus={t.slaStatus} />

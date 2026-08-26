@@ -38,8 +38,13 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: Mod
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onClick={onClose} />
-      <div className={`relative w-full ${widthClasses[maxWidth]} glass-panel bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150`}>
+      <div
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+      <div
+        className={`relative w-full ${widthClasses[maxWidth]} glass-panel bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150`}
+      >
         <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
           <h3 className="text-lg font-bold text-slate-100">{title}</h3>
           <button

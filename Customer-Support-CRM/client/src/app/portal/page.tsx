@@ -42,7 +42,8 @@ export default function PublicPortalPage() {
         </div>
         <h1 className="text-3xl font-extrabold text-white">Track Your Support Request</h1>
         <p className="text-sm text-slate-400 max-w-lg mx-auto">
-          Enter your unique ticket reference code below to check live resolution status and SLA deadlines.
+          Enter your unique ticket reference code below to check live resolution status and SLA
+          deadlines.
         </p>
       </div>
 
@@ -73,12 +74,16 @@ export default function PublicPortalPage() {
           <div className="flex items-start justify-between pb-4 border-b border-slate-800">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="font-mono text-sm font-bold text-indigo-400">{trackedTicket.ticketNumber}</span>
+                <span className="font-mono text-sm font-bold text-indigo-400">
+                  {trackedTicket.ticketNumber}
+                </span>
                 <StatusBadge status={trackedTicket.status} />
                 <PriorityBadge priority={trackedTicket.priority} />
               </div>
               <h2 className="text-xl font-bold text-white">{trackedTicket.title}</h2>
-              <p className="text-xs text-slate-400 mt-1">Submitted by: {trackedTicket.customer?.name} ({trackedTicket.customer?.company})</p>
+              <p className="text-xs text-slate-400 mt-1">
+                Submitted by: {trackedTicket.customer?.name} ({trackedTicket.customer?.company})
+              </p>
             </div>
             <SLABadge slaStatus={trackedTicket.slaStatus} />
           </div>
@@ -90,17 +95,24 @@ export default function PublicPortalPage() {
 
           {/* Conversation History */}
           <div>
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Public Updates</h3>
+            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">
+              Public Updates
+            </h3>
             <div className="space-y-3">
-              {(trackedTicket.notes || []).filter((n: any) => !n.isInternal).map((note: any) => (
-                <div key={note.id} className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 text-xs">
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-                    <span className="font-bold text-indigo-300">{note.authorName}</span>
-                    <span>{new Date(note.createdAt).toLocaleString()}</span>
+              {(trackedTicket.notes || [])
+                .filter((n: any) => !n.isInternal)
+                .map((note: any) => (
+                  <div
+                    key={note.id}
+                    className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 text-xs"
+                  >
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                      <span className="font-bold text-indigo-300">{note.authorName}</span>
+                      <span>{new Date(note.createdAt).toLocaleString()}</span>
+                    </div>
+                    <p className="text-slate-200">{note.content}</p>
                   </div>
-                  <p className="text-slate-200">{note.content}</p>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </Card>

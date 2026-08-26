@@ -38,7 +38,9 @@ app.use('/api/users', userRoutes);
 
 // 404 Catch-All
 app.use((req: Request, res: Response) => {
-  res.status(404).json({ success: false, error: `Route ${req.method} ${req.originalUrl} not found` });
+  res
+    .status(404)
+    .json({ success: false, error: `Route ${req.method} ${req.originalUrl} not found` });
 });
 
 // Global Error Handler

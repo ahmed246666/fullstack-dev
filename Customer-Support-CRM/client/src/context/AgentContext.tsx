@@ -20,7 +20,8 @@ const DEFAULT_AGENTS: AgentUser[] = [
     email: 'admin@azmsquad.com',
     role: 'ADMIN',
     department: 'Management',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+    avatarUrl:
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
   },
   {
     id: 'agent-sara',
@@ -29,7 +30,8 @@ const DEFAULT_AGENTS: AgentUser[] = [
     email: 'sara.ghamdi@azmsquad.com',
     role: 'AGENT',
     department: 'Technical',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
+    avatarUrl:
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
   },
   {
     id: 'agent-khalid',
@@ -38,7 +40,8 @@ const DEFAULT_AGENTS: AgentUser[] = [
     email: 'khalid.mansoor@azmsquad.com',
     role: 'AGENT',
     department: 'Billing',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
+    avatarUrl:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
   },
   {
     id: 'agent-noura',
@@ -47,7 +50,8 @@ const DEFAULT_AGENTS: AgentUser[] = [
     email: 'noura.shehri@azmsquad.com',
     role: 'AGENT',
     department: 'Support',
-    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
+    avatarUrl:
+      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -63,7 +67,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
   const [currentAgent, setCurrentAgent] = useState<AgentUser>(DEFAULT_AGENTS[0]);
 
   const switchAgent = (agentId: string) => {
-    const found = DEFAULT_AGENTS.find(a => a.id === agentId);
+    const found = DEFAULT_AGENTS.find((a) => a.id === agentId);
     if (found) {
       setCurrentAgent(found);
     }

@@ -64,25 +64,26 @@ export async function getSLAPolicies(req: Request, res: Response): Promise<void>
 
 export async function getAnalytics(req: Request, res: Response): Promise<void> {
   try {
-    const [totalTickets, openTickets, resolvedTickets, customersCount, tickets, csatAgg] = await Promise.all([
-      prisma.ticket.count(),
-      prisma.ticket.count({ where: { status: { in: ['NEW', 'OPEN', 'PENDING'] } } }),
-      prisma.ticket.count({ where: { status: { in: ['RESOLVED', 'CLOSED'] } } }),
-      prisma.customer.count(),
-      prisma.ticket.findMany({
-        select: {
-          channel: true,
-          priority: true,
-          status: true,
-          resolutionDueAt: true,
-          resolvedAt: true
-        }
-      }),
-      prisma.ticket.aggregate({
-        _avg: { csatRating: true },
-        where: { csatRating: { not: null } }
-      })
-    ]);
+    const [totalTickets, openTickets, resolvedTickets, customersCount, tickets, csatAgg] =
+      await Promise.all([
+        prisma.ticket.count(),
+        prisma.ticket.count({ where: { status: { in: ['NEW', 'OPEN', 'PENDING'] } } }),
+        prisma.ticket.count({ where: { status: { in: ['RESOLVED', 'CLOSED'] } } }),
+        prisma.customer.count(),
+        prisma.ticket.findMany({
+          select: {
+            channel: true,
+            priority: true,
+            status: true,
+            resolutionDueAt: true,
+            resolvedAt: true
+          }
+        }),
+        prisma.ticket.aggregate({
+          _avg: { csatRating: true },
+          where: { csatRating: { not: null } }
+        })
+      ]);
 
     // Channel Distribution breakdown
     const channelCounts: Record<string, number> = {
@@ -108,7 +109,8 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
       }
     }
 
-    const slaComplianceRate = totalTickets > 0 ? Math.round((onTrackCount / totalTickets) * 100) : 100;
+    const slaComplianceRate =
+      totalTickets > 0 ? Math.round((onTrackCount / totalTickets) * 100) : 100;
 
     res.json({
       success: true,

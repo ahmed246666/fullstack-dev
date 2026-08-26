@@ -18,18 +18,24 @@ async function runApiTests() {
     // 2. Customers List
     const custRes = await fetch(`${baseUrl}/customers?search=Tariq&tier=ENTERPRISE`);
     const custData = await custRes.json();
-    console.log(`✅ [2/8] GET /api/customers -> Status: ${custRes.status}, Found: ${custData.data?.length} customer(s)`);
+    console.log(
+      `✅ [2/8] GET /api/customers -> Status: ${custRes.status}, Found: ${custData.data?.length} customer(s)`
+    );
 
     // 3. Customer 360 Profile
     const firstCust = custData.data[0];
     const profileRes = await fetch(`${baseUrl}/customers/${firstCust.id}`);
     const profileData = await profileRes.json();
-    console.log(`✅ [3/8] GET /api/customers/:id -> Status: ${profileRes.status}, Total Tickets: ${profileData.data?.stats?.totalTickets}`);
+    console.log(
+      `✅ [3/8] GET /api/customers/:id -> Status: ${profileRes.status}, Total Tickets: ${profileData.data?.stats?.totalTickets}`
+    );
 
     // 4. Omnichannel Tickets List with SLA Computation
     const ticketsRes = await fetch(`${baseUrl}/tickets?channel=WHATSAPP`);
     const ticketsData = await ticketsRes.json();
-    console.log(`✅ [4/8] GET /api/tickets?channel=WHATSAPP -> Status: ${ticketsRes.status}, Found: ${ticketsData.data?.length}, SLA: ${ticketsData.data?.[0]?.slaStatus}`);
+    console.log(
+      `✅ [4/8] GET /api/tickets?channel=WHATSAPP -> Status: ${ticketsRes.status}, Found: ${ticketsData.data?.length}, SLA: ${ticketsData.data?.[0]?.slaStatus}`
+    );
 
     // 5. Create New Ticket with Dynamic SLA Deadlines
     const createTicketRes = await fetch(`${baseUrl}/tickets`, {
@@ -45,7 +51,9 @@ async function runApiTests() {
       })
     });
     const newTicket = await createTicketRes.json();
-    console.log(`✅ [5/8] POST /api/tickets -> Status: ${createTicketRes.status}, Created: ${newTicket.data?.ticketNumber}, Priority: ${newTicket.data?.priority}, SLA Status: ${newTicket.data?.slaStatus}`);
+    console.log(
+      `✅ [5/8] POST /api/tickets -> Status: ${createTicketRes.status}, Created: ${newTicket.data?.ticketNumber}, Priority: ${newTicket.data?.priority}, SLA Status: ${newTicket.data?.slaStatus}`
+    );
 
     // 6. Add Note & Update Ticket Status
     const ticketId = newTicket.data.id;
@@ -60,19 +68,25 @@ async function runApiTests() {
       })
     });
     const noteData = await noteRes.json();
-    console.log(`✅ [6/8] POST /api/tickets/:id/notes -> Status: ${noteRes.status}, Added Note: ${noteData.data?.id}`);
+    console.log(
+      `✅ [6/8] POST /api/tickets/:id/notes -> Status: ${noteRes.status}, Added Note: ${noteData.data?.id}`
+    );
 
     // 7. Knowledge Base & Agents
     const kbRes = await fetch(`${baseUrl}/knowledge-base?category=Getting%20Started`);
     const kbData = await kbRes.json();
     const agentsRes = await fetch(`${baseUrl}/users/agents`);
     const agentsData = await agentsRes.json();
-    console.log(`✅ [7/8] GET /api/knowledge-base & /api/users/agents -> KB Articles: ${kbData.data?.length}, Agents: ${agentsData.data?.length}`);
+    console.log(
+      `✅ [7/8] GET /api/knowledge-base & /api/users/agents -> KB Articles: ${kbData.data?.length}, Agents: ${agentsData.data?.length}`
+    );
 
     // 8. OpenAPI JSON Contract Endpoint
     const openapiRes = await fetch(`${baseUrl}/openapi.json`);
     const openapiData = await openapiRes.json();
-    console.log(`✅ [8/8] GET /api/openapi.json -> Status: ${openapiRes.status}, OpenAPI Version: ${openapiData.openapi}, Endpoints: ${Object.keys(openapiData.paths || {}).length}`);
+    console.log(
+      `✅ [8/8] GET /api/openapi.json -> Status: ${openapiRes.status}, OpenAPI Version: ${openapiData.openapi}, Endpoints: ${Object.keys(openapiData.paths || {}).length}`
+    );
 
     console.log('\n🎉 ALL 8 REST API INTEGRATION TESTS PASSED 100%!');
   } finally {

@@ -38,7 +38,11 @@
         "summary": "Get Paginated Customer Directory",
         "parameters": [
           { "name": "search", "in": "query", "schema": { "type": "string" } },
-          { "name": "tier", "in": "query", "schema": { "type": "string", "enum": ["ALL", "STANDARD", "VIP", "ENTERPRISE"] } },
+          {
+            "name": "tier",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ALL", "STANDARD", "VIP", "ENTERPRISE"] }
+          },
           { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
           { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
         ],
@@ -131,9 +135,27 @@
         "summary": "Get Omnichannel Filtered Ticket List",
         "parameters": [
           { "name": "search", "in": "query", "schema": { "type": "string" } },
-          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["ALL", "NEW", "OPEN", "PENDING", "RESOLVED", "CLOSED"] } },
-          { "name": "priority", "in": "query", "schema": { "type": "string", "enum": ["ALL", "LOW", "MEDIUM", "HIGH", "URGENT"] } },
-          { "name": "channel", "in": "query", "schema": { "type": "string", "enum": ["ALL", "EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS", "WEB_FORM"] } },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ALL", "NEW", "OPEN", "PENDING", "RESOLVED", "CLOSED"]
+            }
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ALL", "LOW", "MEDIUM", "HIGH", "URGENT"] }
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ALL", "EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS", "WEB_FORM"]
+            }
+          },
           { "name": "department", "in": "query", "schema": { "type": "string" } },
           { "name": "assignedAgentId", "in": "query", "schema": { "type": "string" } }
         ],
@@ -170,8 +192,16 @@
                   "title": { "type": "string" },
                   "description": { "type": "string" },
                   "customerId": { "type": "string" },
-                  "priority": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "URGENT"], "default": "MEDIUM" },
-                  "channel": { "type": "string", "enum": ["EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS", "WEB_FORM"], "default": "WEB_FORM" },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["LOW", "MEDIUM", "HIGH", "URGENT"],
+                    "default": "MEDIUM"
+                  },
+                  "channel": {
+                    "type": "string",
+                    "enum": ["EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS", "WEB_FORM"],
+                    "default": "WEB_FORM"
+                  },
                   "category": { "type": "string", "default": "General" },
                   "department": { "type": "string", "default": "Support" }
                 }
@@ -235,7 +265,10 @@
                 "type": "object",
                 "required": ["status"],
                 "properties": {
-                  "status": { "type": "string", "enum": ["NEW", "OPEN", "PENDING", "RESOLVED", "CLOSED"] },
+                  "status": {
+                    "type": "string",
+                    "enum": ["NEW", "OPEN", "PENDING", "RESOLVED", "CLOSED"]
+                  },
                   "actorName": { "type": "string" }
                 }
               }
@@ -303,7 +336,10 @@
                   "authorId": { "type": "string" },
                   "authorName": { "type": "string" },
                   "isInternal": { "type": "boolean", "default": false },
-                  "channel": { "type": "string", "enum": ["INTERNAL", "EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS"] }
+                  "channel": {
+                    "type": "string",
+                    "enum": ["INTERNAL", "EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS"]
+                  }
                 }
               }
             }

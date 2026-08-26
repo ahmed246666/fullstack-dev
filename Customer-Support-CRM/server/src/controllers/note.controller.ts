@@ -3,7 +3,9 @@ import { prisma } from '../db';
 
 export async function getTicketNotes(req: Request, res: Response): Promise<void> {
   try {
-    const ticketId = String(Array.isArray(req.params.ticketId) ? req.params.ticketId[0] : req.params.ticketId);
+    const ticketId = String(
+      Array.isArray(req.params.ticketId) ? req.params.ticketId[0] : req.params.ticketId
+    );
 
     const notes = await prisma.note.findMany({
       where: { ticketId },
@@ -24,8 +26,16 @@ export async function getTicketNotes(req: Request, res: Response): Promise<void>
 
 export async function addTicketNote(req: Request, res: Response): Promise<void> {
   try {
-    const ticketId = String(Array.isArray(req.params.ticketId) ? req.params.ticketId[0] : req.params.ticketId);
-    const { content, authorId, authorName = 'Agent', isInternal = false, channel = 'INTERNAL' } = req.body;
+    const ticketId = String(
+      Array.isArray(req.params.ticketId) ? req.params.ticketId[0] : req.params.ticketId
+    );
+    const {
+      content,
+      authorId,
+      authorName = 'Agent',
+      isInternal = false,
+      channel = 'INTERNAL'
+    } = req.body;
 
     if (!content || !content.trim()) {
       res.status(400).json({ success: false, error: 'Note content cannot be empty' });

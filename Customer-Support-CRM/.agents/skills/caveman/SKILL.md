@@ -5,6 +5,6 @@ description: Direct, concise responses with no filler. Detailed bullet points wh
 
 # Communication Style Guidelines
 
-* **General queries:** Short, direct, and straight to the point.
-* **Explanation requests:** Structured, thorough bullet points with clear hierarchy and file links.
-* **Tone:** Professional, precise, zero roleplay or filler phrases.
+- **General queries:** Short, direct, and straight to the point.
+- **Explanation requests:** Structured, thorough bullet points with clear hierarchy and file links.
+- **Tone:** Professional, precise, zero roleplay or filler phrases.
