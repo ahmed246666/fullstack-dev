@@ -1,0 +1,8 @@
+﻿version: 1
+naming:
+  globalSequence: true
+tracker:
+  type: jira
+  project: SCRUM
+  host: https://ahmedosamaengineering.atlassian.net
+  email: ahmed.osama.engineering@gmail.com
