@@ -100,6 +100,21 @@ export const api = {
     );
   },
 
+  getKnowledgeArticleBySlug: (slug: string) =>
+    fetchApi<{ success: boolean; data: any }>(`/knowledge-base/${slug}`),
+
+  createKnowledgeArticle: (data: any) =>
+    fetchApi<{ success: boolean; data: any }>('/knowledge-base', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+
+  voteKnowledgeArticle: (slug: string, isHelpful: boolean) =>
+    fetchApi<{ success: boolean; data: any }>(`/knowledge-base/${slug}/vote`, {
+      method: 'POST',
+      body: JSON.stringify({ isHelpful })
+    }),
+
   // Agents & Canned Responses
   getAgents: () => fetchApi<{ success: boolean; data: any[] }>('/users/agents'),
   getCannedResponses: () => fetchApi<{ success: boolean; data: any[] }>('/users/canned-responses'),

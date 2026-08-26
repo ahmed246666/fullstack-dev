@@ -2,68 +2,109 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpen, Search, ThumbsUp, ThumbsDown, Tag, Sparkles } from 'lucide-react';
+import {
+  BookOpen,
+  Search,
+  Plus,
+  ThumbsUp,
+  FolderOpen,
+  ArrowRight,
+  Sparkles,
+  Tag,
+  CheckCircle2
+} from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { api } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { ArticleModal } from '@/components/knowledge/ArticleModal';
+import { ArticleViewerModal } from '@/components/knowledge/ArticleViewerModal';
 
 export default function KnowledgeBasePage() {
   const { lang, t } = useLanguage();
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('ALL');
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [viewingArticle, setViewingArticle] = useState<any | null>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['kb-articles', search, category],
-    queryFn: () => api.getKnowledgeArticles({ search, category })
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['kb-articles', search, selectedCategory],
+    queryFn: () => api.getKnowledgeArticles({ search, category: selectedCategory })
   });
 
+  const articles = data?.data || [];
+
   const categories = [
-    'ALL',
-    'Getting Started',
-    'API & Integrations',
-    'Account & Billing',
-    'Troubleshooting'
+    { key: 'ALL', label: lang === 'ar' ? 'جميع التصنيفات' : 'All Categories' },
+    { key: 'Getting Started', label: lang === 'ar' ? 'البدء السريع' : 'Getting Started' },
+    {
+      key: 'API & Integrations',
+      label: lang === 'ar' ? 'واجهات البرمجة والربط' : 'API & Integrations'
+    },
+    {
+      key: 'Account & Billing',
+      label: lang === 'ar' ? 'الحسابات والاشتراكات' : 'Account & Billing'
+    },
+    { key: 'Troubleshooting', label: lang === 'ar' ? 'استكشاف الأخطاء وحلها' : 'Troubleshooting' }
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-emerald-400" />
-            <span>{t('navKnowledge')}</span>
+      {/* Top Hero Banner */}
+      <div className="p-8 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-indigo-950/40 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
+        <div className="space-y-2 max-w-xl">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Self-Service Knowledge Base</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
+            {lang === 'ar'
+              ? 'قاعدة المعرفة والمقالات الإرشادية'
+              : 'Knowledge Base & Troubleshooting Guides'}
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Searchable bilingual self-service guides, FAQs, and integration docs.
+          <p className="text-xs text-slate-400 leading-relaxed">
+            {lang === 'ar'
+              ? 'تصفح الحلول والأدلة المعتمدة ثنائية اللغة لتقليل وقت معالجة التذاكر وتسهيل الدعم الذاتي.'
+              : 'Browse verified bilingual guides, API specs, and resolution steps to accelerate agent workflows.'}
           </p>
         </div>
+
+        <Button onClick={() => setIsCreateOpen(true)} className="text-xs shrink-0">
+          <Plus className="w-4 h-4" />
+          <span>{lang === 'ar' ? 'نشر مقال جديد' : 'Publish Article'}</span>
+        </Button>
       </div>
 
-      {/* Search Header */}
-      <div className="p-8 rounded-3xl glass-panel bg-gradient-to-r from-emerald-950/20 via-slate-900 to-slate-950 border border-slate-800 text-center space-y-4">
-        <h2 className="text-xl font-bold text-white">How can we help you today?</h2>
-        <div className="max-w-xl mx-auto relative">
+      {/* Search & Category Filter Bar */}
+      <div className="space-y-4">
+        <div className="relative">
           <Search className="absolute left-4 rtl:right-4 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search FAQs, solutions, or guides..."
+            placeholder={
+              lang === 'ar'
+                ? 'ابحث في المقالات بالعنوان، المحتوى أو الوسوم...'
+                : 'Search articles by title, content, or tags...'
+            }
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-900/90 border border-slate-700 rounded-2xl pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-xl"
+            className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all shadow-inner"
           />
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+
+        {/* Category Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {categories.map((c) => (
             <button
-              key={c}
-              onClick={() => setCategory(c)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${
-                category === c
-                  ? 'bg-emerald-600 text-white border-emerald-500'
-                  : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-white'
+              key={c.key}
+              onClick={() => setSelectedCategory(c.key)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all whitespace-nowrap ${
+                selectedCategory === c.key
+                  ? 'bg-emerald-600 text-white border-emerald-500 shadow-md'
+                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
               }`}
             >
-              {c}
+              {c.label}
             </button>
           ))}
         </div>
@@ -71,39 +112,83 @@ export default function KnowledgeBasePage() {
 
       {/* Articles Grid */}
       {isLoading ? (
-        <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
-          Loading articles...
+        <div className="py-24 text-center text-xs text-slate-400 animate-pulse">
+          Loading Knowledge Base Articles...
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {(data?.data || []).map((article: any) => (
-            <Card key={article.id} className="glass-panel-hover p-6 flex flex-col justify-between">
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold mb-3">
-                  <Tag className="w-3 h-3" />
-                  <span>{article.category}</span>
-                </div>
-                <h3 className="font-bold text-slate-100 text-base mb-2">
-                  {lang === 'ar' ? article.titleAr || article.title : article.title}
-                </h3>
-                <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed mb-4">
-                  {lang === 'ar' ? article.contentAr || article.content : article.content}
-                </p>
-              </div>
+          {articles.map((article: any) => {
+            const title = lang === 'ar' ? article.titleAr || article.title : article.title;
+            const content = lang === 'ar' ? article.contentAr || article.content : article.content;
+            const tagsList =
+              typeof article.tags === 'string'
+                ? article.tags.split(',').map((t: string) => t.trim())
+                : [];
 
-              <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span className="text-[11px] text-slate-500">{article.tags}</span>
-                <div className="flex items-center gap-3 font-semibold text-emerald-400">
-                  <span className="flex items-center gap-1">
-                    <ThumbsUp className="w-3.5 h-3.5" />
-                    <span>+{article.helpfulVotes}</span>
+            return (
+              <Card
+                key={article.id}
+                onClick={() => setViewingArticle(article)}
+                className="p-5 flex flex-col justify-between glass-panel-hover border-slate-800/80 hover:border-emerald-500/50 cursor-pointer group transition-all"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 font-semibold text-[10px] border border-emerald-500/20">
+                      {article.category}
+                    </span>
+                    <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                      <ThumbsUp className="w-3 h-3 text-emerald-400" />
+                      <span>{article.helpfulCount ?? 0}</span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-bold text-slate-100 text-sm group-hover:text-emerald-400 transition-colors line-clamp-2">
+                    {title}
+                  </h3>
+
+                  <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">{content}</p>
+                </div>
+
+                <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {tagsList.slice(0, 2).map((tag: string, idx: number) => (
+                      <span key={idx} className="text-[10px] text-slate-500 font-mono">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <span className="font-semibold text-emerald-400 flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
+                    <span>Read Guide</span>
+                    <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                   </span>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
+
+          {articles.length === 0 && (
+            <div className="col-span-full py-20 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-3xl">
+              No knowledge base articles found matching your criteria.
+            </div>
+          )}
         </div>
       )}
+
+      {/* Article Creation Modal */}
+      <ArticleModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSuccess={() => refetch()}
+      />
+
+      {/* Article Viewer & Voting Modal */}
+      <ArticleViewerModal
+        article={viewingArticle}
+        isOpen={!!viewingArticle}
+        onClose={() => setViewingArticle(null)}
+        onVoted={() => refetch()}
+      />
     </div>
   );
 }
