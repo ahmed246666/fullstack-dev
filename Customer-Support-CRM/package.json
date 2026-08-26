@@ -4,6 +4,9 @@
   "description": "AZM Squad Enterprise Customer Support CRM Platform",
   "scripts": {
     "dev": "npm run server:dev",
+    "client:install": "cd client && npm install",
+    "client:dev": "cd client && npm run dev",
+    "client:build": "cd client && npm run build",
     "server:install": "cd server && npm install",
     "server:dev": "cd server && npm run dev",
     "server:build": "cd server && npm run build",
