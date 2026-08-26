@@ -1,8 +1,12 @@
-﻿version: 1
+version: 1
+project:
+  name: Customer-Support-CRM
+  language: typescript
 naming:
   globalSequence: true
 tracker:
   type: jira
   project: SCRUM
-  host: https://ahmedosamaengineering.atlassian.net
+  workspace: ahmedosamaengineering.atlassian.net
   email: ahmed.osama.engineering@gmail.com
+

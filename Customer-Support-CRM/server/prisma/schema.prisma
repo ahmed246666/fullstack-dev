@@ -7,38 +7,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum Role {
+enum UserRole {
   ADMIN
   AGENT
   CUSTOMER
-}
-
-enum Department {
-  TECHNICAL
-  BILLING
-  CUSTOMER_CARE
-  GENERAL
-}
-
-enum AgentStatus {
-  ONLINE
-  AWAY
-  OFFLINE
 }
 
 enum CustomerTier {
   STANDARD
   VIP
   ENTERPRISE
-}
-
-enum Channel {
-  EMAIL
-  WHATSAPP
-  LIVE_CHAT
-  SMS
-  WEB_FORM
-  INTERNAL
 }
 
 enum TicketStatus {
@@ -56,178 +34,138 @@ enum TicketPriority {
   URGENT
 }
 
-enum TicketCategory {
-  TECHNICAL
-  BILLING
-  FEATURE_REQUEST
-  GENERAL
-}
-
-enum InteractionType {
-  CUSTOMER_MESSAGE
-  AGENT_REPLY
-  INTERNAL_NOTE
-  STATUS_CHANGE
-  SLA_BREACH_ALERT
-  SYSTEM
-}
-
-enum AuthorType {
-  AGENT
-  CUSTOMER
-  SYSTEM
-  AI
+enum TicketChannel {
+  EMAIL
+  WHATSAPP
+  LIVE_CHAT
+  SMS
+  WEB_FORM
 }
 
 model User {
-  id           String      @id @default(cuid())
-  email        String      @unique
-  name         String
-  nameAr       String?
-  role         Role        @default(AGENT)
-  department   Department  @default(GENERAL)
-  status       AgentStatus @default(OFFLINE)
-  avatar       String?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-
-  assignedTickets Ticket[]   @relation("AgentAssignedTickets")
-  articles        KnowledgeBaseArticle[]
-  auditLogs       AuditLog[]
+  id              String         @id @default(uuid())
+  name            String
+  nameAr          String?
+  email           String         @unique
+  role            String         @default("AGENT") // ADMIN, AGENT, CUSTOMER
+  department      String?        // Support, Billing, Technical
+  status          String         @default("ACTIVE") // ACTIVE, INACTIVE
+  avatarUrl       String?
+  assignedTickets Ticket[]       @relation("AssignedAgent")
+  notes           Note[]         @relation("NoteAuthor")
+  auditLogs       AuditLog[]     @relation("AuditActor")
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 model Customer {
-  id             String       @id @default(cuid())
-  name           String
-  nameAr         String?
-  email          String       @unique
-  phone          String?
-  company        String?
-  tier           CustomerTier @default(STANDARD)
-  primaryChannel Channel      @default(EMAIL)
-  avatar         String?
-  tags           String?      // Stored as JSON string or comma-separated
-  customFields   String?      // JSON string for ERP & custom data
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-
-  tickets        Ticket[]
-  interactions   Interaction[]
+  id              String         @id @default(uuid())
+  name            String
+  nameAr          String?
+  email           String         @unique
+  phone           String?
+  company         String?
+  tier            String         @default("STANDARD") // STANDARD, VIP, ENTERPRISE
+  avatarUrl       String?
+  status          String         @default("ACTIVE") // ACTIVE, INACTIVE
+  preferredLang   String         @default("en") // en, ar
+  tickets         Ticket[]       @relation("CustomerTickets")
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 model Ticket {
-  id                 String         @id @default(cuid())
-  ticketNumber       String         @unique // e.g. TICK-1001
-  title              String
-  description        String
-  status             TicketStatus   @default(NEW)
-  priority           TicketPriority @default(MEDIUM)
-  category           TicketCategory @default(GENERAL)
-  channel            Channel        @default(WEB_FORM)
-  department         Department     @default(GENERAL)
+  id              String         @id @default(uuid())
+  ticketNumber    String         @unique // e.g. TCK-1001
+  title           String
+  description     String
+  status          String         @default("NEW") // NEW, OPEN, PENDING, RESOLVED, CLOSED
+  priority        String         @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  channel         String         @default("WEB_FORM") // EMAIL, WHATSAPP, LIVE_CHAT, SMS, WEB_FORM
+  category        String         @default("General") // Technical, Billing, General, Inquiries
+  department      String         @default("Support") // Support, Billing, Technical
   
-  customerId         String
-  customer           Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  // Relations
+  customerId      String
+  customer        Customer       @relation("CustomerTickets", fields: [customerId], references: [id], onDelete: Cascade)
   
-  assignedAgentId    String?
-  assignedAgent      User?          @relation("AgentAssignedTickets", fields: [assignedAgentId], references: [id], onDelete: SetNull)
-
-  slaResponseDue     DateTime?
-  slaResolutionDue   DateTime?
-  firstRespondedAt   DateTime?
-  resolvedAt         DateTime?
-  closedAt           DateTime?
+  assignedAgentId String?
+  assignedAgent   User?          @relation("AssignedAgent", fields: [assignedAgentId], references: [id], onDelete: SetNull)
   
-  csatRating         Int?           // 1 to 5
-  csatFeedback       String?
+  notes           Note[]         @relation("TicketNotes")
   
-  aiSummary          String?
-  aiSuggestedReplies String?        // JSON array string
-  aiUrgencyScore     Int?           // 1 to 100
-  tags               String?        // comma-separated tags
+  // SLA & Timestamps
+  responseDueAt   DateTime?
+  resolutionDueAt DateTime?
+  firstResponseAt DateTime?
+  resolvedAt      DateTime?
   
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
-
-  interactions       Interaction[]
+  // Customer Feedback / CSAT
+  csatRating      Int?           // 1 to 5 stars
+  csatFeedback    String?
+  
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
-model Interaction {
-  id             String          @id @default(cuid())
-  ticketId       String
-  ticket         Ticket          @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+model Note {
+  id              String         @id @default(uuid())
+  ticketId        String
+  ticket          Ticket         @relation("TicketNotes", fields: [ticketId], references: [id], onDelete: Cascade)
   
-  customerId     String?
-  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
-
-  type           InteractionType @default(CUSTOMER_MESSAGE)
-  content        String
-  authorType     AuthorType      @default(CUSTOMER)
-  authorId       String?         // User ID or Customer ID
-  authorName     String?
-  channel        Channel         @default(WEB_FORM)
-  attachments    String?         // JSON array of URLs
-  isInternalOnly Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-}
-
-model KnowledgeBaseArticle {
-  id             String      @id @default(cuid())
-  title          String
-  titleAr        String?
-  slug           String      @unique
-  category       String      // GETTING_STARTED, BILLING, TECHNICAL, etc.
-  content        String
-  contentAr      String?
-  excerpt        String?
-  helpfulCount   Int         @default(0)
-  notHelpfulCount Int        @default(0)
-  isPublished    Boolean     @default(true)
+  authorId        String?
+  author          User?          @relation("NoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  authorName      String
   
-  authorId       String?
-  author         User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
-
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-}
-
-model CannedReply {
-  id         String   @id @default(cuid())
-  shortcut   String   @unique // e.g. "/greet", "/sla-delay"
-  title      String
-  titleAr    String?
-  content    String
-  contentAr  String?
-  category   String   @default("GENERAL")
-  createdAt  DateTime @default(now())
+  content         String
+  isInternal      Boolean        @default(false)
+  channel         String?        // EMAIL, WHATSAPP, LIVE_CHAT, SMS, INTERNAL
+  
+  createdAt       DateTime       @default(now())
 }
 
 model SLAConfig {
-  id                          String         @id @default(cuid())
-  priority                    TicketPriority @unique
-  responseTimeMinutes         Int
-  resolutionTimeMinutes       Int
-  escalationThresholdMinutes  Int
-  createdAt                   DateTime       @default(now())
-  updatedAt                   DateTime       @updatedAt
+  id                  String     @id @default(uuid())
+  priority            String     @unique // LOW, MEDIUM, HIGH, URGENT
+  responseTimeHours   Float      // e.g. 1.0 (1 hour for urgent)
+  resolutionTimeHours Float      // e.g. 4.0 (4 hours for urgent)
+  escalationRole      String     @default("ADMIN")
+}
+
+model KnowledgeArticle {
+  id              String         @id @default(uuid())
+  slug            String         @unique
+  title           String
+  titleAr         String?
+  content         String
+  contentAr       String?
+  category        String         // Getting Started, Account & Billing, Troubleshooting, API & Integrations
+  tags            String?        // Comma-separated tags
+  helpfulVotes    Int            @default(0)
+  unhelpfulVotes  Int            @default(0)
+  isPublished     Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 model AuditLog {
-  id         String   @id @default(cuid())
-  action     String
-  entityType String
-  entityId   String?
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  details    String?  // JSON string of changes
-  ipAddress  String?
-  createdAt  DateTime @default(now())
+  id              String         @id @default(uuid())
+  actorId         String?
+  actor           User?          @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  actorName       String
+  action          String         // CREATE_TICKET, UPDATE_STATUS, ASSIGN_AGENT, ADD_NOTE, UPDATE_CUSTOMER
+  entity          String         // Ticket, Customer, User, SLAConfig
+  entityId        String
+  details         String?        // JSON or textual diff details
+  createdAt       DateTime       @default(now())
 }
 
-model SystemSetting {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     String
-  category  String   @default("GENERAL")
-  updatedAt DateTime @updatedAt
+model CannedResponse {
+  id              String         @id @default(uuid())
+  shortcut        String         @unique // e.g. /greeting, /resolve, /more-info
+  title           String
+  titleAr         String?
+  content         String
+  contentAr       String?
+  category        String         @default("General") // Greetings, Troubleshooting, Billing, Closures
 }

@@ -1,19 +1,22 @@
 {
   "name": "customer-support-crm",
   "version": "1.0.0",
-  "private": true,
-  "description": "AZM Squad Customer Support CRM - Enterprise Full-Stack Platform",
-  "workspaces": [
-    "server",
-    "client"
-  ],
+  "description": "AZM Squad Enterprise Customer Support CRM Platform",
   "scripts": {
-    "server:dev": "npm run dev --workspace=server",
-    "client:dev": "npm run dev --workspace=client",
-    "prisma:migrate": "npm run prisma:migrate --workspace=server",
-    "prisma:seed": "npm run prisma:seed --workspace=server",
-    "prisma:studio": "npm run prisma:studio --workspace=server",
-    "openapi:generate": "npm run openapi:generate --workspace=server"
+    "dev": "npm run server:dev",
+    "server:install": "cd server && npm install",
+    "server:dev": "cd server && npm run dev",
+    "server:build": "cd server && npm run build",
+    "server:db:push": "cd server && npm run prisma:push",
+    "server:db:generate": "cd server && npm run prisma:generate",
+    "server:db:seed": "cd server && npm run prisma:seed",
+    "server:db:studio": "cd server && npx prisma studio",
+    "jira:list": "node jira.js list",
+    "jira:sprints": "node jira.js sprints",
+    "jira:sprint:issues": "node jira.js sprint-issues 1",
+    "squad:status": "npx squad-kit status",
+    "squad:list": "npx squad-kit list",
+    "squad:doctor": "npx squad-kit doctor"
   },
   "keywords": [
     "crm",
@@ -22,9 +25,8 @@
     "express",
     "prisma",
     "typescript",
-    "openapi",
-    "react-query"
+    "openapi"
   ],
   "author": "AZM Squad",
-  "license": "MIT"
+  "license": "ISC"
 }

@@ -1,7 +1,5 @@
-# Plans index
+# Squad Plans Index
 
-One row per feature folder under `.squad/plans/`. `NN` continues as a global execution sequence across all features when `naming.globalSequence` is `true` in `config.yaml`.
-
-| Feature | Overview | NN range |
-|---------|----------|----------|
-| _add rows per feature_ |
+| Feature Slug | Display Name | Stories | Status |
+| :--- | :--- | :--- | :--- |
+| `crm-database` | Prisma ORM & Database Schema | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-database/00-overview.md) | In Progress |
