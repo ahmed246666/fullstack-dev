@@ -31,6 +31,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
 import { CSATModal } from '@/components/sla/CSATModal';
+import { AICopilotWidget } from '@/components/ai/AICopilotWidget';
 
 interface TicketDrawerProps {
   ticketId: string | null;
@@ -280,6 +281,9 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
                   )}
                 </div>
               </div>
+
+              {/* AI Support Copilot */}
+              <AICopilotWidget ticket={ticket} onApplyDraft={(draft) => setReplyText(draft)} />
 
               {/* Reply / Note Composer */}
               <form onSubmit={handleSendNote} className="space-y-3 pt-4 border-t border-slate-800">

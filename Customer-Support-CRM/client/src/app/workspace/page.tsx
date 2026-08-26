@@ -33,6 +33,7 @@ import {
 import { CannedResponsesBar } from '@/components/workspace/CannedResponsesBar';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
 import { CSATModal } from '@/components/sla/CSATModal';
+import { AICopilotWidget } from '@/components/ai/AICopilotWidget';
 
 export default function WorkspacePage() {
   const { lang, t } = useLanguage();
@@ -299,6 +300,12 @@ export default function WorkspacePage() {
                   )}
                 </div>
               </div>
+
+              {/* AI Support Copilot */}
+              <AICopilotWidget
+                ticket={activeTicket}
+                onApplyDraft={(draft) => setReplyText(draft)}
+              />
 
               {/* 1-Click Canned Responses Bar */}
               <div className="pt-2">
