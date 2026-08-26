@@ -7,4 +7,5 @@
 | `crm-frontend` | Next.js 15 App Shell & RTL Platform | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-frontend/00-overview.md) | Done |
 | `crm-customers` | Customer 360 & Interaction Timeline | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-customers/00-overview.md) | Done |
 | `crm-tickets` | Omnichannel Tickets & Kanban Board | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-tickets/00-overview.md) | Done |
-| `crm-sla` | SLA Calculation Engine & CSAT Feedback | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-sla/00-overview.md) | In Progress |
+| `crm-sla` | SLA Calculation Engine & CSAT Feedback | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-sla/00-overview.md) | Done |
+| `crm-workspace` | Agent Workspace & Canned Responses | [00-overview.md](file:///c:/Users/user/Desktop/Projects%20AZM/fullstack/fullstack-dev/Customer-Support-CRM/.squad/plans/crm-workspace/00-overview.md) | In Progress |
