@@ -1,0 +1,284 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import {
+  X,
+  Building2,
+  Mail,
+  Send,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  User,
+  ShieldCheck,
+  MessageSquare,
+  Sparkles,
+  Lock,
+  Globe
+} from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+import { useAgent } from '@/context/AgentContext';
+import { api } from '@/lib/api';
+import {
+  TierBadge,
+  StatusBadge,
+  PriorityBadge,
+  ChannelBadge,
+  SLABadge
+} from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+
+interface TicketDrawerProps {
+  ticketId: string | null;
+  onClose: () => void;
+  onUpdated?: () => void;
+}
+
+export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps) {
+  const { lang, t } = useLanguage();
+  const { currentAgent } = useAgent();
+  const [replyText, setReplyText] = useState('');
+  const [isInternal, setIsInternal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusUpdating, setStatusUpdating] = useState(false);
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['ticket-detail', ticketId],
+    queryFn: () => api.getTicketById(ticketId!),
+    enabled: !!ticketId
+  });
+
+  if (!ticketId) return null;
+
+  const ticket = data?.data;
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!ticket) return;
+    try {
+      setStatusUpdating(true);
+      await api.updateTicketStatus(ticket.id, newStatus, currentAgent.name);
+      refetch();
+      onUpdated?.();
+    } catch (err: any) {
+      alert(err.message || 'Failed to update status');
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
+
+  const handleSendNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ticket || !replyText.trim()) return;
+
+    try {
+      setIsSubmitting(true);
+      await api.addTicketNote(ticket.id, {
+        content: replyText.trim(),
+        authorName: lang === 'ar' ? currentAgent.nameAr : currentAgent.name,
+        isInternal,
+        channel: ticket.channel
+      });
+      setReplyText('');
+      refetch();
+      onUpdated?.();
+    } catch (err: any) {
+      alert(err.message || 'Failed to add note');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* Drawer Panel */}
+      <div className="absolute inset-y-0 right-0 rtl:left-0 rtl:right-auto max-w-full flex pl-10 rtl:pl-0 rtl:pr-10">
+        <div className="w-screen max-w-2xl glass-panel bg-slate-950/95 border-l rtl:border-r rtl:border-l-0 border-slate-800 p-6 md:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right rtl:slide-in-from-left duration-200">
+          {isLoading ? (
+            <div className="py-24 text-center text-xs text-slate-400 animate-pulse">
+              Loading Ticket Details...
+            </div>
+          ) : ticket ? (
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex items-start justify-between pb-4 border-b border-slate-800">
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span className="font-mono text-sm font-extrabold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-lg border border-indigo-500/20">
+                      {ticket.ticketNumber}
+                    </span>
+                    <ChannelBadge channel={ticket.channel} />
+                    <PriorityBadge priority={ticket.priority} />
+                    <SLABadge slaStatus={ticket.slaStatus} />
+                  </div>
+                  <h2 className="text-xl font-bold text-white mt-2 leading-snug">{ticket.title}</h2>
+                  <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                    <span>
+                      Customer:{' '}
+                      <strong className="text-slate-200">
+                        {lang === 'ar'
+                          ? ticket.customer?.nameAr || ticket.customer?.name
+                          : ticket.customer?.name}
+                      </strong>
+                    </span>
+                    <span>•</span>
+                    <span>{ticket.customer?.company || 'Direct'}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-900 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Status and Assignment Control Bar */}
+              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Ticket Status
+                  </label>
+                  <select
+                    value={ticket.status}
+                    onChange={(e) => handleStatusChange(e.target.value)}
+                    disabled={statusUpdating}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 font-semibold outline-none focus:border-indigo-500"
+                  >
+                    <option value="NEW">New (Unassigned)</option>
+                    <option value="OPEN">Open (In Progress)</option>
+                    <option value="PENDING">Pending (Waiting on Customer)</option>
+                    <option value="RESOLVED">Resolved</option>
+                    <option value="CLOSED">Closed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Assigned Agent
+                  </label>
+                  <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-950 border border-slate-800 text-xs">
+                    <User className="w-4 h-4 text-indigo-400" />
+                    <span className="font-semibold text-slate-200">
+                      {ticket.assignedAgent
+                        ? lang === 'ar'
+                          ? ticket.assignedAgent.nameAr
+                          : ticket.assignedAgent.name
+                        : 'Sara Al-Ghamdi (Auto-Assigned)'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Issue Description Box */}
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
+                <div className="font-bold text-indigo-400 mb-1 flex items-center justify-between">
+                  <span>Initial Support Request</span>
+                  <span className="text-[10px] text-slate-500">
+                    {new Date(ticket.createdAt).toLocaleString()}
+                  </span>
+                </div>
+                <p className="leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+              </div>
+
+              {/* Conversation & Notes Activity Thread */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Conversation & Internal Notes ({ticket.notes?.length || 0})</span>
+                  </h3>
+                </div>
+
+                <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                  {(ticket.notes || []).map((note: any) => (
+                    <div
+                      key={note.id}
+                      className={`p-3.5 rounded-2xl border text-xs ${
+                        note.isInternal
+                          ? 'bg-amber-950/20 border-amber-800/40 text-amber-200'
+                          : 'bg-slate-900/80 border-slate-800 text-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-[11px] mb-1.5 pb-1 border-b border-slate-800/60">
+                        <div className="flex items-center gap-1.5 font-bold">
+                          {note.isInternal ? (
+                            <span className="flex items-center gap-1 text-amber-400">
+                              <Lock className="w-3 h-3" />
+                              <span>Internal Note: {note.authorName}</span>
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-indigo-400">
+                              <Globe className="w-3 h-3" />
+                              <span>Public Reply: {note.authorName}</span>
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          {new Date(note.createdAt).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="leading-relaxed whitespace-pre-wrap">{note.content}</p>
+                    </div>
+                  ))}
+                  {(ticket.notes || []).length === 0 && (
+                    <div className="py-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+                      No replies or internal notes added yet.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Reply / Note Composer */}
+              <form onSubmit={handleSendNote} className="space-y-3 pt-4 border-t border-slate-800">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-300">Add Message / Reply</span>
+                  <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isInternal}
+                      onChange={(e) => setIsInternal(e.target.checked)}
+                      className="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0"
+                    />
+                    <span className="text-amber-400 font-semibold">Private Internal Note</span>
+                  </label>
+                </div>
+                <textarea
+                  rows={3}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder={
+                    isInternal
+                      ? 'Add private note for support agents...'
+                      : 'Type public reply to send to customer...'
+                  }
+                  className={`w-full p-3 rounded-2xl text-xs outline-none border transition-all ${
+                    isInternal
+                      ? 'bg-amber-950/20 border-amber-800/50 text-amber-100 placeholder-amber-400/50'
+                      : 'bg-slate-900 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-indigo-500'
+                  }`}
+                  required
+                />
+                <div className="flex justify-end">
+                  <Button type="submit" isLoading={isSubmitting} size="sm">
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{isInternal ? 'Save Internal Note' : 'Send Public Reply'}</span>
+                  </Button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <div className="text-center text-xs text-rose-400">Ticket not found</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
