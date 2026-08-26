@@ -1,15 +1,26 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Globe, Bell, ChevronDown, ShieldCheck, Sparkles, Sliders } from 'lucide-react';
+import {
+  Search,
+  Globe,
+  Bell,
+  ChevronDown,
+  ShieldCheck,
+  Sparkles,
+  Sliders,
+  History
+} from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
 import { SLAPolicyDrawer } from '@/components/sla/SLAPolicyDrawer';
+import { AuditLogsDrawer } from '@/components/admin/AuditLogsDrawer';
 
 export function Header() {
   const { lang, toggleLanguage, t } = useLanguage();
-  const { currentAgent, agents, switchAgent } = useAgent();
+  const { currentAgent, agents, isAdmin, switchAgent } = useAgent();
   const [isSLAPolicyOpen, setIsSLAPolicyOpen] = useState(false);
+  const [isAuditLogsOpen, setIsAuditLogsOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 glass-panel border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
@@ -27,16 +38,35 @@ export function Header() {
 
       {/* Right Actions: SLA Ticker, Language Toggle, Agent Switcher */}
       <div className="flex items-center gap-3">
-        {/* SLA Status & Config Button */}
-        <button
-          onClick={() => setIsSLAPolicyOpen(true)}
-          className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/40 border border-emerald-800/40 text-emerald-400 text-xs font-semibold transition-colors"
-          title="Configure SLA Policy Targets"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>SLA Engine Active</span>
-          <Sliders className="w-3 h-3 text-emerald-400 ml-1 rtl:mr-1 rtl:ml-0" />
-        </button>
+        {/* Admin Audit Trail Button */}
+        {isAdmin && (
+          <button
+            onClick={() => setIsAuditLogsOpen(true)}
+            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-800/40 text-purple-300 text-xs font-semibold transition-colors"
+            title="System Audit Log Trail"
+          >
+            <History className="w-3.5 h-3.5 text-purple-400" />
+            <span>Audit Trail</span>
+          </button>
+        )}
+
+        {/* SLA Status & Config Button (Admin Only) */}
+        {isAdmin ? (
+          <button
+            onClick={() => setIsSLAPolicyOpen(true)}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/40 border border-emerald-800/40 text-emerald-400 text-xs font-semibold transition-colors"
+            title="Configure SLA Policy Targets"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>SLA Engine</span>
+            <Sliders className="w-3 h-3 text-emerald-400 ml-1 rtl:mr-1 rtl:ml-0" />
+          </button>
+        ) : (
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-xs font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span>SLA Active (Agent View)</span>
+          </div>
+        )}
 
         {/* Language Switcher */}
         <button
@@ -98,6 +128,9 @@ export function Header() {
 
       {/* SLA Policy Config Drawer */}
       <SLAPolicyDrawer isOpen={isSLAPolicyOpen} onClose={() => setIsSLAPolicyOpen(false)} />
+
+      {/* Audit Logs Drawer */}
+      <AuditLogsDrawer isOpen={isAuditLogsOpen} onClose={() => setIsAuditLogsOpen(false)} />
     </header>
   );
 }

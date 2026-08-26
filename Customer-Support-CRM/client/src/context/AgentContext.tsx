@@ -58,6 +58,7 @@ const DEFAULT_AGENTS: AgentUser[] = [
 interface AgentContextType {
   currentAgent: AgentUser;
   agents: AgentUser[];
+  isAdmin: boolean;
   switchAgent: (agentId: string) => void;
 }
 
@@ -73,8 +74,10 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const isAdmin = currentAgent.role === 'ADMIN';
+
   return (
-    <AgentContext.Provider value={{ currentAgent, agents: DEFAULT_AGENTS, switchAgent }}>
+    <AgentContext.Provider value={{ currentAgent, agents: DEFAULT_AGENTS, isAdmin, switchAgent }}>
       {children}
     </AgentContext.Provider>
   );

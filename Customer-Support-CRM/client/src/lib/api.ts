@@ -135,5 +135,8 @@ export const api = {
     fetchApi<{ success: boolean; data: any }>(`/users/sla-policies/${priority}`, {
       method: 'PUT',
       body: JSON.stringify(data)
-    })
+    }),
+
+  // Audit Logs
+  getAuditLogs: () => fetchApi<{ success: boolean; data: any[] }>('/users/audit-logs')
 };
