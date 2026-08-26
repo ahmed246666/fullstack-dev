@@ -7,6 +7,7 @@
     "server:install": "cd server && npm install",
     "server:dev": "cd server && npm run dev",
     "server:build": "cd server && npm run build",
+    "server:test": "cd server && npm run test",
     "server:db:push": "cd server && npm run prisma:push",
     "server:db:generate": "cd server && npm run prisma:generate",
     "server:db:seed": "cd server && npm run prisma:seed",

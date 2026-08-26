@@ -1,0 +1,482 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AZM Customer Support CRM API",
+    "version": "1.0.0",
+    "description": "Enterprise Full-Stack Customer Support CRM REST API with OpenAPI & TypeScript integration."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check Endpoint",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "timestamp": { "type": "string", "example": "2026-08-26T17:00:00.000Z" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers": {
+      "get": {
+        "summary": "Get Paginated Customer Directory",
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "tier", "in": "query", "schema": { "type": "string", "enum": ["ALL", "STANDARD", "VIP", "ENTERPRISE"] } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of customers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Customer" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a New Customer Profile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "nameAr": { "type": "string" },
+                  "email": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "company": { "type": "string" },
+                  "tier": { "type": "string", "enum": ["STANDARD", "VIP", "ENTERPRISE"] },
+                  "preferredLang": { "type": "string", "enum": ["en", "ar"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Customer created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/Customer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers/{id}": {
+      "get": {
+        "summary": "Get Customer 360 Profile and History",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer profile details with tickets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/CustomerProfile" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets": {
+      "get": {
+        "summary": "Get Omnichannel Filtered Ticket List",
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["ALL", "NEW", "OPEN", "PENDING", "RESOLVED", "CLOSED"] } },
+          { "name": "priority", "in": "query", "schema": { "type": "string", "enum": ["ALL", "LOW", "MEDIUM", "HIGH", "URGENT"] } },
+          { "name": "channel", "in": "query", "schema": { "type": "string", "enum": ["ALL", "EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS", "WEB_FORM"] } },
+          { "name": "department", "in": "query", "schema": { "type": "string" } },
+          { "name": "assignedAgentId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filtered tickets list with SLA calculations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Ticket" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create New Ticket with Auto-SLA Deadlines",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "description", "customerId"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "customerId": { "type": "string" },
+                  "priority": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "URGENT"], "default": "MEDIUM" },
+                  "channel": { "type": "string", "enum": ["EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS", "WEB_FORM"], "default": "WEB_FORM" },
+                  "category": { "type": "string", "default": "General" },
+                  "department": { "type": "string", "default": "Support" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/Ticket" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{id}": {
+      "get": {
+        "summary": "Get Ticket by ID or Ticket Number",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/TicketDetail" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{id}/status": {
+      "patch": {
+        "summary": "Update Ticket Workflow Status",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": { "type": "string", "enum": ["NEW", "OPEN", "PENDING", "RESOLVED", "CLOSED"] },
+                  "actorName": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/Ticket" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/notes": {
+      "get": {
+        "summary": "Get Notes for Ticket",
+        "parameters": [
+          { "name": "ticketId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of notes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Note" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add Note or Reply to Ticket",
+        "parameters": [
+          { "name": "ticketId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["content"],
+                "properties": {
+                  "content": { "type": "string" },
+                  "authorId": { "type": "string" },
+                  "authorName": { "type": "string" },
+                  "isInternal": { "type": "boolean", "default": false },
+                  "channel": { "type": "string", "enum": ["INTERNAL", "EMAIL", "WHATSAPP", "LIVE_CHAT", "SMS"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Note added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/Note" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/agents": {
+      "get": {
+        "summary": "List Active Support Agents",
+        "responses": {
+          "200": {
+            "description": "List of agents",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/User" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/analytics": {
+      "get": {
+        "summary": "Get Executive KPI Metrics & SLA Breakdown",
+        "responses": {
+          "200": {
+            "description": "KPI analytics data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "totalTickets": { "type": "integer" },
+                        "openTickets": { "type": "integer" },
+                        "resolvedTickets": { "type": "integer" },
+                        "customersCount": { "type": "integer" },
+                        "slaComplianceRate": { "type": "number" },
+                        "averageCSAT": { "type": "number" },
+                        "channelDistribution": { "type": "object" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "nameAr": { "type": "string", "nullable": true },
+          "email": { "type": "string" },
+          "phone": { "type": "string", "nullable": true },
+          "company": { "type": "string", "nullable": true },
+          "tier": { "type": "string" },
+          "status": { "type": "string" },
+          "preferredLang": { "type": "string" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "CustomerProfile": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Customer" },
+          {
+            "type": "object",
+            "properties": {
+              "tickets": { "type": "array", "items": { "$ref": "#/components/schemas/Ticket" } },
+              "stats": {
+                "type": "object",
+                "properties": {
+                  "totalTickets": { "type": "integer" },
+                  "openTickets": { "type": "integer" },
+                  "resolvedTickets": { "type": "integer" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "ticketNumber": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string" },
+          "priority": { "type": "string" },
+          "channel": { "type": "string" },
+          "category": { "type": "string" },
+          "department": { "type": "string" },
+          "customerId": { "type": "string" },
+          "assignedAgentId": { "type": "string", "nullable": true },
+          "slaStatus": { "type": "string" },
+          "responseDueAt": { "type": "string", "nullable": true },
+          "resolutionDueAt": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "TicketDetail": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Ticket" },
+          {
+            "type": "object",
+            "properties": {
+              "customer": { "$ref": "#/components/schemas/Customer" },
+              "assignedAgent": { "$ref": "#/components/schemas/User", "nullable": true },
+              "notes": { "type": "array", "items": { "$ref": "#/components/schemas/Note" } }
+            }
+          }
+        ]
+      },
+      "Note": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "ticketId": { "type": "string" },
+          "content": { "type": "string" },
+          "authorName": { "type": "string" },
+          "isInternal": { "type": "boolean" },
+          "channel": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "nameAr": { "type": "string", "nullable": true },
+          "email": { "type": "string" },
+          "role": { "type": "string" },
+          "department": { "type": "string", "nullable": true },
+          "avatarUrl": { "type": "string", "nullable": true }
+        }
+      }
+    }
+  }
+}
