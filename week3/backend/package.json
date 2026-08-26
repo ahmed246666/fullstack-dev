@@ -1,0 +1,20 @@
+{
+  "name": "week3-express-backend",
+  "version": "1.0.0",
+  "description": "Week 3 Node.js & Express REST API with SQLite database persistence",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test tests/api.test.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "author": "Ahmed Osama",
+  "license": "ISC"
+}
