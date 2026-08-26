@@ -1,13 +1,15 @@
 'use client';
 
-import React from 'react';
-import { Search, Globe, Bell, ChevronDown, ShieldCheck, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Globe, Bell, ChevronDown, ShieldCheck, Sparkles, Sliders } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
+import { SLAPolicyDrawer } from '@/components/sla/SLAPolicyDrawer';
 
 export function Header() {
   const { lang, toggleLanguage, t } = useLanguage();
   const { currentAgent, agents, switchAgent } = useAgent();
+  const [isSLAPolicyOpen, setIsSLAPolicyOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 glass-panel border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
@@ -24,12 +26,17 @@ export function Header() {
       </div>
 
       {/* Right Actions: SLA Ticker, Language Toggle, Agent Switcher */}
-      <div className="flex items-center gap-4">
-        {/* SLA Status Badge */}
-        <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 text-xs font-semibold">
+      <div className="flex items-center gap-3">
+        {/* SLA Status & Config Button */}
+        <button
+          onClick={() => setIsSLAPolicyOpen(true)}
+          className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/40 border border-emerald-800/40 text-emerald-400 text-xs font-semibold transition-colors"
+          title="Configure SLA Policy Targets"
+        >
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>SLA: 100% On-Track</span>
-        </div>
+          <span>SLA Engine Active</span>
+          <Sliders className="w-3 h-3 text-emerald-400 ml-1 rtl:mr-1 rtl:ml-0" />
+        </button>
 
         {/* Language Switcher */}
         <button
@@ -88,6 +95,9 @@ export function Header() {
           </div>
         </div>
       </div>
+
+      {/* SLA Policy Config Drawer */}
+      <SLAPolicyDrawer isOpen={isSLAPolicyOpen} onClose={() => setIsSLAPolicyOpen(false)} />
     </header>
   );
 }

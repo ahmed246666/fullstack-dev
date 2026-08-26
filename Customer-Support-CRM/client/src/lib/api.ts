@@ -102,5 +102,23 @@ export const api = {
 
   // Agents & Canned Responses
   getAgents: () => fetchApi<{ success: boolean; data: any[] }>('/users/agents'),
-  getCannedResponses: () => fetchApi<{ success: boolean; data: any[] }>('/users/canned-responses')
+  getCannedResponses: () => fetchApi<{ success: boolean; data: any[] }>('/users/canned-responses'),
+
+  // SLA & CSAT
+  submitCSAT: (ticketId: string, data: { rating: number; feedback?: string }) =>
+    fetchApi<{ success: boolean; data: any }>(`/tickets/${ticketId}/csat`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+
+  getSLAPolicies: () => fetchApi<{ success: boolean; data: any[] }>('/users/sla-policies'),
+
+  updateSLAPolicy: (
+    priority: string,
+    data: { responseTimeHours: number; resolutionTimeHours: number }
+  ) =>
+    fetchApi<{ success: boolean; data: any }>(`/users/sla-policies/${priority}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
 };

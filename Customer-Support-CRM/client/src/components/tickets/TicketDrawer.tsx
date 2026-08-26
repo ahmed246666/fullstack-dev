@@ -15,7 +15,8 @@ import {
   MessageSquare,
   Sparkles,
   Lock,
-  Globe
+  Globe,
+  Star
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
@@ -28,6 +29,8 @@ import {
   SLABadge
 } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
+import { CSATModal } from '@/components/sla/CSATModal';
 
 interface TicketDrawerProps {
   ticketId: string | null;
@@ -42,6 +45,7 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
   const [isInternal, setIsInternal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const [isCSATOpen, setIsCSATOpen] = useState(false);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['ticket-detail', ticketId],
@@ -60,6 +64,9 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
       await api.updateTicketStatus(ticket.id, newStatus, currentAgent.name);
       refetch();
       onUpdated?.();
+      if (newStatus === 'RESOLVED') {
+        setIsCSATOpen(true);
+      }
     } catch (err: any) {
       alert(err.message || 'Failed to update status');
     } finally {
@@ -116,6 +123,10 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
                     <ChannelBadge channel={ticket.channel} />
                     <PriorityBadge priority={ticket.priority} />
                     <SLABadge slaStatus={ticket.slaStatus} />
+                    <SLACountdownTimer
+                      resolutionDueAt={ticket.resolutionDueAt}
+                      status={ticket.status}
+                    />
                   </div>
                   <h2 className="text-xl font-bold text-white mt-2 leading-snug">{ticket.title}</h2>
                   <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
@@ -155,7 +166,7 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
                     <option value="NEW">New (Unassigned)</option>
                     <option value="OPEN">Open (In Progress)</option>
                     <option value="PENDING">Pending (Waiting on Customer)</option>
-                    <option value="RESOLVED">Resolved</option>
+                    <option value="RESOLVED">Resolved (Complete)</option>
                     <option value="CLOSED">Closed</option>
                   </select>
                 </div>
@@ -177,6 +188,40 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
                 </div>
               </div>
 
+              {/* CSAT Feedback Banner (If Rated or Resolved) */}
+              {ticket.csatRating ? (
+                <div className="p-3.5 rounded-2xl bg-purple-950/20 border border-purple-800/40 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    <span className="font-bold text-slate-200">Customer CSAT Score:</span>
+                    <span className="font-extrabold text-amber-300">
+                      {ticket.csatRating} / 5 Stars
+                    </span>
+                  </div>
+                  {ticket.csatFeedback && (
+                    <span className="text-slate-400 italic text-[11px] truncate max-w-xs">
+                      &quot;{ticket.csatFeedback}&quot;
+                    </span>
+                  )}
+                </div>
+              ) : ticket.status === 'RESOLVED' ? (
+                <div className="p-3.5 rounded-2xl bg-amber-950/20 border border-amber-800/40 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amber-400" />
+                    <span className="text-amber-200 font-semibold">
+                      Ready for Customer CSAT Survey
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => setIsCSATOpen(true)}
+                    className="text-[11px] py-1 bg-amber-600 hover:bg-amber-500 text-white"
+                  >
+                    Rate Service
+                  </Button>
+                </div>
+              ) : null}
+
               {/* Issue Description Box */}
               <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
                 <div className="font-bold text-indigo-400 mb-1 flex items-center justify-between">
@@ -197,7 +242,7 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
                   </h3>
                 </div>
 
-                <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                   {(ticket.notes || []).map((note: any) => (
                     <div
                       key={note.id}
@@ -279,6 +324,17 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
           )}
         </div>
       </div>
+
+      {/* CSAT Modal */}
+      <CSATModal
+        isOpen={isCSATOpen}
+        ticket={ticket}
+        onClose={() => setIsCSATOpen(false)}
+        onSuccess={() => {
+          refetch();
+          onUpdated?.();
+        }}
+      />
     </div>
   );
 }
