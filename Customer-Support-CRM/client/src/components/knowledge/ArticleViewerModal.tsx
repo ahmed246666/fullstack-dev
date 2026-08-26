@@ -15,7 +15,7 @@ interface ArticleViewerModalProps {
 }
 
 export function ArticleViewerModal({ article, isOpen, onClose, onVoted }: ArticleViewerModalProps) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const [hasVoted, setHasVoted] = useState<boolean | null>(null);
   const [upvotes, setUpvotes] = useState<number>(0);
   const [downvotes, setDownvotes] = useState<number>(0);
@@ -63,34 +63,39 @@ export function ArticleViewerModal({ article, isOpen, onClose, onVoted }: Articl
       onClose={onClose}
       title={
         <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-emerald-400" />
-          <span className="text-sm font-bold text-white">{article.category}</span>
+          <BookOpen className="w-5 h-5 text-gold-400" />
+          <span className="text-sm font-bold text-white font-brand text-gold-300">
+            {article.category}
+          </span>
         </div>
       }
       maxWidth="xl"
     >
-      <div className="space-y-6">
+      <div className="space-y-6 font-sans">
         <div>
-          <h2 className="text-xl font-extrabold text-white leading-relaxed">{title}</h2>
+          <h2 className="text-xl font-extrabold text-white leading-relaxed font-brand text-gold-200">
+            {title}
+          </h2>
           <div className="flex items-center gap-3 text-xs text-slate-400 mt-2 flex-wrap">
             <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <Clock className="w-3.5 h-3.5 text-gold-400" />
               <span>
-                Published {new Date(article.createdAt || Date.now()).toLocaleDateString()}
+                {lang === 'ar' ? 'تاريخ النشر: ' : 'Published on '}
+                {new Date(article.createdAt || Date.now()).toLocaleDateString()}
               </span>
             </span>
             <span>•</span>
-            <span className="font-mono text-slate-500 text-[11px]">/{article.slug}</span>
+            <span className="font-mono text-gold-400/80 text-[11px]">/{article.slug}</span>
           </div>
         </div>
 
         {/* Tags */}
         {tagsList.length > 0 && (
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap font-sans">
             {tagsList.map((tag: string, idx: number) => (
               <span
                 key={idx}
-                className="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-[10px] font-medium"
+                className="px-2 py-0.5 rounded-lg bg-navy-950 border border-navy-800 text-gold-300 text-[10.5px] font-medium font-mono"
               >
                 #{tag}
               </span>
@@ -99,53 +104,59 @@ export function ArticleViewerModal({ article, isOpen, onClose, onVoted }: Articl
         )}
 
         {/* Article Body */}
-        <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800/80 text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">
+        <div className="p-5 rounded-2xl bg-navy-950 border border-navy-800 text-xs text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
           {content}
         </div>
 
         {/* Helpfulness Voting Section */}
-        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="p-4 rounded-2xl bg-navy-900/90 border border-gold-500/20 flex flex-col sm:flex-row items-center justify-between gap-4 font-sans">
           <div>
-            <div className="text-xs font-bold text-slate-200">
-              {lang === 'ar' ? 'هل كان هذا المقال مفيداً لك؟' : 'Was this article helpful?'}
+            <div className="text-xs font-bold text-white font-brand text-gold-300">
+              {lang === 'ar' ? 'هل كان هذا الدليل مفيداً لك؟' : 'Was this article helpful?'}
             </div>
             <div className="text-[11px] text-slate-400">
-              Your feedback helps our team maintain high quality knowledge base articles.
+              {lang === 'ar'
+                ? 'تقييمك يساعد فريق الدعم على تحسين وتحديث قواعد المعرفة باستمرار.'
+                : 'Your feedback helps our team maintain high quality knowledge base articles.'}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-brand">
             <button
               onClick={() => handleVote(true)}
               disabled={hasVoted !== null || isVoting}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
                 hasVoted === true
                   ? 'bg-emerald-600/30 border-emerald-500 text-emerald-300 ring-2 ring-emerald-500/30'
-                  : 'bg-slate-950 border-slate-800 hover:border-emerald-500/50 text-slate-300 hover:text-emerald-400'
+                  : 'bg-navy-950 border-navy-800 hover:border-emerald-500/50 text-slate-300 hover:text-emerald-400'
               }`}
             >
               <ThumbsUp className="w-3.5 h-3.5" />
-              <span>Yes ({upvotes})</span>
+              <span>
+                {lang === 'ar' ? 'نعم، مفيد' : 'Yes'} ({upvotes})
+              </span>
             </button>
 
             <button
               onClick={() => handleVote(false)}
               disabled={hasVoted !== null || isVoting}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
                 hasVoted === false
                   ? 'bg-rose-600/30 border-rose-500 text-rose-300 ring-2 ring-rose-500/30'
-                  : 'bg-slate-950 border-slate-800 hover:border-rose-500/50 text-slate-300 hover:text-rose-400'
+                  : 'bg-navy-950 border-navy-800 hover:border-rose-500/50 text-slate-300 hover:text-rose-400'
               }`}
             >
               <ThumbsDown className="w-3.5 h-3.5" />
-              <span>No ({downvotes})</span>
+              <span>
+                {lang === 'ar' ? 'غير مفيد' : 'No'} ({downvotes})
+              </span>
             </button>
           </div>
         </div>
 
-        <div className="flex justify-end pt-2">
-          <Button variant="outline" onClick={onClose} size="sm">
-            Close
+        <div className="flex justify-end pt-2 font-sans">
+          <Button variant="outline" onClick={onClose} size="sm" className="border-navy-700">
+            {lang === 'ar' ? 'إغلاق' : 'Close'}
           </Button>
         </div>
       </div>

@@ -133,7 +133,8 @@ export function SLABadge({ slaStatus }: { slaStatus: string }) {
 }
 
 export function TierBadge({ tier }: { tier: string }) {
-  const t = tier.toUpperCase();
+  const { t: translate } = useLanguage();
+  const tVal = tier.toUpperCase();
   const styles: Record<string, string> = {
     ENTERPRISE: 'bg-purple-500/20 text-purple-300 border-purple-500/40 font-bold',
     VIP: 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-semibold',
@@ -144,10 +145,10 @@ export function TierBadge({ tier }: { tier: string }) {
     <span
       className={twMerge(
         'inline-flex items-center px-2 py-0.5 rounded text-[11px] uppercase tracking-wider border',
-        styles[t] || styles.STANDARD
+        styles[tVal] || styles.STANDARD
       )}
     >
-      {t}
+      {translate(`tier_${tVal}`) !== `tier_${tVal}` ? translate(`tier_${tVal}`) : tVal}
     </span>
   );
 }

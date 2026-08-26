@@ -149,12 +149,16 @@ export function KanbanBoard({ tickets, onSelectTicket, onUpdated }: KanbanBoardP
               {colTickets.length === 0 && (
                 <div
                   className={`py-12 text-center text-xs text-slate-500 border border-dashed rounded-2xl transition-colors ${
-                    isOver
-                      ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-                      : 'border-slate-800/60'
+                    isOver ? 'border-gold-500 text-gold-300 bg-gold-500/10' : 'border-slate-800/60'
                   }`}
                 >
-                  {isOver ? 'Drop ticket here' : 'No tickets in this status'}
+                  {isOver
+                    ? lang === 'ar'
+                      ? 'أفلت التذكرة هنا لتحديث حالتها'
+                      : 'Drop ticket here to update status'
+                    : lang === 'ar'
+                      ? 'لا توجد تذاكر في هذه المرحلة'
+                      : 'No tickets in this stage'}
                 </div>
               )}
             </div>

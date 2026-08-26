@@ -62,14 +62,20 @@ export function CannedResponsesBar({ onSelect }: CannedResponsesBarProps) {
   ];
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-[11px] font-bold text-slate-400">
-        <div className="flex items-center gap-1.5 text-indigo-400">
+    <div className="space-y-2 font-sans">
+      <div className="flex items-center justify-between text-[11px] font-bold text-gold-300">
+        <div className="flex items-center gap-1.5 text-gold-400 font-brand">
           <Zap className="w-3.5 h-3.5" />
-          <span>1-Click Canned Macro Replies:</span>
+          <span>
+            {lang === 'ar'
+              ? 'الردود السريعة الجاهزة (1-Click Macros):'
+              : '1-Click Canned Macro Replies:'}
+          </span>
         </div>
-        <span className="text-[10px] text-slate-500 font-normal">
-          Click chip to auto-insert template
+        <span className="text-[10px] text-slate-400 font-normal">
+          {lang === 'ar'
+            ? 'انقر لإدراج الرد المخصص تلقائياً'
+            : 'Click chip to auto-insert template'}
         </span>
       </div>
 

@@ -17,7 +17,8 @@ import {
   Sparkles,
   ArrowRight,
   HelpCircle,
-  Mail
+  Mail,
+  ShieldAlert
 } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
@@ -76,7 +77,7 @@ export default function PublicPortalPage() {
       setIsSubmittingReply(true);
       await api.addTicketNote(matchedTicket.id, {
         content: customerReply.trim(),
-        authorName: matchedTicket.customer?.name || 'Customer / العميل',
+        authorName: matchedTicket.customer?.name || (lang === 'ar' ? 'العميل' : 'Customer'),
         isInternal: false,
         channel: 'WEB_FORM'
       });
@@ -122,45 +123,59 @@ export default function PublicPortalPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen bg-navy-950 text-slate-100 p-6 md:p-10 max-w-5xl mx-auto space-y-8">
       {/* Top Portal Nav */}
-      <div className="flex items-center justify-between pb-6 border-b border-slate-800">
+      <div className="flex items-center justify-between pb-6 border-b border-navy-800">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-extrabold text-lg shadow-lg shadow-indigo-600/30">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-gold-600 via-gold-500 to-gold-400 text-navy-950 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-gold-500/20 font-brand">
             عزم
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">AZM Public Support Portal</h1>
-            <p className="text-xs text-slate-400">بوابة الدعم الفني وتتبع التذاكر لعملاء عزم</p>
+            <h1 className="text-xl font-bold text-white font-brand text-gold-300">
+              {lang === 'ar'
+                ? 'بوابة دعم وخدمة العملاء الذاتية'
+                : 'AZM Public Customer Support Portal'}
+            </h1>
+            <p className="text-xs text-slate-400 font-sans">
+              {lang === 'ar'
+                ? 'منصة تتبع التذاكر والتواصل المباشر مع فريق الدعم'
+                : 'Self-service ticket tracking and live inquiry submission'}
+            </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={toggleLanguage}
-            className="px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900 text-xs font-semibold text-slate-300 hover:text-white"
+            className="px-3.5 py-1.5 rounded-xl border border-navy-800 bg-navy-900 text-xs font-semibold text-gold-300 hover:text-white transition-colors"
           >
             {lang === 'en' ? 'العربية' : 'English'}
           </button>
-          <Link href="/">
-            <Button variant="secondary" size="sm" className="text-xs">
-              Agent Portal Login
+          <Link href="/login">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="text-xs border-gold-500/30 text-gold-300 hover:bg-navy-900"
+            >
+              {lang === 'ar' ? 'دخول الموظفين' : 'Specialist Login'}
             </Button>
           </Link>
         </div>
       </div>
 
       {/* Hero Search Box */}
-      <div className="p-8 rounded-3xl bg-gradient-to-r from-indigo-950/60 via-slate-900 to-purple-950/60 border border-slate-800 space-y-6 text-center shadow-2xl">
+      <div className="p-8 md:p-10 rounded-3xl bg-gradient-to-r from-navy-900 via-navy-950 to-navy-900 border border-gold-500/30 space-y-6 text-center shadow-2xl">
         <div className="max-w-xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 text-xs font-semibold border border-indigo-500/20">
-            <Globe className="w-3.5 h-3.5" />
-            <span>24/7 Real-Time Ticket Tracker</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-500/10 text-gold-300 text-xs font-semibold border border-gold-500/20 font-brand">
+            <Globe className="w-3.5 h-3.5 text-gold-400" />
+            <span>
+              {lang === 'ar' ? 'نظام التتبع المباشر 24/7' : '24/7 Real-Time Ticket Tracker'}
+            </span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-white font-brand text-gold-200">
             {lang === 'ar' ? 'تتبع حالة طلبك الفني فورياً' : 'Track Your Support Request Live'}
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 font-sans">
             {lang === 'ar'
               ? 'أدخل رقم التذكرة لمتابعة حالة المعالجة وسجل الردود واتفاقية الـ SLA.'
               : 'Enter your ticket reference code to inspect real-time progress, agent notes, and SLA status.'}
@@ -170,238 +185,271 @@ export default function PublicPortalPage() {
         {/* Search Input Bar */}
         <form onSubmit={handleSearchSubmit} className="max-w-lg mx-auto flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-4 rtl:right-4 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-4 rtl:right-4 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-gold-400" />
             <input
               type="text"
               value={ticketSearch}
               onChange={(e) => setTicketSearch(e.target.value)}
               placeholder="e.g. TCK-1001"
-              className="w-full bg-slate-900 border border-slate-700 rounded-2xl pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500 shadow-inner"
+              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500/60 rounded-2xl pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 text-xs text-slate-100 font-mono focus:outline-none shadow-inner"
               required
             />
           </div>
-          <Button type="submit" size="md" className="py-3 px-6 text-xs">
-            Track Ticket
+          <Button
+            type="submit"
+            size="md"
+            className="bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold"
+          >
+            <span>{lang === 'ar' ? 'بحث' : 'Search'}</span>
           </Button>
         </form>
 
-        <div className="flex items-center justify-center gap-3 text-xs text-slate-400 pt-2">
-          <span>Need to report a new problem?</span>
-          <button
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <span className="text-xs text-slate-400">
+            {lang === 'ar' ? 'أو تود إنشاء استفسار جديد؟' : 'Need help with something else?'}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setIsCreateOpen(true)}
-            className="text-indigo-400 hover:underline font-bold"
+            className="text-xs border-gold-500/40 text-gold-300 hover:bg-gold-500/10"
           >
-            + Submit New Inquiry
-          </button>
+            <Plus className="w-3.5 h-3.5" />
+            <span>{lang === 'ar' ? 'فتح بلاغ دعم جديد' : 'Open New Support Ticket'}</span>
+          </Button>
         </div>
       </div>
 
-      {/* Ticket Details View */}
+      {/* Ticket Details Body */}
       {isLoading ? (
-        <div className="py-16 text-center text-xs text-slate-400 animate-pulse">
-          Searching ticket tracking records...
+        <div className="py-20 text-center text-xs text-slate-400 animate-pulse font-sans">
+          {lang === 'ar' ? 'جاري استرجاع تفاصيل التذكرة...' : 'Loading ticket records...'}
         </div>
       ) : matchedTicket ? (
-        <Card className="p-6 md:p-8 space-y-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-800">
-            <div>
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="font-mono text-sm font-extrabold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-xl border border-indigo-500/20">
-                  {matchedTicket.ticketNumber}
-                </span>
-                <StatusBadge status={matchedTicket.status} />
-                <PriorityBadge priority={matchedTicket.priority} />
+        <div className="space-y-6">
+          <Card className="p-6 md:p-8 space-y-6 border-gold-500/30 bg-navy-900/80">
+            {/* Header Info */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-navy-800 gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2 flex-wrap font-sans">
+                  <span className="font-mono text-sm font-extrabold text-gold-300 bg-gold-500/10 px-3 py-1 rounded-xl border border-gold-500/30">
+                    {matchedTicket.ticketNumber}
+                  </span>
+                  <StatusBadge status={matchedTicket.status} />
+                  <PriorityBadge priority={matchedTicket.priority} />
+                  <ChannelBadge channel={matchedTicket.channel} />
+                </div>
+                <h3 className="text-xl font-extrabold text-white font-brand text-gold-200">
+                  {matchedTicket.title}
+                </h3>
+                <div className="text-xs text-slate-400 mt-1 font-sans">
+                  {lang === 'ar' ? 'تاريخ الإنشاء: ' : 'Submitted on '}
+                  {new Date(matchedTicket.createdAt).toLocaleString()}
+                </div>
+              </div>
+
+              <div className="text-left sm:text-right rtl:text-right sm:rtl:text-left">
                 <SLACountdownTimer
                   resolutionDueAt={matchedTicket.resolutionDueAt}
                   status={matchedTicket.status}
                 />
               </div>
-              <h2 className="text-xl font-bold text-white">{matchedTicket.title}</h2>
-              <div className="text-xs text-slate-400 mt-1">
-                Requested by:{' '}
-                <strong className="text-slate-200">{matchedTicket.customer?.name}</strong> • Created
-                on {new Date(matchedTicket.createdAt).toLocaleDateString()}
-              </div>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
-              <User className="w-4 h-4 text-indigo-400" />
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase font-bold">
-                  Assigned Specialist
-                </div>
-                <div className="font-bold text-slate-200">
-                  {matchedTicket.assignedAgent
-                    ? lang === 'ar'
-                      ? matchedTicket.assignedAgent.nameAr
-                      : matchedTicket.assignedAgent.name
-                    : 'Support Team'}
-                </div>
-              </div>
+            {/* Description */}
+            <div className="p-4 rounded-2xl bg-navy-950 border border-navy-800 space-y-1">
+              <span className="text-[10.5px] uppercase font-bold text-gold-400 font-brand">
+                {lang === 'ar' ? 'تفاصيل البلاغ المسجلة:' : 'Ticket Inquiry Details:'}
+              </span>
+              <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                {matchedTicket.description}
+              </p>
             </div>
-          </div>
 
-          {/* Issue Description */}
-          <div className="p-4 rounded-2xl bg-slate-900/70 border border-slate-800 text-xs text-slate-300">
-            <div className="font-bold text-indigo-400 mb-1">Inquiry Description:</div>
-            <p className="leading-relaxed whitespace-pre-wrap">{matchedTicket.description}</p>
-          </div>
+            {/* Notes & Messages Stream */}
+            <div className="space-y-4 pt-2">
+              <h4 className="text-xs font-bold text-gold-300 uppercase tracking-wider flex items-center gap-2 font-brand">
+                <MessageSquare className="w-4 h-4 text-gold-400" />
+                <span>
+                  {lang === 'ar' ? 'سجل المحادثات والمتابعة' : 'Resolution & Communication History'}
+                </span>
+              </h4>
 
-          {/* Public Conversation History (Internal Notes Filtered Out) */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Official Responses & Activity</span>
-            </h3>
+              <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+                {(matchedTicket.notes || [])
+                  .filter((n: any) => !n.isInternal)
+                  .map((note: any) => {
+                    const isCustomer =
+                      note.authorName === matchedTicket.customer?.name ||
+                      note.authorName?.toLowerCase().includes('customer') ||
+                      note.authorName?.includes('العميل');
 
-            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-              {(matchedTicket.notes || [])
-                .filter((note: any) => !note.isInternal)
-                .map((note: any) => (
-                  <div
-                    key={note.id}
-                    className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-1"
-                  >
-                    <div className="flex items-center justify-between text-[11px] pb-1 border-b border-slate-800/60">
-                      <strong className="text-indigo-400 flex items-center gap-1">
-                        <Globe className="w-3 h-3" />
-                        <span>{note.authorName}</span>
-                      </strong>
-                      <span className="text-[10px] text-slate-500">
-                        {new Date(note.createdAt).toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-slate-200 leading-relaxed whitespace-pre-wrap pt-1">
-                      {note.content}
-                    </p>
+                    return (
+                      <div
+                        key={note.id}
+                        className={`p-4 rounded-2xl border text-xs space-y-1.5 ${
+                          isCustomer
+                            ? 'bg-navy-950 border-navy-800 text-slate-300 ml-4 rtl:ml-0 rtl:mr-4'
+                            : 'bg-gradient-to-r from-gold-950/20 to-navy-900 border-gold-500/30 text-white mr-4 rtl:mr-0 rtl:ml-4'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-[11px]">
+                          <div className="flex items-center gap-1.5 font-semibold">
+                            <User className="w-3 h-3 text-gold-400" />
+                            <span className="font-brand text-gold-200">
+                              {isCustomer
+                                ? lang === 'ar'
+                                  ? 'أنت (العميل)'
+                                  : 'You (Customer)'
+                                : `${note.authorName} (${lang === 'ar' ? 'فريق دعم عزم' : 'AZM Specialist'})`}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {new Date(note.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
+                          {note.content}
+                        </p>
+                      </div>
+                    );
+                  })}
+
+                {(matchedTicket.notes || []).filter((n: any) => !n.isInternal).length === 0 && (
+                  <div className="py-8 text-center text-xs text-slate-400 border border-dashed border-navy-800 rounded-2xl font-sans">
+                    {lang === 'ar'
+                      ? 'لا توجد ردود بعد. يقوم أحد مسؤولي الدعم بمراجعة طلبك حالياً.'
+                      : 'No public updates yet. A support specialist is actively handling your request.'}
                   </div>
-                ))}
+                )}
+              </div>
+            </div>
 
-              {(matchedTicket.notes || []).filter((n: any) => !n.isInternal).length === 0 && (
-                <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-                  Our support engineering team is reviewing your ticket. Updates will appear here.
+            {/* Reply Input Box */}
+            {matchedTicket.status !== 'CLOSED' && (
+              <form
+                onSubmit={handleSendCustomerReply}
+                className="pt-4 border-t border-navy-800 space-y-3 font-sans"
+              >
+                <label className="block text-xs font-bold text-gold-300 font-brand">
+                  {lang === 'ar'
+                    ? 'إضافة رد أو تعقيب على التذكرة:'
+                    : 'Add a reply or update to this ticket:'}
+                </label>
+                <textarea
+                  rows={3}
+                  value={customerReply}
+                  onChange={(e) => setCustomerReply(e.target.value)}
+                  placeholder={
+                    lang === 'ar'
+                      ? 'اكتب رسالتك أو أي تفاصيل إضافية هنا...'
+                      : 'Provide additional information or reply to the support agent...'
+                  }
+                  className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500/50 rounded-2xl p-3 text-xs text-slate-100 outline-none"
+                  required
+                />
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    size="sm"
+                    isLoading={isSubmittingReply}
+                    className="bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{lang === 'ar' ? 'إرسال الرد' : 'Send Update'}</span>
+                  </Button>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Customer Reply Box */}
-          <form
-            onSubmit={handleSendCustomerReply}
-            className="space-y-3 pt-4 border-t border-slate-800"
-          >
-            <span className="text-xs font-bold text-slate-300 block">
-              Send Update / Reply to Support Team
-            </span>
-            <textarea
-              rows={3}
-              value={customerReply}
-              onChange={(e) => setCustomerReply(e.target.value)}
-              placeholder="Type your message or additional details here..."
-              className="w-full p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 outline-none"
-              required
-            />
-            <div className="flex justify-end">
-              <Button type="submit" isLoading={isSubmittingReply} size="sm">
-                <Send className="w-3.5 h-3.5" />
-                <span>Send Reply</span>
-              </Button>
-            </div>
-          </form>
-        </Card>
-      ) : (
-        <div className="py-16 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-3xl">
-          No ticket found with tracking code &quot;{queriedCode}&quot;. Please verify the ticket
-          code.
+              </form>
+            )}
+          </Card>
         </div>
+      ) : (
+        <Card className="p-12 text-center space-y-3 border-navy-800 bg-navy-900/60 font-sans">
+          <HelpCircle className="w-10 h-10 text-gold-400/60 mx-auto" />
+          <h3 className="text-base font-bold text-white font-brand">
+            {lang === 'ar' ? 'لم يتم العثور على التذكرة' : 'Ticket Not Found'}
+          </h3>
+          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            {lang === 'ar'
+              ? 'يرجى التأكد من كتابة رمز التذكرة بشكل صحيح (مثال: TCK-1001).'
+              : 'Please check your ticket reference ID (e.g. TCK-1001) and try again.'}
+          </p>
+        </Card>
       )}
 
-      {/* New Public Inquiry Modal */}
+      {/* New Inquiry Modal */}
       <Modal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        title="Submit New Support Request"
+        title={lang === 'ar' ? 'فتح بلاغ دعم جديد' : 'Submit Support Inquiry'}
         maxWidth="lg"
       >
         {createdSuccessCode ? (
-          <div className="py-8 text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mx-auto flex items-center justify-center">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Ticket Submitted Successfully!</h3>
+          <div className="py-8 text-center space-y-3 font-sans">
+            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto animate-bounce" />
+            <h3 className="text-lg font-bold text-white font-brand text-gold-300">
+              {lang === 'ar' ? 'تم إنشاء التذكرة بنجاح!' : 'Ticket Submitted Successfully!'}
+            </h3>
             <p className="text-xs text-slate-400">
-              Your tracking reference code is{' '}
-              <strong className="font-mono text-emerald-400">{createdSuccessCode}</strong>.
+              {lang === 'ar' ? 'رمز تذكرتك هو: ' : 'Your ticket reference code is: '}
+              <span className="font-mono font-bold text-gold-300 text-sm">
+                {createdSuccessCode}
+              </span>
             </p>
           </div>
         ) : (
-          <form onSubmit={handleCreatePublicTicket} className="space-y-4">
-            <Input
-              label="Subject / العنوان"
-              placeholder="e.g. Inability to access portal API keys"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              required
-            />
-
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label="Your Name / الاسم"
-                placeholder="Tariq Al-Harbi"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-              />
-              <Input
-                label="Email Address / البريد الإلكتروني"
-                type="email"
-                placeholder="customer@enterprise.sa"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-              />
-            </div>
-
+          <form onSubmit={handleCreatePublicTicket} className="space-y-4 font-sans">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Priority Level
+              <label className="block text-xs font-bold text-gold-300 mb-1 font-brand">
+                {lang === 'ar' ? 'عنوان المشكلة أو الطلب' : 'Inquiry Subject / Title'}
               </label>
-              <select
-                value={newPriority}
-                onChange={(e) => setNewPriority(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
-              >
-                <option value="URGENT">Critical Business Impact (1h Response)</option>
-                <option value="HIGH">High Priority (2h Response)</option>
-                <option value="MEDIUM">Standard Inquiry (4h Response)</option>
-                <option value="LOW">General Question (8h Response)</option>
-              </select>
+              <Input
+                placeholder={
+                  lang === 'ar'
+                    ? 'مثال: مشكلة في تسجيل الدخول'
+                    : 'e.g. Issue connecting to API endpoint'
+                }
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                required
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Issue Description / تفاصيل المشكلة
+              <label className="block text-xs font-bold text-gold-300 mb-1 font-brand">
+                {lang === 'ar' ? 'شرح مفصل للبلاغ' : 'Detailed Description'}
               </label>
               <textarea
                 rows={4}
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
-                placeholder="Provide detailed information regarding the issue..."
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-100 outline-none focus:border-indigo-500"
+                placeholder={
+                  lang === 'ar'
+                    ? 'يرجى تقديم أكبر قدر ممكن من التفاصيل...'
+                    : 'Please describe the steps to reproduce...'
+                }
+                className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500/50 rounded-2xl p-3 text-xs text-slate-100 outline-none"
                 required
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex justify-end gap-2 pt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsCreateOpen(false)}
                 size="sm"
               >
-                Cancel
+                {lang === 'ar' ? 'إلغاء' : 'Cancel'}
               </Button>
-              <Button type="submit" isLoading={isSubmittingTicket} size="sm">
-                Submit Inquiry
+              <Button
+                type="submit"
+                size="sm"
+                isLoading={isSubmittingTicket}
+                className="bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold"
+              >
+                {lang === 'ar' ? 'إرسال التذكرة' : 'Submit Ticket'}
               </Button>
             </div>
           </form>

@@ -78,7 +78,7 @@ export function ArticleModal({ isOpen, onClose, onSuccess }: ArticleModalProps) 
       title={lang === 'ar' ? 'نشر مقال جديد في قاعدة المعرفة' : 'Publish Knowledge Base Article'}
       maxWidth="xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 font-sans">
         {error && (
           <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs">
             {error}
@@ -87,14 +87,14 @@ export function ArticleModal({ isOpen, onClose, onSuccess }: ArticleModalProps) 
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
-            label="Article Title (English)"
+            label={lang === 'ar' ? 'عنوان المقال بالإنجليزية' : 'Article Title (English)'}
             placeholder="e.g. How to Connect WhatsApp Business API"
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
             required
           />
           <Input
-            label="عنوان المقال (بالعربية)"
+            label={lang === 'ar' ? 'عنوان المقال بالعربية' : 'Article Title (Arabic)'}
             placeholder="مثال: كيفية ربط واتساب للأعمال عبر API"
             value={titleAr}
             onChange={(e) => setTitleAr(e.target.value)}
@@ -110,22 +110,32 @@ export function ArticleModal({ isOpen, onClose, onSuccess }: ArticleModalProps) 
             required
           />
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Category
+            <label className="block text-xs font-bold text-gold-300 uppercase tracking-wider mb-1.5 font-brand">
+              {lang === 'ar' ? 'القسم / التصنيف' : 'Category'}
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-slate-900/80 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
+              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500/50 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
             >
-              <option value="Getting Started">Getting Started</option>
-              <option value="API & Integrations">API & Integrations</option>
-              <option value="Account & Billing">Account & Billing</option>
-              <option value="Troubleshooting">Troubleshooting</option>
+              <option value="Getting Started">
+                {lang === 'ar' ? 'البدء السريع (Getting Started)' : 'Getting Started'}
+              </option>
+              <option value="API & Integrations">
+                {lang === 'ar'
+                  ? 'واجهات البرمجة والربط (API & Integrations)'
+                  : 'API & Integrations'}
+              </option>
+              <option value="Account & Billing">
+                {lang === 'ar' ? 'الحسابات والاشتراكات (Account & Billing)' : 'Account & Billing'}
+              </option>
+              <option value="Troubleshooting">
+                {lang === 'ar' ? 'استكشاف الأخطاء وحلها (Troubleshooting)' : 'Troubleshooting'}
+              </option>
             </select>
           </div>
           <Input
-            label="Tags (Comma separated)"
+            label={lang === 'ar' ? 'الوسوم (مفصولة بفواصل)' : 'Tags (Comma separated)'}
             placeholder="WhatsApp, API, Integration"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -133,38 +143,49 @@ export function ArticleModal({ isOpen, onClose, onSuccess }: ArticleModalProps) 
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-            Content (English)
+          <label className="block text-xs font-bold text-gold-300 uppercase tracking-wider mb-1.5 font-brand">
+            {lang === 'ar' ? 'المحتوى والشرح بالإنجليزية' : 'Content (English)'}
           </label>
           <textarea
             rows={4}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Detailed guide steps, explanations, or FAQ solution in English..."
-            className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 outline-none"
+            className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500/50 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 outline-none"
             required
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-            المحتوى والشرح (بالعربية)
+          <label className="block text-xs font-bold text-gold-300 uppercase tracking-wider mb-1.5 font-brand">
+            {lang === 'ar' ? 'المحتوى والشرح بالعربية' : 'Content (Arabic)'}
           </label>
           <textarea
             rows={4}
             value={contentAr}
             onChange={(e) => setContentAr(e.target.value)}
             placeholder="شرح الخطوات التفصيلية وحل المشكلة باللغة العربية..."
-            className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 outline-none"
+            className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500/50 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 outline-none"
           />
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-          <Button type="button" variant="outline" onClick={onClose} size="sm">
-            Cancel
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-navy-800 font-sans">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            size="sm"
+            className="border-navy-700"
+          >
+            {lang === 'ar' ? 'إلغاء' : 'Cancel'}
           </Button>
-          <Button type="submit" isLoading={isLoading} size="sm">
-            Publish Article
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            size="sm"
+            className="bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold"
+          >
+            {lang === 'ar' ? 'نشر المقال' : 'Publish Article'}
           </Button>
         </div>
       </form>
