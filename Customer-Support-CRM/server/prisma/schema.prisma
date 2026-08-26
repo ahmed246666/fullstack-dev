@@ -1,0 +1,233 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  AGENT
+  CUSTOMER
+}
+
+enum Department {
+  TECHNICAL
+  BILLING
+  CUSTOMER_CARE
+  GENERAL
+}
+
+enum AgentStatus {
+  ONLINE
+  AWAY
+  OFFLINE
+}
+
+enum CustomerTier {
+  STANDARD
+  VIP
+  ENTERPRISE
+}
+
+enum Channel {
+  EMAIL
+  WHATSAPP
+  LIVE_CHAT
+  SMS
+  WEB_FORM
+  INTERNAL
+}
+
+enum TicketStatus {
+  NEW
+  OPEN
+  PENDING
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketCategory {
+  TECHNICAL
+  BILLING
+  FEATURE_REQUEST
+  GENERAL
+}
+
+enum InteractionType {
+  CUSTOMER_MESSAGE
+  AGENT_REPLY
+  INTERNAL_NOTE
+  STATUS_CHANGE
+  SLA_BREACH_ALERT
+  SYSTEM
+}
+
+enum AuthorType {
+  AGENT
+  CUSTOMER
+  SYSTEM
+  AI
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  name         String
+  nameAr       String?
+  role         Role        @default(AGENT)
+  department   Department  @default(GENERAL)
+  status       AgentStatus @default(OFFLINE)
+  avatar       String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  assignedTickets Ticket[]   @relation("AgentAssignedTickets")
+  articles        KnowledgeBaseArticle[]
+  auditLogs       AuditLog[]
+}
+
+model Customer {
+  id             String       @id @default(cuid())
+  name           String
+  nameAr         String?
+  email          String       @unique
+  phone          String?
+  company        String?
+  tier           CustomerTier @default(STANDARD)
+  primaryChannel Channel      @default(EMAIL)
+  avatar         String?
+  tags           String?      // Stored as JSON string or comma-separated
+  customFields   String?      // JSON string for ERP & custom data
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  tickets        Ticket[]
+  interactions   Interaction[]
+}
+
+model Ticket {
+  id                 String         @id @default(cuid())
+  ticketNumber       String         @unique // e.g. TICK-1001
+  title              String
+  description        String
+  status             TicketStatus   @default(NEW)
+  priority           TicketPriority @default(MEDIUM)
+  category           TicketCategory @default(GENERAL)
+  channel            Channel        @default(WEB_FORM)
+  department         Department     @default(GENERAL)
+  
+  customerId         String
+  customer           Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  assignedAgentId    String?
+  assignedAgent      User?          @relation("AgentAssignedTickets", fields: [assignedAgentId], references: [id], onDelete: SetNull)
+
+  slaResponseDue     DateTime?
+  slaResolutionDue   DateTime?
+  firstRespondedAt   DateTime?
+  resolvedAt         DateTime?
+  closedAt           DateTime?
+  
+  csatRating         Int?           // 1 to 5
+  csatFeedback       String?
+  
+  aiSummary          String?
+  aiSuggestedReplies String?        // JSON array string
+  aiUrgencyScore     Int?           // 1 to 100
+  tags               String?        // comma-separated tags
+  
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  interactions       Interaction[]
+}
+
+model Interaction {
+  id             String          @id @default(cuid())
+  ticketId       String
+  ticket         Ticket          @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  customerId     String?
+  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  type           InteractionType @default(CUSTOMER_MESSAGE)
+  content        String
+  authorType     AuthorType      @default(CUSTOMER)
+  authorId       String?         // User ID or Customer ID
+  authorName     String?
+  channel        Channel         @default(WEB_FORM)
+  attachments    String?         // JSON array of URLs
+  isInternalOnly Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+}
+
+model KnowledgeBaseArticle {
+  id             String      @id @default(cuid())
+  title          String
+  titleAr        String?
+  slug           String      @unique
+  category       String      // GETTING_STARTED, BILLING, TECHNICAL, etc.
+  content        String
+  contentAr      String?
+  excerpt        String?
+  helpfulCount   Int         @default(0)
+  notHelpfulCount Int        @default(0)
+  isPublished    Boolean     @default(true)
+  
+  authorId       String?
+  author         User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model CannedReply {
+  id         String   @id @default(cuid())
+  shortcut   String   @unique // e.g. "/greet", "/sla-delay"
+  title      String
+  titleAr    String?
+  content    String
+  contentAr  String?
+  category   String   @default("GENERAL")
+  createdAt  DateTime @default(now())
+}
+
+model SLAConfig {
+  id                          String         @id @default(cuid())
+  priority                    TicketPriority @unique
+  responseTimeMinutes         Int
+  resolutionTimeMinutes       Int
+  escalationThresholdMinutes  Int
+  createdAt                   DateTime       @default(now())
+  updatedAt                   DateTime       @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  entityType String
+  entityId   String?
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  details    String?  // JSON string of changes
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  category  String   @default("GENERAL")
+  updatedAt DateTime @updatedAt
+}

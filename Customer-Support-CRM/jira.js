@@ -110,6 +110,69 @@ async function transitionIssue(issueKey, targetStatus) {
   }
 }
 
+async function listSprints() {
+  const boardRes = await fetch(`${baseUrl}/rest/agile/1.0/board`, { headers });
+  const boards = await boardRes.json();
+  if (!boards.values?.length) {
+    console.log('No boards found.');
+    return;
+  }
+  const boardId = boards.values[0].id;
+  const sprintRes = await fetch(`${baseUrl}/rest/agile/1.0/board/${boardId}/sprint`, { headers });
+  const sprints = await sprintRes.json();
+  console.log(`\n🏃 Sprints in Board [${boards.values[0].name}] (ID: ${boardId}):\n`);
+  for (const s of sprints.values || []) {
+    console.log(`ID: ${s.id} | Name: ${s.name} | State: ${s.state}`);
+  }
+}
+
+async function listSprintIssues(sprintId = 1) {
+  const res = await fetch(`${baseUrl}/rest/agile/1.0/sprint/${sprintId}/issue?fields=summary,status,issuetype`, { headers });
+  const data = await res.json();
+  console.log(`\n📋 Issues in Sprint [${sprintId}] (Total: ${data.total || 0}):\n`);
+  console.log('Key'.padEnd(12) + 'Type'.padEnd(10) + 'Status'.padEnd(16) + 'Summary');
+  console.log('-'.repeat(85));
+  for (const issue of data.issues || []) {
+    const key = issue.key.padEnd(12);
+    const type = (issue.fields.issuetype?.name || '').padEnd(10);
+    const status = (issue.fields.status?.name || '').padEnd(16);
+    const summary = issue.fields.summary || '';
+    console.log(`${key}${type}${status}${summary}`);
+  }
+}
+
+async function addIssuesToSprint(sprintId, issues) {
+  const res = await fetch(`${baseUrl}/rest/agile/1.0/sprint/${sprintId}/issue`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ issues })
+  });
+  if (res.ok) {
+    console.log(`✅ Successfully assigned ${issues.length} issues to Sprint ${sprintId}`);
+  } else {
+    console.error(`❌ Failed to assign issues:`, await res.text());
+  }
+}
+
+async function startSprint(sprintId, name, goal) {
+  const res = await fetch(`${baseUrl}/rest/agile/1.0/sprint/${sprintId}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({
+      name: name || 'AZM CRM - Sprint 1 (Week 4)',
+      goal: goal || 'AZM Customer Support CRM full-stack delivery with TypeScript & OpenAPI',
+      state: 'active',
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+    })
+  });
+  if (res.ok) {
+    console.log(`✅ Sprint ${sprintId} started successfully!`);
+  } else {
+    console.error(`❌ Failed to start sprint:`, await res.text());
+  }
+}
+
 async function main() {
   const [,, cmd, ...args] = process.argv;
   if (!cmd || cmd === 'list') {
@@ -128,8 +191,18 @@ async function main() {
       return;
     }
     await transitionIssue(issueKey, status);
+  } else if (cmd === 'sprints') {
+    await listSprints();
+  } else if (cmd === 'sprint-issues') {
+    await listSprintIssues(args[0] || 1);
+  } else if (cmd === 'sprint-add') {
+    const [sprintId, ...issues] = args;
+    await addIssuesToSprint(sprintId, issues);
+  } else if (cmd === 'sprint-start') {
+    const [sprintId, name, goal] = args;
+    await startSprint(sprintId || 1, name, goal);
   } else {
-    console.log('Commands: list, create, transition');
+    console.log('Commands: list, create, transition, sprints, sprint-issues, sprint-add, sprint-start');
   }
 }
 

@@ -1,0 +1,30 @@
+{
+  "name": "customer-support-crm",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AZM Squad Customer Support CRM - Enterprise Full-Stack Platform",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "server:dev": "npm run dev --workspace=server",
+    "client:dev": "npm run dev --workspace=client",
+    "prisma:migrate": "npm run prisma:migrate --workspace=server",
+    "prisma:seed": "npm run prisma:seed --workspace=server",
+    "prisma:studio": "npm run prisma:studio --workspace=server",
+    "openapi:generate": "npm run openapi:generate --workspace=server"
+  },
+  "keywords": [
+    "crm",
+    "customer-support",
+    "nextjs",
+    "express",
+    "prisma",
+    "typescript",
+    "openapi",
+    "react-query"
+  ],
+  "author": "AZM Squad",
+  "license": "MIT"
+}
