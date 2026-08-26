@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -12,6 +13,12 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -26,7 +33,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: Mod
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const widthClasses = {
     sm: 'max-w-sm',
@@ -36,26 +43,27 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'lg' }: Mod
     '2xl': 'max-w-2xl'
   };
 
-  return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
       <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
       <div
-        className={`relative w-full ${widthClasses[maxWidth]} glass-panel bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150`}
+        className={`relative w-full ${widthClasses[maxWidth]} glass-panel bg-navy-950 border border-gold-500/30 rounded-3xl p-6 md:p-8 shadow-2xl z-[999999] animate-in fade-in zoom-in-95 duration-150`}
       >
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
-          <h3 className="text-lg font-bold text-slate-100">{title}</h3>
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-navy-800">
+          <h3 className="text-lg font-bold text-white font-brand text-gold-300">{title}</h3>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-navy-900 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
         <div>{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

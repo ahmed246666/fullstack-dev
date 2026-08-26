@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   X,
@@ -47,6 +48,11 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [isCSATOpen, setIsCSATOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['ticket-detail', ticketId],
@@ -54,7 +60,7 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
     enabled: !!ticketId
   });
 
-  if (!ticketId) return null;
+  if (!ticketId || !mounted) return null;
 
   const ticket = data?.data;
 
@@ -83,7 +89,7 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
       setIsSubmitting(true);
       await api.addTicketNote(ticket.id, {
         content: replyText.trim(),
-        authorName: lang === 'ar' ? currentAgent.nameAr : currentAgent.name,
+        authorName: currentAgent.name,
         isInternal,
         channel: ticket.channel
       });
@@ -91,23 +97,23 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
       refetch();
       onUpdated?.();
     } catch (err: any) {
-      alert(err.message || 'Failed to add note');
+      alert(err.message || 'Failed to send note');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[99999] overflow-hidden">
+  return createPortal(
+    <div className="fixed inset-0 z-[999999] overflow-hidden">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/75 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
 
       {/* Drawer Panel */}
-      <div className="absolute inset-y-0 right-0 rtl:left-0 rtl:right-auto max-w-full flex pl-10 rtl:pl-0 rtl:pr-10">
-        <div className="w-screen max-w-2xl glass-panel bg-slate-950/95 border-l rtl:border-r rtl:border-l-0 border-slate-800 p-6 md:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right rtl:slide-in-from-left duration-200">
+      <div className="absolute inset-y-0 right-0 rtl:left-0 rtl:right-auto max-w-full flex pl-10 rtl:pl-0 rtl:pr-10 z-[999999]">
+        <div className="w-screen max-w-2xl glass-panel bg-navy-950/95 border-l rtl:border-r rtl:border-l-0 border-gold-500/30 p-6 md:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right rtl:slide-in-from-left duration-200">
           {isLoading ? (
             <div className="py-24 text-center text-xs text-slate-400 animate-pulse">
               Loading Ticket Details...
@@ -339,6 +345,7 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
           onUpdated?.();
         }}
       />
-    </div>
+    </div>,
+    document.body
   );
 }
