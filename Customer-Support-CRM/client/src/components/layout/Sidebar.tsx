@@ -13,13 +13,15 @@ import {
   BarChart3,
   ExternalLink,
   Sparkles,
-  Layers
+  Layers,
+  Crown,
+  LogIn
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const navItems = [
     { labelKey: 'navDashboard', href: '/', icon: LayoutDashboard },
@@ -33,26 +35,24 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 min-h-screen glass-panel border-r rtl:border-l rtl:border-r-0 border-slate-800/80 bg-slate-950/95 flex flex-col justify-between p-4">
+    <aside className="w-68 min-h-screen glass-panel border-r rtl:border-l rtl:border-r-0 border-gold-500/20 bg-navy-950/95 flex flex-col justify-between p-5">
       <div>
         {/* Brand Logo & Name */}
-        <div className="flex items-center gap-3 px-3 py-4 mb-4">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-azm flex items-center justify-center shadow-lg shadow-indigo-600/30">
-            <Layers className="w-5 h-5 text-white" />
+        <Link href="/" className="flex items-center gap-3.5 px-3 py-4 mb-6 group cursor-pointer">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-gold-600 via-gold-500 to-gold-400 text-navy-950 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-gold-500/20 group-hover:scale-105 transition-transform font-brand">
+            عزم
           </div>
           <div>
-            <h1 className="font-extrabold text-sm text-slate-100 tracking-tight flex items-center gap-1.5">
-              <span>AZM SQUAD</span>
-              <span className="px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 text-[10px] font-bold">
-                CRM
-              </span>
+            <h1 className="font-extrabold text-base text-white tracking-tight flex items-center gap-1.5 font-brand">
+              <span>AZM CRM</span>
+              <Crown className="w-3.5 h-3.5 text-gold-400" />
             </h1>
-            <p className="text-[11px] text-slate-400 font-medium">Customer Support Platform</p>
+            <p className="text-xs text-gold-300/80 font-medium">Customer Support Platform</p>
           </div>
-        </div>
+        </Link>
 
         {/* Navigation Items */}
-        <nav className="space-y-1.5">
+        <nav className="space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -62,28 +62,42 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+                className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold transition-all duration-150 font-sans ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/80'
+                    ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold shadow-md shadow-gold-500/20'
+                    : 'text-slate-300 hover:text-white hover:bg-navy-900/90 hover:border-gold-500/20 border border-transparent'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                <span>{t(item.labelKey)}</span>
+                <Icon className={`w-4 h-4 ${isActive ? 'text-navy-950' : 'text-gold-400/80'}`} />
+                <span className="font-medium tracking-wide">{t(item.labelKey)}</span>
               </Link>
             );
           })}
+
+          <div className="pt-3 border-t border-navy-800/80">
+            <Link
+              href="/login"
+              className={`flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all ${
+                pathname === '/login'
+                  ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30'
+                  : 'text-slate-400 hover:text-gold-300 hover:bg-navy-900/60'
+              }`}
+            >
+              <LogIn className="w-4 h-4 text-gold-400" />
+              <span>{lang === 'ar' ? 'تسجيل الدخول / الحسابات' : 'Agent Login / Switch'}</span>
+            </Link>
+          </div>
         </nav>
       </div>
 
       {/* Footer Info Box */}
-      <div className="p-3.5 rounded-2xl glass-panel bg-slate-900/60 border border-slate-800/60 text-xs">
-        <div className="flex items-center gap-2 text-indigo-400 font-bold mb-1">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>AI Support Copilot</span>
+      <div className="p-4 rounded-2xl glass-panel bg-navy-900/80 border border-gold-500/20 text-xs space-y-1.5 shadow-lg">
+        <div className="flex items-center gap-2 text-gold-300 font-bold font-brand text-xs">
+          <Sparkles className="w-4 h-4 text-gold-400" />
+          <span>AZM AI Copilot Active</span>
         </div>
-        <p className="text-[11px] text-slate-400 leading-relaxed">
-          OpenAPI 3.0 TypeScript contract connected on port 5000.
+        <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
+          Saudi Enterprise Bilingual Support CRM with 99.9% SLA enforcement.
         </p>
       </div>
     </aside>

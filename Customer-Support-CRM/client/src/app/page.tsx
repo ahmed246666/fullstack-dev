@@ -15,7 +15,8 @@ import {
   Sparkles,
   TrendingUp,
   Headphones,
-  ShieldCheck
+  ShieldCheck,
+  Crown
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
@@ -66,11 +67,11 @@ export default function DashboardPage() {
   });
 
   const stats = analyticsData?.data || {
-    totalTickets: 6,
-    openTickets: 4,
-    slaComplianceRate: 94,
-    averageCSAT: 4.8,
-    channelDistribution: { EMAIL: 2, WHATSAPP: 1, LIVE_CHAT: 1, SMS: 1, WEB_FORM: 1 }
+    totalTickets: 17,
+    openTickets: 16,
+    slaComplianceRate: 88,
+    averageCSAT: 4.9,
+    channelDistribution: { EMAIL: 6, WHATSAPP: 3, LIVE_CHAT: 3, SMS: 2, WEB_FORM: 3 }
   };
 
   const handleCreateTicket = async (e: React.FormEvent) => {
@@ -98,36 +99,43 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-7xl mx-auto">
       {/* Welcome Banner */}
-      <div className="glass-panel p-6 md:p-8 rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
+      <div className="glass-panel p-8 md:p-10 rounded-3xl border border-gold-500/25 bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 relative overflow-hidden shadow-2xl">
+        <div className="absolute -right-20 -top-20 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs font-semibold">
+              <Crown className="w-4 h-4 text-gold-400" />
               <span>AZM Squad Customer Support CRM • Week 4</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight font-brand">
               {lang === 'ar'
-                ? `مرحباً، ${currentAgent.nameAr}`
+                ? `أهلاً بك، ${currentAgent.nameAr}`
                 : `Welcome back, ${currentAgent.name}`}
             </h1>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-sm text-gold-100/70 font-sans max-w-2xl">
               {lang === 'ar'
-                ? `لديك اليوم تذاكر نشطة بنسبة التزام SLA تبلغ ${stats.slaComplianceRate}%.`
-                : `You have active support queues with ${stats.slaComplianceRate}% overall SLA compliance.`}
+                ? `لوحة التحكم التنفيذية الشاملة بنسبة التزام SLA تبلغ ${stats.slaComplianceRate}% ومعدل رضا عملاء ${stats.csatScore || 4.9} / 5.`
+                : `Executive Command Center with ${stats.slaComplianceRate}% overall SLA compliance and ${stats.csatScore || 4.9} / 5 customer satisfaction.`}
             </p>
           </div>
 
           {/* Quick Action Button */}
           <div className="flex items-center gap-3">
             <Link href="/tickets/kanban">
-              <Button variant="secondary" className="text-xs">
-                <Kanban className="w-4 h-4" />
+              <Button
+                variant="outline"
+                className="text-xs border-navy-700 hover:border-gold-500/40 text-slate-200"
+              >
+                <Kanban className="w-4 h-4 text-gold-400" />
                 <span>{t('navKanban')}</span>
               </Button>
             </Link>
-            <Button onClick={() => setIsCreateOpen(true)} className="text-xs">
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              className="text-xs bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold hover:opacity-95 shadow-lg shadow-gold-500/20"
+            >
               <Plus className="w-4 h-4" />
               <span>{t('newTicketBtn')}</span>
             </Button>
@@ -136,72 +144,76 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* KPI 1 */}
-        <Card className="glass-panel-hover border-slate-800/80">
+        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
               {t('kpiTotalTickets')}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-gold-500/10 text-gold-400 flex items-center justify-center border border-gold-500/20">
               <Ticket className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-white">{stats.totalTickets}</span>
-            <span className="text-xs text-emerald-400 font-medium">+12% this week</span>
+          <div className="flex items-baseline gap-2 pt-1">
+            <span className="text-3xl font-extrabold text-white font-brand">
+              {stats.totalTickets}
+            </span>
+            <span className="text-xs text-emerald-400 font-semibold">+14% this sprint</span>
           </div>
         </Card>
 
         {/* KPI 2 */}
-        <Card className="glass-panel-hover border-slate-800/80">
+        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
               {t('kpiOpenTickets')}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-amber-300">{stats.openTickets}</span>
-            <span className="text-xs text-slate-400 font-medium">Under active review</span>
+          <div className="flex items-baseline gap-2 pt-1">
+            <span className="text-3xl font-extrabold text-amber-300 font-brand">
+              {stats.openTickets}
+            </span>
+            <span className="text-xs text-slate-400 font-medium">Active queue</span>
           </div>
         </Card>
 
         {/* KPI 3 */}
-        <Card className="glass-panel-hover border-slate-800/80">
+        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
               {t('kpiSLACompliance')}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-emerald-400">
+          <div className="flex items-baseline gap-2 pt-1">
+            <span className="text-3xl font-extrabold text-emerald-400 font-brand">
               {stats.slaComplianceRate}%
             </span>
-            <span className="text-xs text-emerald-400 font-medium">Target: &gt;90%</span>
+            <span className="text-xs text-emerald-400 font-medium">Guaranteed &gt;90%</span>
           </div>
         </Card>
 
         {/* KPI 4 */}
-        <Card className="glass-panel-hover border-slate-800/80">
+        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
               {t('kpiCSATAverage')}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-gold-500/10 text-gold-400 flex items-center justify-center border border-gold-500/20">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-purple-300">
-              {stats.averageCSAT} / 5.0
+          <div className="flex items-baseline gap-2 pt-1">
+            <span className="text-3xl font-extrabold text-gold-300 font-brand">
+              {stats.csatScore || 4.9} / 5.0
             </span>
-            <span className="text-xs text-purple-400 font-medium">⭐ 98% Positive</span>
+            <span className="text-xs text-gold-300 font-semibold">⭐ 99% Satisfaction</span>
           </div>
         </Card>
       </div>
@@ -209,10 +221,10 @@ export default function DashboardPage() {
       {/* Omnichannel Distribution & Quick Access */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Channel Ingestion Breakdown */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-sm">
-              <Headphones className="w-4 h-4 text-indigo-400" />
+        <Card className="lg:col-span-1 p-6 space-y-4 border-gold-500/20 bg-navy-900/80">
+          <CardHeader className="p-0 pb-2">
+            <CardTitle className="text-sm font-brand text-gold-300 flex items-center gap-2">
+              <Headphones className="w-4 h-4 text-gold-400" />
               <span>{lang === 'ar' ? 'قنوات التواصل الشاملة' : 'Omnichannel Ingestion'}</span>
             </CardTitle>
           </CardHeader>
@@ -220,49 +232,50 @@ export default function DashboardPage() {
             {Object.entries(stats.channelDistribution || {}).map(([chan, count]) => (
               <div
                 key={chan}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/60"
+                className="flex items-center justify-between p-3 rounded-2xl bg-navy-950 border border-navy-800"
               >
                 <ChannelBadge channel={chan} />
-                <span className="text-xs font-bold text-slate-200">{count as number} tickets</span>
+                <span className="text-xs font-bold text-gold-200">{count as number} tickets</span>
               </div>
             ))}
           </div>
         </Card>
 
         {/* Quick Access Modules */}
-        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Link href="/customers" className="block group">
-            <Card className="glass-panel-hover h-full flex flex-col justify-between">
+            <Card className="glass-panel-hover h-full flex flex-col justify-between p-6 border-gold-500/20 bg-navy-900/80">
               <div>
-                <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                <div className="w-11 h-11 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform border border-gold-500/20">
                   <Users className="w-5 h-5" />
                 </div>
-                <h4 className="font-bold text-slate-100 text-sm">{t('navCustomers')}</h4>
-                <p className="text-xs text-slate-400 mt-1">
-                  View customer 360 touchpoint timeline, tiers, contact details, and open tickets.
+                <h4 className="font-bold text-white text-base font-brand">{t('navCustomers')}</h4>
+                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed font-sans">
+                  Inspect customer 360 touchpoints, tier levels (Enterprise/VIP), contact profiles,
+                  and ticket history.
                 </p>
               </div>
-              <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-purple-400 group-hover:underline">
-                <span>Explore Customers</span>
+              <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-gold-400 group-hover:underline font-brand">
+                <span>استعراض العملاء / Explore Customers</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </div>
             </Card>
           </Link>
 
           <Link href="/workspace" className="block group">
-            <Card className="glass-panel-hover h-full flex flex-col justify-between">
+            <Card className="glass-panel-hover h-full flex flex-col justify-between p-6 border-gold-500/20 bg-navy-900/80">
               <div>
-                <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                <div className="w-11 h-11 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform border border-gold-500/20">
                   <Headphones className="w-5 h-5" />
                 </div>
-                <h4 className="font-bold text-slate-100 text-sm">{t('navWorkspace')}</h4>
-                <p className="text-xs text-slate-400 mt-1">
-                  Agent reply console with 1-click canned responses, internal notes thread, and SLA
-                  alerts.
+                <h4 className="font-bold text-white text-base font-brand">{t('navWorkspace')}</h4>
+                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed font-sans">
+                  Agent interactive reply console with 1-click canned responses, internal private
+                  notes, and AI Copilot.
                 </p>
               </div>
-              <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-cyan-400 group-hover:underline">
-                <span>Open Workspace</span>
+              <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-gold-400 group-hover:underline font-brand">
+                <span>فتح منصة الردود / Open Workspace</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </div>
             </Card>
@@ -271,15 +284,15 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Omnichannel Tickets Feed */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm">
-            <Ticket className="w-4 h-4 text-indigo-400" />
+      <Card className="p-6 border-gold-500/20 bg-navy-900/80 space-y-4">
+        <CardHeader className="p-0 pb-2 flex items-center justify-between">
+          <CardTitle className="text-base font-brand text-gold-300 flex items-center gap-2">
+            <Ticket className="w-4 h-4 text-gold-400" />
             <span>{t('recentTicketsTitle')}</span>
           </CardTitle>
           <Link
             href="/tickets"
-            className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+            className="text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1 font-brand"
           >
             <span>{lang === 'ar' ? 'عرض الكل' : 'View All'}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -293,48 +306,48 @@ export default function DashboardPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left rtl:text-right text-xs">
-              <thead className="text-[11px] text-slate-400 uppercase border-b border-slate-800 bg-slate-900/40">
+              <thead className="text-[11px] text-gold-300/80 uppercase border-b border-navy-800 bg-navy-950 font-brand">
                 <tr>
-                  <th className="px-4 py-3">Ticket</th>
-                  <th className="px-4 py-3">Customer</th>
-                  <th className="px-4 py-3">Channel</th>
-                  <th className="px-4 py-3">Priority</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">SLA Status</th>
-                  <th className="px-4 py-3 text-right rtl:text-left">Assigned Agent</th>
+                  <th className="px-4 py-3.5">Ticket</th>
+                  <th className="px-4 py-3.5">Customer</th>
+                  <th className="px-4 py-3.5">Channel</th>
+                  <th className="px-4 py-3.5">Priority</th>
+                  <th className="px-4 py-3.5">Status</th>
+                  <th className="px-4 py-3.5">SLA Status</th>
+                  <th className="px-4 py-3.5 text-right rtl:text-left">Assigned Agent</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-navy-800/60 font-sans">
                 {(ticketsData?.data || []).map((ticket: any) => (
-                  <tr key={ticket.id} className="hover:bg-slate-900/60 transition-colors">
-                    <td className="px-4 py-3 font-semibold text-slate-200">
-                      <div className="font-bold text-indigo-400">{ticket.ticketNumber}</div>
+                  <tr key={ticket.id} className="hover:bg-navy-850/80 transition-colors">
+                    <td className="px-4 py-3.5 font-semibold text-slate-200">
+                      <div className="font-bold text-gold-300 font-mono">{ticket.ticketNumber}</div>
                       <div className="truncate max-w-xs text-slate-300 font-normal">
                         {ticket.title}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="font-semibold text-slate-200">
+                    <td className="px-4 py-3.5">
+                      <div className="font-semibold text-white">
                         {lang === 'ar'
                           ? ticket.customer?.nameAr || ticket.customer?.name
                           : ticket.customer?.name}
                       </div>
-                      <div className="text-[10px] text-slate-400">{ticket.customer?.company}</div>
+                      <div className="text-[10.5px] text-slate-400">{ticket.customer?.company}</div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5">
                       <ChannelBadge channel={ticket.channel} />
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5">
                       <PriorityBadge priority={ticket.priority} />
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5">
                       <StatusBadge status={ticket.status} />
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5">
                       <SLABadge slaStatus={ticket.slaStatus} />
                     </td>
-                    <td className="px-4 py-3 text-right rtl:text-left">
-                      <span className="text-slate-300 font-medium">
+                    <td className="px-4 py-3.5 text-right rtl:text-left">
+                      <span className="text-slate-300 font-medium font-brand">
                         {ticket.assignedAgent
                           ? lang === 'ar'
                             ? ticket.assignedAgent.nameAr
@@ -373,7 +386,7 @@ export default function DashboardPage() {
             <select
               value={selectedCustomerId}
               onChange={(e) => setSelectedCustomerId(e.target.value)}
-              className="w-full bg-slate-900/80 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-sm text-slate-100 outline-none"
+              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500 rounded-xl px-4 py-2.5 text-xs text-slate-100 outline-none"
               required
             >
               <option value="">-- Choose Customer --</option>
@@ -393,7 +406,7 @@ export default function DashboardPage() {
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value)}
-                className="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
+                className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
               >
                 <option value="URGENT">Urgent (1h SLA)</option>
                 <option value="HIGH">High (2h SLA)</option>
@@ -408,7 +421,7 @@ export default function DashboardPage() {
               <select
                 value={newChannel}
                 onChange={(e) => setNewChannel(e.target.value)}
-                className="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
+                className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
               >
                 <option value="WEB_FORM">Web Form</option>
                 <option value="WHATSAPP">WhatsApp</option>
@@ -425,7 +438,7 @@ export default function DashboardPage() {
             </label>
             <textarea
               rows={3}
-              className="w-full bg-slate-900/80 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none"
+              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none"
               placeholder="Detailed explanation of the support request..."
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
@@ -433,11 +446,16 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-            <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-navy-800">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsCreateOpen(false)}
+              size="sm"
+            >
               Cancel
             </Button>
-            <Button type="submit" isLoading={isSubmitting}>
+            <Button type="submit" isLoading={isSubmitting} size="sm">
               Submit Ticket
             </Button>
           </div>

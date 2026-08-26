@@ -1,70 +1,90 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #090d16;
+  --background: #050b1a;
   --foreground: #f8fafc;
-  --card: #0f172a;
+  --card: #09132b;
   --card-foreground: #f8fafc;
-  --border: #1e293b;
-  --font-inter: 'Inter', sans-serif;
-  --font-cairo: 'Cairo', sans-serif;
+  --border: #15264f;
+  --font-inter: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-messiri: 'El Messiri', serif;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter);
+  font-size: 14.5px;
+  line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
+/* El Messiri for Arabic text, Brand Headings & Titles */
 [dir='rtl'] body,
-[dir='rtl'] {
-  font-family: var(--font-cairo);
+[dir='rtl'],
+h1,
+h2,
+h3,
+.font-brand {
+  font-family: var(--font-messiri), var(--font-inter), sans-serif;
+  letter-spacing: 0.01em;
 }
 
-/* Glassmorphism Cards */
+/* Luxury Navy Glassmorphic Cards & Panels */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(9, 19, 43, 0.78);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(2, 6, 23, 0.4);
+}
+
+.glass-panel-hover {
+  transition: all 0.25s ease-in-out;
 }
 
 .glass-panel-hover:hover {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(14, 30, 77, 0.9);
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 12px 40px 0 rgba(212, 175, 55, 0.08);
+}
+
+/* Gold Accents & Badges */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #faeabf 0%, #d4af37 50%, #b89228 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-gold {
+  background: linear-gradient(135deg, #d4af37 0%, #b89228 100%);
+}
+
+.border-gold-glow {
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.12);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #050b1a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
+  background: #15264f;
+  border-radius: 6px;
+  border: 1px solid rgba(212, 175, 55, 0.1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-/* Gradient accents */
-.bg-gradient-azm {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
-}
-
-.text-gradient-azm {
-  background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: #254b9f;
 }
