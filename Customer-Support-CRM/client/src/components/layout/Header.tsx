@@ -102,8 +102,9 @@ export function Header() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     setIsSearchOpen(false);
-    router.push(`/tickets?search=${encodeURIComponent(searchQuery.trim())}`);
+    router.push(`/${lang}/tickets?search=${encodeURIComponent(searchQuery.trim())}`);
   };
+
 
   const hasResults =
     searchResults.tickets.length > 0 ||
@@ -175,7 +176,7 @@ export function Header() {
                 {searchResults.tickets.map((t) => (
                   <Link
                     key={t.id}
-                    href={`/tickets?search=${encodeURIComponent(t.ticketNumber)}`}
+                    href={`/${lang}/tickets?search=${encodeURIComponent(t.ticketNumber)}`}
                     onClick={() => setIsSearchOpen(false)}
                     className="flex items-center justify-between p-2 rounded-xl hover:bg-navy-800 border border-transparent hover:border-gold-500/30 transition-all text-xs"
                   >
@@ -213,7 +214,7 @@ export function Header() {
                 {searchResults.customers.map((c) => (
                   <Link
                     key={c.id}
-                    href={`/customers?search=${encodeURIComponent(c.name)}`}
+                    href={`/${lang}/customers?search=${encodeURIComponent(c.name)}`}
                     onClick={() => setIsSearchOpen(false)}
                     className="flex items-center justify-between p-2 rounded-xl hover:bg-navy-800 border border-transparent hover:border-gold-500/30 transition-all text-xs"
                   >
@@ -241,7 +242,7 @@ export function Header() {
                 {searchResults.articles.map((a) => (
                   <Link
                     key={a.id}
-                    href={`/knowledge-base?search=${encodeURIComponent(a.title)}`}
+                    href={`/${lang}/knowledge-base?search=${encodeURIComponent(a.title)}`}
                     onClick={() => setIsSearchOpen(false)}
                     className="flex items-center justify-between p-2 rounded-xl hover:bg-navy-800 border border-transparent hover:border-gold-500/30 transition-all text-xs"
                   >
@@ -258,6 +259,7 @@ export function Header() {
                 ))}
               </div>
             )}
+
 
             {/* View Full Results Footer */}
             <div className="pt-2 border-t border-navy-800 text-center">
@@ -339,7 +341,7 @@ export function Header() {
         <button
           onClick={() => {
             logout();
-            window.location.href = '/login';
+            window.location.href = `/${lang}/login`;
           }}
           className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-rose-500/30 bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 hover:text-rose-200 text-xs font-semibold transition-all shadow-sm"
           title="Sign Out / تسجيل الخروج"
@@ -347,6 +349,7 @@ export function Header() {
           <LogOut className="w-3.5 h-3.5" />
           <span className="hidden sm:inline font-brand">{lang === 'ar' ? 'خروج' : 'Log Out'}</span>
         </button>
+
       </div>
 
       {/* SLA Policy Config Drawer */}

@@ -1,26 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   ShieldCheck,
   Lock,
   Mail,
   ArrowRight,
-  Sparkles,
   Globe,
-  Headphones,
-  CheckCircle2,
-  Building2,
-  Crown
+  Crown,
+  UserCheck
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { useAgent } from '@/context/AgentContext';
+import { useAgent, DEFAULT_AGENTS } from '@/context/AgentContext';
 import { Button } from '@/components/ui/Button';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect');
   const { lang, toggleLanguage, t } = useLanguage();
   const { login } = useAgent();
   const [email, setEmail] = useState('admin@azmsquad.com');
@@ -28,13 +27,13 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleManualLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePerformLogin = async (targetEmail: string, targetPass: string) => {
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      await login(email, password);
-      router.push('/');
+      await login(targetEmail, targetPass);
+      const destination = redirectTarget || `/${lang}`;
+      router.push(destination);
     } catch (err: any) {
       setErrorMessage(err.message || 'Invalid email or password');
     } finally {
@@ -42,8 +41,12 @@ export default function LoginPage() {
     }
   };
 
-  return (
+  const handleManualLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handlePerformLogin(email, password);
+  };
 
+  return (
     <div className="min-h-screen bg-navy-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(212,175,55,0.15),rgba(255,255,255,0))] text-slate-100 flex flex-col justify-between p-6 md:p-10 font-sans">
       {/* Top Header */}
       <div className="max-w-6xl w-full mx-auto flex items-center justify-between">
@@ -56,7 +59,9 @@ export default function LoginPage() {
               <span>AZM CRM Enterprise</span>
               <Crown className="w-4 h-4 text-gold-400" />
             </h1>
-            <p className="text-xs text-gold-200/70">منصة خدمة العملاء والدعم الفني الذكية</p>
+            <p className="text-xs text-gold-200/70">
+              {lang === 'ar' ? 'منصة خدمة العملاء والدعم الفني الذكية' : 'Enterprise Customer Support Platform'}
+            </p>
           </div>
         </div>
 
@@ -68,13 +73,13 @@ export default function LoginPage() {
             <Globe className="w-3.5 h-3.5 text-gold-400" />
             <span>{lang === 'en' ? 'العربية' : 'English'}</span>
           </button>
-          <Link href="/portal">
+          <Link href={`/${lang}/portal`}>
             <Button
               variant="outline"
               size="sm"
               className="text-xs border-navy-700 hover:border-gold-500/50 text-slate-300 hover:text-gold-200"
             >
-              Customer Portal
+              {lang === 'ar' ? 'بوابة العملاء' : 'Customer Portal'}
             </Button>
           </Link>
         </div>
@@ -101,32 +106,56 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {/* Quick 1-Click Demo Logins */}
+          <div className="space-y-2 pt-1">
+            <div className="text-[11px] font-bold text-gold-300 uppercase tracking-wider flex items-center gap-1">
+              <UserCheck className="w-3.5 h-3.5 text-gold-400" />
+              <span>{lang === 'ar' ? 'الدخول السريع (حسابات تجريبية):' : 'Quick Demo Logins:'}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {DEFAULT_AGENTS.map((agent) => (
+                <button
+                  key={agent.id}
+                  type="button"
+                  onClick={() => {
+                    setEmail(agent.email);
+                    setPassword('Password123!');
+                    handlePerformLogin(agent.email, 'Password123!');
+                  }}
+                  className="p-2.5 rounded-xl border border-navy-800 bg-navy-950/80 hover:border-gold-500/40 text-left rtl:text-right transition-colors group"
+                >
+                  <div className="font-bold text-xs text-white group-hover:text-gold-300 truncate">
+                    {lang === 'ar' ? agent.nameAr : agent.name}
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-mono truncate">{agent.role}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {errorMessage && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium text-center">
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs text-center font-medium">
               {errorMessage}
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleManualLogin} className="space-y-4">
-
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-gold-400" />
-                <span>{lang === 'ar' ? 'البريد الإلكتروني المهني' : 'Work Email Address'}</span>
+                <span>{lang === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}</span>
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500 transition-colors"
+                className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500 transition-colors font-mono"
                 required
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-gold-400" />
                 <span>{lang === 'ar' ? 'كلمة المرور' : 'Password'}</span>
               </label>
@@ -152,13 +181,19 @@ export default function LoginPage() {
 
         {/* Public Portal Switcher Box */}
         <div className="text-center text-xs text-slate-400 space-y-1">
-          <span>Are you a client looking to track a support ticket?</span>
+          <span>
+            {lang === 'ar'
+              ? 'هل أنت عميل تبحث عن متابعة تذكرة دعم؟'
+              : 'Are you a client looking to track a support ticket?'}
+          </span>
           <div>
             <Link
-              href="/portal"
+              href={`/${lang}/portal`}
               className="text-gold-400 hover:text-gold-300 font-bold hover:underline"
             >
-              Go to Public Customer Self-Service Portal →
+              {lang === 'ar'
+                ? 'الانتقال إلى بوابة الخدمة الذاتية للعملاء ←'
+                : 'Go to Public Customer Self-Service Portal →'}
             </Link>
           </div>
         </div>

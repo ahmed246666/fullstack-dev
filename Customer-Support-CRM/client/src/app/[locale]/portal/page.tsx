@@ -162,7 +162,7 @@ export default function PublicPortalPage() {
           >
             {lang === 'en' ? 'العربية' : 'English'}
           </button>
-          <Link href="/login">
+          <Link href={`/${lang}/login`}>
             <Button
               variant="secondary"
               size="sm"
@@ -171,6 +171,7 @@ export default function PublicPortalPage() {
               {lang === 'ar' ? 'دخول الموظفين' : 'Specialist Login'}
             </Button>
           </Link>
+
         </div>
       </div>
 

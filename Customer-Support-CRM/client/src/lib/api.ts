@@ -11,8 +11,10 @@ export function setAuthToken(token: string | null): void {
   if (typeof window !== 'undefined') {
     if (token) {
       localStorage.setItem('azm_auth_token', token);
+      document.cookie = `azm_crm_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax;`;
     } else {
       localStorage.removeItem('azm_auth_token');
+      document.cookie = 'azm_crm_token=; path=/; max-age=0; SameSite=Lax;';
     }
   }
 }

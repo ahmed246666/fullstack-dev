@@ -13,4 +13,5 @@ node_modules/
 *.db-journal
 dist/
 .next/
+server/uploads/
 

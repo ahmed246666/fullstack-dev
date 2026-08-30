@@ -4,22 +4,31 @@ import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/queryClient';
-import { LanguageProvider } from '@/context/LanguageContext';
+import { LanguageProvider, Language } from '@/context/LanguageContext';
 import { AgentProvider } from '@/context/AgentContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { SLABreachBanner } from '@/components/sla/SLABreachBanner';
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+interface AppShellProps {
+  children: React.ReactNode;
+  initialLocale?: Language;
+  dir?: 'ltr' | 'rtl';
+}
+
+export function AppShell({ children, initialLocale }: AppShellProps) {
   const [queryClient] = useState(() => getQueryClient());
   const pathname = usePathname();
 
-  const isPublicStandalone = pathname === '/login' || pathname.startsWith('/portal');
+  const isPublicStandalone =
+    pathname?.endsWith('/login') ||
+    pathname === '/login' ||
+    pathname?.includes('/portal');
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
+      <LanguageProvider initialLocale={initialLocale}>
         <AgentProvider>
           <AuthGuard>
             {isPublicStandalone ? (
@@ -42,4 +51,3 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     </QueryClientProvider>
   );
 }
-

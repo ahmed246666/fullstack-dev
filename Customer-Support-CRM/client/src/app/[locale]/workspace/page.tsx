@@ -5,32 +5,22 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Headphones,
   Send,
-  Clock,
-  Sparkles,
   MessageSquare,
-  ShieldAlert,
-  CheckCircle,
-  User,
-  Building2,
   Lock,
   Globe,
   Search,
-  CheckCircle2,
-  Star,
   Paperclip
 } from 'lucide-react';
-
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
 import { api } from '@/lib/api';
-import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import {
   PriorityBadge,
   ChannelBadge,
   SLABadge,
-  StatusBadge,
-  TierBadge
+  StatusBadge
 } from '@/components/ui/Badge';
 import { CannedResponsesBar } from '@/components/workspace/CannedResponsesBar';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
@@ -49,7 +39,6 @@ export default function WorkspacePage() {
   const [isInternal, setIsInternal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCSATOpen, setIsCSATOpen] = useState(false);
-
 
   const {
     data: ticketsData,
@@ -86,7 +75,6 @@ export default function WorkspacePage() {
     }
   };
 
-
   const handleStatusChange = async (newStatus: string) => {
     if (!activeTicket) return;
     try {
@@ -105,21 +93,19 @@ export default function WorkspacePage() {
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
-            <Headphones className="w-6 h-6 text-cyan-400" />
-            <span>{t('navWorkspace')}</span>
+          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2 font-brand">
+            <Headphones className="w-6 h-6 text-gold-400" />
+            <span>{t('workspaceTitle')}</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            {lang === 'ar'
-              ? 'وحدة تحكم الوكيل المتكاملة مع الردود الجاهزة بنقرة واحدة، والملاحظات الداخلية وسجل التذاكر.'
-              : 'Interactive agent console with 1-click canned responses, internal notes, and omnichannel replies.'}
+            {t('workspaceSubtitle')}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-navy-900 border border-navy-800 text-xs">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-slate-400">Agent:</span>
-          <strong className="text-slate-100">
+          <span className="text-slate-400">{t('activeAgent')}:</span>
+          <strong className="text-slate-100 font-brand">
             {lang === 'ar' ? currentAgent.nameAr : currentAgent.name}
           </strong>
         </div>
@@ -128,12 +114,14 @@ export default function WorkspacePage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Pane: Assigned Queue & Tasks (4 cols) */}
         <div className="lg:col-span-4 space-y-4">
-          <Card className="p-4 space-y-3">
+          <Card className="p-4 space-y-3 border-gold-500/20 bg-navy-900/80">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                Inbox Queue ({tickets.length})
+              <h3 className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
+                {lang === 'ar' ? `طابور التذاكر (${tickets.length})` : `Inbox Queue (${tickets.length})`}
               </h3>
-              <span className="text-[10px] text-indigo-400 font-semibold">Active Queue</span>
+              <span className="text-[10px] text-emerald-400 font-semibold">
+                {lang === 'ar' ? 'طابور مباشر' : 'Active Queue'}
+              </span>
             </div>
 
             {/* Search Queue */}
@@ -141,17 +129,19 @@ export default function WorkspacePage() {
               <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search queue..."
+                placeholder={lang === 'ar' ? 'البحث في الطابور...' : 'Search queue...'}
                 value={searchQueue}
                 onChange={(e) => setSearchQueue(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 rtl:pr-9 rtl:pl-3 py-1.5 text-xs text-slate-100 outline-none focus:border-cyan-500"
+                className="w-full bg-navy-950 border border-navy-800 rounded-xl pl-9 pr-3 rtl:pr-9 rtl:pl-3 py-1.5 text-xs text-slate-100 outline-none focus:border-gold-500"
               />
             </div>
 
             {/* Queue List */}
             <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
               {isLoading ? (
-                <div className="py-12 text-center text-xs text-slate-500">Loading queue...</div>
+                <div className="py-12 text-center text-xs text-slate-500">
+                  {lang === 'ar' ? 'جاري تحميل الطابور...' : 'Loading queue...'}
+                </div>
               ) : (
                 tickets.map((ticket: any) => {
                   const isSelected = ticket.id === activeTicket?.id;
@@ -161,12 +151,12 @@ export default function WorkspacePage() {
                       onClick={() => setSelectedTicketId(ticket.id)}
                       className={`p-3 rounded-2xl border transition-all cursor-pointer space-y-2 ${
                         isSelected
-                          ? 'bg-slate-800/90 border-cyan-500 shadow-md shadow-cyan-500/10'
-                          : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700 hover:bg-slate-900'
+                          ? 'bg-navy-800 border-gold-500 shadow-md shadow-gold-500/10'
+                          : 'bg-navy-950/80 border-navy-800 hover:border-gold-500/30 hover:bg-navy-900'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold font-mono text-cyan-400">
+                        <span className="text-[11px] font-bold font-mono text-gold-300">
                           {ticket.ticketNumber}
                         </span>
                         <PriorityBadge priority={ticket.priority} />
@@ -180,10 +170,10 @@ export default function WorkspacePage() {
                         {lang === 'ar' && ticket.customer?.nameAr
                           ? ticket.customer.nameAr
                           : ticket.customer?.name}{' '}
-                        ({ticket.customer?.company || 'Direct'})
+                        ({ticket.customer?.company || (lang === 'ar' ? 'مباشر' : 'Direct')})
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 text-[10px]">
+                      <div className="flex items-center justify-between pt-2 border-t border-navy-800 text-[10px]">
                         <ChannelBadge channel={ticket.channel} />
                         <SLABadge slaStatus={ticket.slaStatus} />
                       </div>
@@ -193,7 +183,7 @@ export default function WorkspacePage() {
               )}
               {tickets.length === 0 && (
                 <div className="py-12 text-center text-xs text-slate-500">
-                  No tickets found in queue
+                  {lang === 'ar' ? 'لا توجد تذاكر في الطابور' : 'No tickets found in queue'}
                 </div>
               )}
             </div>
@@ -204,14 +194,14 @@ export default function WorkspacePage() {
         </div>
 
         {/* Right Pane: Active Ticket Conversation & Reply Console (8 cols) */}
-        <Card className="lg:col-span-8 p-6 flex flex-col justify-between space-y-6">
+        <Card className="lg:col-span-8 p-6 flex flex-col justify-between space-y-6 border-gold-500/20 bg-navy-900/80">
           {activeTicket ? (
             <div className="space-y-6">
               {/* Ticket Top Meta */}
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-navy-800">
                 <div>
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="font-mono text-sm font-extrabold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-lg border border-indigo-500/20">
+                    <span className="font-mono text-sm font-extrabold text-gold-300 bg-gold-500/10 px-2.5 py-0.5 rounded-lg border border-gold-500/20">
                       {activeTicket.ticketNumber}
                     </span>
                     <ChannelBadge channel={activeTicket.channel} />
@@ -227,7 +217,7 @@ export default function WorkspacePage() {
                   </h2>
                   <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
                     <span>
-                      Customer:{' '}
+                      {lang === 'ar' ? 'العميل: ' : 'Customer: '}
                       <strong className="text-slate-200">
                         {lang === 'ar'
                           ? activeTicket.customer?.nameAr || activeTicket.customer?.name
@@ -244,33 +234,37 @@ export default function WorkspacePage() {
                   <select
                     value={activeTicket.status}
                     onChange={(e) => handleStatusChange(e.target.value)}
-                    className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 font-semibold outline-none focus:border-indigo-500"
+                    className="bg-navy-950 border border-navy-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 font-semibold outline-none focus:border-gold-500"
                   >
-                    <option value="NEW">New</option>
-                    <option value="OPEN">Open</option>
-                    <option value="PENDING">Pending</option>
-                    <option value="RESOLVED">Resolved</option>
-                    <option value="CLOSED">Closed</option>
+                    <option value="NEW">{t('status_NEW')}</option>
+                    <option value="OPEN">{t('status_OPEN')}</option>
+                    <option value="PENDING">{t('status_PENDING')}</option>
+                    <option value="RESOLVED">{t('status_RESOLVED')}</option>
+                    <option value="CLOSED">{t('status_CLOSED')}</option>
                   </select>
                 </div>
               </div>
 
               {/* Customer Initial Issue */}
-              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
-                <div className="font-bold text-indigo-400 mb-1 flex items-center justify-between">
-                  <span>Customer Support Request:</span>
+              <div className="p-4 rounded-2xl bg-navy-950/80 border border-navy-800 text-xs text-slate-300">
+                <div className="font-bold text-gold-400 mb-1 flex items-center justify-between font-brand">
+                  <span>{lang === 'ar' ? 'طلب الدعم وتفاصيل المشكلة:' : 'Customer Support Request:'}</span>
                   <span className="text-[10px] text-slate-500">
                     {new Date(activeTicket.createdAt).toLocaleString()}
                   </span>
                 </div>
-                <p className="leading-relaxed whitespace-pre-wrap">{activeTicket.description}</p>
+                <p className="leading-relaxed whitespace-pre-wrap font-sans">{activeTicket.description}</p>
               </div>
 
               {/* Conversation Activity Thread */}
               <div>
-                <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Activity Thread ({activeTicket.notes?.length || 0})</span>
+                <h3 className="text-xs font-bold text-gold-300 uppercase tracking-wider mb-3 flex items-center gap-1.5 font-brand">
+                  <MessageSquare className="w-3.5 h-3.5 text-gold-400" />
+                  <span>
+                    {lang === 'ar'
+                      ? `سجل المحادثة والتحديثات (${activeTicket.notes?.length || 0})`
+                      : `Activity Thread (${activeTicket.notes?.length || 0})`}
+                  </span>
                 </h3>
 
                 <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
@@ -279,40 +273,40 @@ export default function WorkspacePage() {
                       key={note.id}
                       className={`p-3.5 rounded-2xl border text-xs ${
                         note.isInternal
-                          ? 'bg-amber-950/20 border-amber-800/40 text-amber-200'
-                          : 'bg-slate-900/80 border-slate-800 text-slate-200'
+                          ? 'bg-amber-950/30 border-amber-800/40 text-amber-200'
+                          : 'bg-navy-950 border-navy-800 text-slate-200'
                       }`}
                     >
-                      <div className="flex items-center justify-between text-[11px] mb-1.5 pb-1 border-b border-slate-800/60">
-                        <div className="flex items-center gap-1.5 font-bold">
+                      <div className="flex items-center justify-between text-[11px] mb-1.5 pb-1 border-b border-navy-800">
+                        <div className="flex items-center gap-1.5 font-bold font-brand">
                           {note.isInternal ? (
                             <span className="flex items-center gap-1 text-amber-400">
                               <Lock className="w-3 h-3" />
-                              <span>Internal Note: {note.authorName}</span>
+                              <span>{lang === 'ar' ? 'ملاحظة سرية خاصة:' : 'Internal Note:'} {note.authorName}</span>
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1 text-indigo-400">
+                            <span className="flex items-center gap-1 text-gold-300">
                               <Globe className="w-3 h-3" />
-                              <span>Public Reply: {note.authorName}</span>
+                              <span>{lang === 'ar' ? 'رد معتمد للعميل:' : 'Public Reply:'} {note.authorName}</span>
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-[10px] text-slate-500 font-mono">
                           {new Date(note.createdAt).toLocaleTimeString()}
                         </span>
                       </div>
-                      <p className="leading-relaxed whitespace-pre-wrap">{note.content}</p>
+                      <p className="leading-relaxed whitespace-pre-wrap font-sans">{note.content}</p>
 
                       {/* Note Attachments */}
                       {note.attachments && note.attachments.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 pt-2 mt-2 border-t border-slate-800/50">
+                        <div className="flex flex-wrap gap-1.5 pt-2 mt-2 border-t border-navy-800">
                           {note.attachments.map((att: any) => (
                             <a
                               key={att.id}
                               href={att.fileUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-navy-950/80 border border-slate-700 text-[10.5px] text-slate-300 hover:text-gold-300 hover:border-gold-500/40"
+                              className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-navy-900 border border-gold-500/20 text-[10.5px] text-slate-300 hover:text-gold-300 hover:border-gold-500/40"
                             >
                               <Paperclip className="w-3 h-3 text-gold-400" />
                               <span className="truncate max-w-[120px]">{att.originalName}</span>
@@ -323,8 +317,8 @@ export default function WorkspacePage() {
                     </div>
                   ))}
                   {(activeTicket.notes || []).length === 0 && (
-                    <div className="py-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-                      No replies recorded yet.
+                    <div className="py-6 text-center text-xs text-slate-500 border border-dashed border-navy-800 rounded-2xl">
+                      {lang === 'ar' ? 'لا توجد ردود مسجلة بعد.' : 'No replies recorded yet.'}
                     </div>
                   )}
                 </div>
@@ -342,32 +336,32 @@ export default function WorkspacePage() {
               </div>
 
               {/* Composer Box */}
-              <form onSubmit={handleSendReply} className="space-y-3 pt-3 border-t border-slate-800">
+              <form onSubmit={handleSendReply} className="space-y-3 pt-3 border-t border-navy-800">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-300">Message Composer</span>
+                  <span className="text-xs font-bold text-slate-300 font-brand">
+                    {lang === 'ar' ? 'محرر الردود والملاحظات' : 'Message Composer'}
+                  </span>
                   <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={isInternal}
                       onChange={(e) => setIsInternal(e.target.checked)}
-                      className="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0"
+                      className="rounded bg-navy-950 border-navy-700 text-gold-500 focus:ring-0"
                     />
-                    <span className="text-amber-400 font-semibold">Private Internal Note</span>
+                    <span className="text-amber-400 font-semibold font-brand">
+                      {t('internalNoteLabel')}
+                    </span>
                   </label>
                 </div>
                 <textarea
                   rows={3}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  placeholder={
-                    isInternal
-                      ? 'Add private note for support agents...'
-                      : 'Type public reply to send to customer...'
-                  }
+                  placeholder={isInternal ? t('internalNotePlaceholder') : t('publicReplyPlaceholder')}
                   className={`w-full p-3.5 rounded-2xl text-xs outline-none border transition-all ${
                     isInternal
                       ? 'bg-amber-950/20 border-amber-800/50 text-amber-100 placeholder-amber-400/50'
-                      : 'bg-slate-900 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-cyan-500'
+                      : 'bg-navy-950 border-navy-800 text-slate-100 placeholder-slate-500 focus:border-gold-500'
                   }`}
                 />
 
@@ -380,19 +374,22 @@ export default function WorkspacePage() {
 
                 <div className="flex items-center justify-between pt-1">
                   <span className="text-[11px] text-slate-500">
-                    Pressing Send updates customer timeline and audit logs.
+                    {lang === 'ar'
+                      ? 'يؤدي الإرسال إلى تحديث سجل العميل وتتبع سجل التدقيق.'
+                      : 'Pressing Send updates customer timeline and audit logs.'}
                   </span>
                   <Button type="submit" isLoading={isSubmitting} size="sm">
                     <Send className="w-3.5 h-3.5" />
-                    <span>{isInternal ? 'Save Internal Note' : 'Send Public Reply'}</span>
+                    <span>{isInternal ? t('saveNoteBtn') : t('sendReplyBtn')}</span>
                   </Button>
                 </div>
               </form>
-
             </div>
           ) : (
             <div className="py-24 text-center text-xs text-slate-500">
-              Select a ticket from the queue to start responding.
+              {lang === 'ar'
+                ? 'اختر تذكرة من الطابور لبدء كتابة الرد.'
+                : 'Select a ticket from the queue to start responding.'}
             </div>
           )}
         </Card>

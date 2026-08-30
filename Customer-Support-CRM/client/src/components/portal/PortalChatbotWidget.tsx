@@ -234,11 +234,12 @@ export function PortalChatbotWidget({ onEscalateToTicket }: PortalChatbotWidgetP
                       {m.suggestedArticles.map((art) => (
                         <a
                           key={art.id}
-                          href={`/knowledge-base?search=${encodeURIComponent(art.title)}`}
+                          href={`/${lang}/knowledge-base?search=${encodeURIComponent(art.title)}`}
                           target="_blank"
                           rel="noreferrer"
                           className="flex items-center justify-between p-1.5 rounded-lg bg-navy-800/80 hover:bg-navy-750 text-slate-200 hover:text-white transition-colors text-[11px]"
                         >
+
                           <span className="truncate pr-1 rtl:pl-1 rtl:pr-0">
                             {lang === 'ar' && art.titleAr ? art.titleAr : art.title}
                           </span>

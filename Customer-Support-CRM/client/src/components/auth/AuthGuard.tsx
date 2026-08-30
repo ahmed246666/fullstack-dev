@@ -11,23 +11,27 @@ interface AuthGuardProps {
   children: React.ReactNode;
 }
 
-const PUBLIC_ROUTES = ['/login', '/portal'];
-
 export function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, isLoadingAuth, isAdmin, currentAgent } = useAgent();
   const { lang } = useLanguage();
   const pathname = usePathname();
   const router = useRouter();
 
-  const isPublicRoute = PUBLIC_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
+  // Strip locale prefix (e.g. /en/login -> /login)
+  const pathWithoutLocale = pathname
+    ? pathname.replace(/^\/(en|ar)/, '') || '/'
+    : '/';
+
+  const isPublicRoute =
+    pathWithoutLocale === '/login' ||
+    pathWithoutLocale === '/portal' ||
+    pathWithoutLocale.startsWith('/portal/');
 
   useEffect(() => {
     if (!isLoadingAuth && !isAuthenticated && !isPublicRoute) {
-      router.push('/login');
+      router.push(`/${lang}/login`);
     }
-  }, [isAuthenticated, isLoadingAuth, isPublicRoute, router]);
+  }, [isAuthenticated, isLoadingAuth, isPublicRoute, router, lang]);
 
   // Loading Screen while verifying JWT token
   if (isLoadingAuth && !isPublicRoute) {
@@ -38,7 +42,11 @@ export function AuthGuard({ children }: AuthGuardProps) {
         </div>
         <div className="flex items-center gap-2 text-gold-400 text-xs font-semibold">
           <Loader2 className="w-4 h-4 animate-spin" />
-          <span>Verifying Enterprise Security Credentials...</span>
+          <span>
+            {lang === 'ar'
+              ? 'جاري التحقق من بيانات الأمان المؤسسي...'
+              : 'Verifying Enterprise Security Credentials...'}
+          </span>
         </div>
       </div>
     );
@@ -50,7 +58,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }
 
   // Admin-only Route Check for /analytics
-  if (pathname.startsWith('/analytics') && !isAdmin && isAuthenticated) {
+  if (pathWithoutLocale.startsWith('/analytics') && !isAdmin && isAuthenticated) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-6">
         <div className="glass-panel p-8 max-w-md w-full text-center space-y-4 border border-rose-500/30">
@@ -68,7 +76,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
           <div className="pt-2">
             <Button
               variant="outline"
-              onClick={() => router.push('/workspace')}
+              onClick={() => router.push(`/${lang}/workspace`)}
               className="text-xs border-navy-700 hover:border-gold-500/50"
             >
               {lang === 'ar' ? 'العودة إلى مساحة العمل' : 'Go to Agent Workspace'}

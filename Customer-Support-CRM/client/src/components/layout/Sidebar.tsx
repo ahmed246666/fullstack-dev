@@ -43,7 +43,7 @@ export function Sidebar() {
     <aside className="w-68 min-h-screen glass-panel border-r rtl:border-l rtl:border-r-0 border-gold-500/20 bg-navy-950/95 flex flex-col justify-between p-5">
       <div>
         {/* Brand Logo & Name */}
-        <Link href="/" className="flex items-center gap-3.5 px-3 py-4 mb-6 group cursor-pointer">
+        <Link href={`/${lang}`} className="flex items-center gap-3.5 px-3 py-4 mb-6 group cursor-pointer">
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-gold-600 via-gold-500 to-gold-400 text-navy-950 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-gold-500/20 group-hover:scale-105 transition-transform font-brand">
             عزم
           </div>
@@ -60,13 +60,20 @@ export function Sidebar() {
         <nav className="space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
+            const targetHref = item.href === '/' ? `/${lang}` : `/${lang}${item.href}`;
+            const pathWithoutLocale = pathname ? pathname.replace(/^\/(en|ar)/, '') || '/' : '/';
+            
             const isActive =
-              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+              item.href === '/'
+                ? pathWithoutLocale === '/'
+                : item.href === '/tickets'
+                ? pathWithoutLocale === '/tickets' || (pathWithoutLocale.startsWith('/tickets/') && pathWithoutLocale !== '/tickets/kanban')
+                : pathWithoutLocale === item.href || pathWithoutLocale.startsWith(`${item.href}/`);
 
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={targetHref}
                 className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold transition-all duration-150 font-sans ${
                   isActive
                     ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold shadow-md shadow-gold-500/20'
@@ -83,12 +90,12 @@ export function Sidebar() {
             <button
               onClick={() => {
                 logout();
-                window.location.href = '/login';
+                window.location.href = `/${lang}/login`;
               }}
               className="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 transition-all text-left rtl:text-right"
             >
               <LogOut className="w-4 h-4 text-rose-400" />
-              <span>{lang === 'ar' ? 'تسجيل الخروج' : 'Log Out'}</span>
+              <span className="font-medium">{t('logout')}</span>
             </button>
           </div>
 

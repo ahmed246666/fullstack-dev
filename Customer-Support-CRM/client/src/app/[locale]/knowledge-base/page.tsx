@@ -7,11 +7,7 @@ import {
   Search,
   Plus,
   ThumbsUp,
-  FolderOpen,
-  ArrowRight,
-  Sparkles,
-  Tag,
-  CheckCircle2
+  ArrowRight
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { api } from '@/lib/api';
@@ -21,7 +17,6 @@ import { ArticleEditorModal } from '@/components/knowledge/ArticleEditorModal';
 import { ArticleViewerModal } from '@/components/knowledge/ArticleViewerModal';
 
 export default function KnowledgeBasePage() {
-
   const { lang, t } = useLanguage();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -52,27 +47,26 @@ export default function KnowledgeBasePage() {
   return (
     <div className="space-y-6">
       {/* Top Hero Banner */}
-      <div className="p-8 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-indigo-950/40 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
+      <div className="p-8 rounded-3xl bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 border border-gold-500/25 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
         <div className="space-y-2 max-w-xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Self-Service Knowledge Base</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-500/10 border border-gold-500/20 text-gold-300 text-xs font-semibold font-brand">
+            <BookOpen className="w-3.5 h-3.5 text-gold-400" />
+            <span>{lang === 'ar' ? 'قاعدة المعرفة الذاتية' : 'Self-Service Knowledge Base'}</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
-            {lang === 'ar'
-              ? 'قاعدة المعرفة والمقالات الإرشادية'
-              : 'Knowledge Base & Troubleshooting Guides'}
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white leading-tight font-brand">
+            {t('kbTitle')}
           </h1>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            {lang === 'ar'
-              ? 'تصفح الحلول والأدلة المعتمدة ثنائية اللغة لتقليل وقت معالجة التذاكر وتسهيل الدعم الذاتي.'
-              : 'Browse verified bilingual guides, API specs, and resolution steps to accelerate agent workflows.'}
+          <p className="text-xs text-slate-400 leading-relaxed font-sans">
+            {t('kbSubtitle')}
           </p>
         </div>
 
-        <Button onClick={() => setIsCreateOpen(true)} className="text-xs shrink-0">
+        <Button
+          onClick={() => setIsCreateOpen(true)}
+          className="text-xs shrink-0 bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold hover:opacity-95 shadow-lg shadow-gold-500/20"
+        >
           <Plus className="w-4 h-4" />
-          <span>{lang === 'ar' ? 'نشر مقال جديد' : 'Publish Article'}</span>
+          <span>{t('kbNewArticle')}</span>
         </Button>
       </div>
 
@@ -89,7 +83,7 @@ export default function KnowledgeBasePage() {
             }
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all shadow-inner"
+            className="w-full bg-navy-950 border border-navy-800 rounded-2xl pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-gold-500 transition-all shadow-inner"
           />
         </div>
 
@@ -99,10 +93,10 @@ export default function KnowledgeBasePage() {
             <button
               key={c.key}
               onClick={() => setSelectedCategory(c.key)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all whitespace-nowrap font-brand ${
                 selectedCategory === c.key
-                  ? 'bg-emerald-600 text-white border-emerald-500 shadow-md'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                  ? 'bg-gold-500 text-navy-950 border-gold-400 font-bold shadow-md shadow-gold-500/20'
+                  : 'bg-navy-950 text-slate-300 border-navy-800 hover:text-white'
               }`}
             >
               {c.label}
@@ -114,7 +108,7 @@ export default function KnowledgeBasePage() {
       {/* Articles Grid */}
       {isLoading ? (
         <div className="py-24 text-center text-xs text-slate-400 animate-pulse">
-          Loading Knowledge Base Articles...
+          {lang === 'ar' ? 'جاري تحميل مقالات قاعدة المعرفة...' : 'Loading Knowledge Base Articles...'}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -130,27 +124,27 @@ export default function KnowledgeBasePage() {
               <Card
                 key={article.id}
                 onClick={() => setViewingArticle(article)}
-                className="p-5 flex flex-col justify-between glass-panel-hover border-slate-800/80 hover:border-emerald-500/50 cursor-pointer group transition-all"
+                className="p-5 flex flex-col justify-between glass-panel-hover border-gold-500/20 bg-navy-900/80 hover:border-gold-500/50 cursor-pointer group transition-all"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 font-semibold text-[10px] border border-emerald-500/20">
+                    <span className="px-2.5 py-0.5 rounded-md bg-gold-500/10 text-gold-300 font-semibold text-[10px] border border-gold-500/20 font-brand">
                       {article.category}
                     </span>
-                    <div className="flex items-center gap-1 text-[11px] text-slate-400">
-                      <ThumbsUp className="w-3 h-3 text-emerald-400" />
+                    <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
+                      <ThumbsUp className="w-3 h-3 text-gold-400" />
                       <span>{article.helpfulCount ?? 0}</span>
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-slate-100 text-sm group-hover:text-emerald-400 transition-colors line-clamp-2">
+                  <h3 className="font-bold text-slate-100 text-sm group-hover:text-gold-300 transition-colors line-clamp-2 font-brand">
                     {title}
                   </h3>
 
-                  <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">{content}</p>
+                  <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed font-sans">{content}</p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                <div className="pt-4 mt-4 border-t border-navy-800 flex items-center justify-between text-xs font-brand">
                   <div className="flex items-center gap-1 flex-wrap">
                     {tagsList.slice(0, 2).map((tag: string, idx: number) => (
                       <span key={idx} className="text-[10px] text-slate-500 font-mono">
@@ -159,8 +153,8 @@ export default function KnowledgeBasePage() {
                     ))}
                   </div>
 
-                  <span className="font-semibold text-emerald-400 flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
-                    <span>Read Guide</span>
+                  <span className="font-semibold text-gold-400 flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
+                    <span>{lang === 'ar' ? 'قراءة الدليل' : 'Read Guide'}</span>
                     <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                   </span>
                 </div>
@@ -169,8 +163,10 @@ export default function KnowledgeBasePage() {
           })}
 
           {articles.length === 0 && (
-            <div className="col-span-full py-20 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-3xl">
-              No knowledge base articles found matching your criteria.
+            <div className="col-span-full py-20 text-center text-xs text-slate-500 border border-dashed border-navy-800 rounded-3xl">
+              {lang === 'ar'
+                ? 'لم يتم العثور على مقالات تطابق معايير البحث.'
+                : 'No knowledge base articles found matching your criteria.'}
             </div>
           )}
         </div>
@@ -182,7 +178,6 @@ export default function KnowledgeBasePage() {
         onClose={() => setIsCreateOpen(false)}
         onSuccess={() => refetch()}
       />
-
 
       {/* Article Viewer & Voting Modal */}
       <ArticleViewerModal

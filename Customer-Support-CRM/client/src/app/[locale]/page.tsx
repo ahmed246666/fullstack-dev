@@ -8,14 +8,11 @@ import {
   Users,
   Kanban,
   CheckCircle2,
-  AlertTriangle,
   Clock,
   Plus,
   ArrowUpRight,
-  Sparkles,
   TrendingUp,
   Headphones,
-  ShieldCheck,
   Crown
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -27,8 +24,7 @@ import {
   StatusBadge,
   PriorityBadge,
   ChannelBadge,
-  SLABadge,
-  TierBadge
+  SLABadge
 } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
@@ -47,7 +43,7 @@ export default function DashboardPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Queries
-  const { data: analyticsData, isLoading: isAnalyticsLoading } = useQuery({
+  const { data: analyticsData } = useQuery({
     queryKey: ['analytics'],
     queryFn: () => api.getAnalytics()
   });
@@ -107,7 +103,11 @@ export default function DashboardPage() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs font-semibold">
               <Crown className="w-4 h-4 text-gold-400" />
-              <span>AZM Squad Customer Support CRM • Week 4</span>
+              <span>
+                {lang === 'ar'
+                  ? 'منصة خدمة ودعم عملاء عزم المؤسسية'
+                  : 'AZM Squad Customer Support CRM • Enterprise'}
+              </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight font-brand">
               {lang === 'ar'
@@ -123,7 +123,7 @@ export default function DashboardPage() {
 
           {/* Quick Action Button */}
           <div className="flex items-center gap-3">
-            <Link href="/tickets/kanban">
+            <Link href={`/${lang}/tickets/kanban`}>
               <Button
                 variant="outline"
                 className="text-xs border-navy-700 hover:border-gold-500/40 text-slate-200"
@@ -159,7 +159,9 @@ export default function DashboardPage() {
             <span className="text-3xl font-extrabold text-white font-brand">
               {stats.totalTickets}
             </span>
-            <span className="text-xs text-emerald-400 font-semibold">+14% this sprint</span>
+            <span className="text-xs text-emerald-400 font-semibold">
+              {lang === 'ar' ? '+14% هذا الأسبوع' : '+14% this sprint'}
+            </span>
           </div>
         </Card>
 
@@ -177,7 +179,9 @@ export default function DashboardPage() {
             <span className="text-3xl font-extrabold text-amber-300 font-brand">
               {stats.openTickets}
             </span>
-            <span className="text-xs text-slate-400 font-medium">Active queue</span>
+            <span className="text-xs text-slate-400 font-medium">
+              {lang === 'ar' ? 'طابور نشط' : 'Active queue'}
+            </span>
           </div>
         </Card>
 
@@ -195,7 +199,9 @@ export default function DashboardPage() {
             <span className="text-3xl font-extrabold text-emerald-400 font-brand">
               {stats.slaComplianceRate}%
             </span>
-            <span className="text-xs text-emerald-400 font-medium">Guaranteed &gt;90%</span>
+            <span className="text-xs text-emerald-400 font-medium">
+              {lang === 'ar' ? 'المستهدف >90%' : 'Guaranteed >90%'}
+            </span>
           </div>
         </Card>
 
@@ -213,7 +219,9 @@ export default function DashboardPage() {
             <span className="text-3xl font-extrabold text-gold-300 font-brand">
               {stats.csatScore || 4.9} / 5.0
             </span>
-            <span className="text-xs text-gold-300 font-semibold">⭐ 99% Satisfaction</span>
+            <span className="text-xs text-gold-300 font-semibold">
+              {lang === 'ar' ? '⭐ 99% نسبة الرضا' : '⭐ 99% Satisfaction'}
+            </span>
           </div>
         </Card>
       </div>
@@ -235,7 +243,9 @@ export default function DashboardPage() {
                 className="flex items-center justify-between p-3 rounded-2xl bg-navy-950 border border-navy-800"
               >
                 <ChannelBadge channel={chan} />
-                <span className="text-xs font-bold text-gold-200">{count as number} tickets</span>
+                <span className="text-xs font-bold text-gold-200">
+                  {lang === 'ar' ? `${count} تذاكر` : `${count} tickets`}
+                </span>
               </div>
             ))}
           </div>
@@ -243,7 +253,7 @@ export default function DashboardPage() {
 
         {/* Quick Access Modules */}
         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <Link href="/customers" className="block group">
+          <Link href={`/${lang}/customers`} className="block group">
             <Card className="glass-panel-hover h-full flex flex-col justify-between p-6 border-gold-500/20 bg-navy-900/80">
               <div>
                 <div className="w-11 h-11 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform border border-gold-500/20">
@@ -251,18 +261,19 @@ export default function DashboardPage() {
                 </div>
                 <h4 className="font-bold text-white text-base font-brand">{t('navCustomers')}</h4>
                 <p className="text-xs text-slate-400 mt-1.5 leading-relaxed font-sans">
-                  Inspect customer 360 touchpoints, tier levels (Enterprise/VIP), contact profiles,
-                  and ticket history.
+                  {lang === 'ar'
+                    ? 'استعراض نقاط تفاعل العملاء الشاملة 360، وفئات الحسابات (مؤسسي/VIP)، وسجل التذاكر.'
+                    : 'Inspect customer 360 touchpoints, tier levels (Enterprise/VIP), contact profiles, and ticket history.'}
                 </p>
               </div>
               <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-gold-400 group-hover:underline font-brand">
-                <span>استعراض العملاء / Explore Customers</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
+                <span>{lang === 'ar' ? 'استعراض العملاء' : 'Explore Customers'}</span>
+                <ArrowUpRight className="w-3.5 h-3.5 rtl:rotate-180" />
               </div>
             </Card>
           </Link>
 
-          <Link href="/workspace" className="block group">
+          <Link href={`/${lang}/workspace`} className="block group">
             <Card className="glass-panel-hover h-full flex flex-col justify-between p-6 border-gold-500/20 bg-navy-900/80">
               <div>
                 <div className="w-11 h-11 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform border border-gold-500/20">
@@ -270,13 +281,14 @@ export default function DashboardPage() {
                 </div>
                 <h4 className="font-bold text-white text-base font-brand">{t('navWorkspace')}</h4>
                 <p className="text-xs text-slate-400 mt-1.5 leading-relaxed font-sans">
-                  Agent interactive reply console with 1-click canned responses, internal private
-                  notes, and AI Copilot.
+                  {lang === 'ar'
+                    ? 'منصة الردود التفاعلية مع قوالب الردود السريعة بنقرة واحدة، والملاحظات الخاصة، والمساعد الذكي.'
+                    : 'Agent interactive reply console with 1-click canned responses, internal private notes, and AI Copilot.'}
                 </p>
               </div>
               <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-gold-400 group-hover:underline font-brand">
-                <span>فتح منصة الردود / Open Workspace</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
+                <span>{lang === 'ar' ? 'فتح منصة الردود' : 'Open Workspace'}</span>
+                <ArrowUpRight className="w-3.5 h-3.5 rtl:rotate-180" />
               </div>
             </Card>
           </Link>
@@ -291,30 +303,30 @@ export default function DashboardPage() {
             <span>{t('recentTicketsTitle')}</span>
           </CardTitle>
           <Link
-            href="/tickets"
+            href={`/${lang}/tickets`}
             className="text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1 font-brand"
           >
             <span>{lang === 'ar' ? 'عرض الكل' : 'View All'}</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <ArrowUpRight className="w-3.5 h-3.5 rtl:rotate-180" />
           </Link>
         </CardHeader>
 
         {isTicketsLoading ? (
           <div className="py-8 text-center text-xs text-slate-400 animate-pulse">
-            Loading live tickets...
+            {lang === 'ar' ? 'جاري تحميل التذاكر المباشرة...' : 'Loading live tickets...'}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left rtl:text-right text-xs">
               <thead className="text-[11px] text-gold-300/80 uppercase border-b border-navy-800 bg-navy-950 font-brand">
                 <tr>
-                  <th className="px-4 py-3.5">Ticket</th>
-                  <th className="px-4 py-3.5">Customer</th>
-                  <th className="px-4 py-3.5">Channel</th>
-                  <th className="px-4 py-3.5">Priority</th>
-                  <th className="px-4 py-3.5">Status</th>
-                  <th className="px-4 py-3.5">SLA Status</th>
-                  <th className="px-4 py-3.5 text-right rtl:text-left">Assigned Agent</th>
+                  <th className="px-4 py-3.5">{lang === 'ar' ? 'التذكرة' : 'Ticket'}</th>
+                  <th className="px-4 py-3.5">{lang === 'ar' ? 'العميل' : 'Customer'}</th>
+                  <th className="px-4 py-3.5">{lang === 'ar' ? 'القناة' : 'Channel'}</th>
+                  <th className="px-4 py-3.5">{lang === 'ar' ? 'الأولوية' : 'Priority'}</th>
+                  <th className="px-4 py-3.5">{lang === 'ar' ? 'الحالة' : 'Status'}</th>
+                  <th className="px-4 py-3.5">{lang === 'ar' ? 'اتفاقية SLA' : 'SLA Status'}</th>
+                  <th className="px-4 py-3.5 text-right rtl:text-left">{lang === 'ar' ? 'الموظف المسؤول' : 'Assigned Agent'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-navy-800/60 font-sans">
@@ -372,8 +384,8 @@ export default function DashboardPage() {
       >
         <form onSubmit={handleCreateTicket} className="space-y-4">
           <Input
-            label="Ticket Subject"
-            placeholder="Brief summary of the inquiry or issue..."
+            label={lang === 'ar' ? 'عنوان التذكرة' : 'Ticket Subject'}
+            placeholder={lang === 'ar' ? 'ملخص موجز لطلب الدعم أو المشكلة...' : 'Brief summary of the inquiry or issue...'}
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             required
@@ -381,7 +393,7 @@ export default function DashboardPage() {
 
           <div>
             <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Select Customer
+              {lang === 'ar' ? 'اختيار العميل' : 'Select Customer'}
             </label>
             <select
               value={selectedCustomerId}
@@ -389,10 +401,10 @@ export default function DashboardPage() {
               className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500 rounded-xl px-4 py-2.5 text-xs text-slate-100 outline-none"
               required
             >
-              <option value="">-- Choose Customer --</option>
+              <option value="">{lang === 'ar' ? '-- اختر العميل --' : '-- Choose Customer --'}</option>
               {(customersData?.data || []).map((c: any) => (
                 <option key={c.id} value={c.id}>
-                  {c.name} ({c.company || c.email}) - {c.tier}
+                  {lang === 'ar' && c.nameAr ? c.nameAr : c.name} ({c.company || c.email}) - {c.tier}
                 </option>
               ))}
             </select>
@@ -401,45 +413,45 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Priority
+                {lang === 'ar' ? 'مستوى الأولوية' : 'Priority'}
               </label>
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value)}
                 className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
               >
-                <option value="URGENT">Urgent (1h SLA)</option>
-                <option value="HIGH">High (2h SLA)</option>
-                <option value="MEDIUM">Medium (4h SLA)</option>
-                <option value="LOW">Low (8h SLA)</option>
+                <option value="URGENT">{lang === 'ar' ? 'عاجل جداً (ساعة واحدة)' : 'Urgent (1h SLA)'}</option>
+                <option value="HIGH">{lang === 'ar' ? 'عالية (ساعتان)' : 'High (2h SLA)'}</option>
+                <option value="MEDIUM">{lang === 'ar' ? 'متوسطة (4 ساعات)' : 'Medium (4h SLA)'}</option>
+                <option value="LOW">{lang === 'ar' ? 'منخفضة (8 ساعات)' : 'Low (8h SLA)'}</option>
               </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Channel
+                {lang === 'ar' ? 'قناة التواصل' : 'Channel'}
               </label>
               <select
                 value={newChannel}
                 onChange={(e) => setNewChannel(e.target.value)}
                 className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
               >
-                <option value="WEB_FORM">Web Form</option>
-                <option value="WHATSAPP">WhatsApp</option>
-                <option value="EMAIL">Email</option>
-                <option value="LIVE_CHAT">Live Chat</option>
-                <option value="SMS">SMS</option>
+                <option value="WEB_FORM">{lang === 'ar' ? 'بوابة الدعم' : 'Web Form'}</option>
+                <option value="WHATSAPP">{lang === 'ar' ? 'واتساب' : 'WhatsApp'}</option>
+                <option value="EMAIL">{lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</option>
+                <option value="LIVE_CHAT">{lang === 'ar' ? 'المحادثة المباشرة' : 'Live Chat'}</option>
+                <option value="SMS">{lang === 'ar' ? 'الرسائل النصية' : 'SMS'}</option>
               </select>
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Issue Description
+              {lang === 'ar' ? 'تفاصيل ووصف المشكلة' : 'Issue Description'}
             </label>
             <textarea
               rows={3}
               className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none"
-              placeholder="Detailed explanation of the support request..."
+              placeholder={lang === 'ar' ? 'شرح مفصل لطلب الدعم والمشكلة...' : 'Detailed explanation of the support request...'}
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
               required
@@ -453,10 +465,10 @@ export default function DashboardPage() {
               onClick={() => setIsCreateOpen(false)}
               size="sm"
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" isLoading={isSubmitting} size="sm">
-              Submit Ticket
+              {lang === 'ar' ? 'إرسال التذكرة' : 'Submit Ticket'}
             </Button>
           </div>
         </form>

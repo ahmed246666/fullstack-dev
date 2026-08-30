@@ -8,9 +8,6 @@ import {
   Clock,
   ShieldCheck,
   Star,
-  Users,
-  CheckCircle2,
-  TrendingUp,
   Download,
   Calendar
 } from 'lucide-react';
@@ -25,7 +22,7 @@ import { AgentLeaderboardTable } from '@/components/analytics/AgentLeaderboardTa
 export default function AnalyticsPage() {
   const { lang, t } = useLanguage();
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['executive-analytics'],
     queryFn: () => api.getAnalytics()
   });
@@ -63,20 +60,18 @@ export default function AnalyticsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-purple-400" />
-            <span>{t('navAnalytics')}</span>
+          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2 font-brand">
+            <BarChart3 className="w-6 h-6 text-gold-400" />
+            <span>{t('analyticsTitle')}</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            {lang === 'ar'
-              ? 'لوحة القيادة التنفيذية: مؤشرات الأداء، تقارير الامتثال لـ SLA، وتوزيع حركة التذاكر.'
-              : 'Executive intelligence: Key performance indicators, SLA contract compliance, and omnichannel telemetry.'}
+            {t('analyticsSubtitle')}
           </p>
         </div>
 
         <div className="flex items-center flex-wrap gap-2.5">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
-            <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-navy-900 border border-navy-800 text-xs text-slate-300">
+            <Calendar className="w-3.5 h-3.5 text-gold-400" />
             <span>{lang === 'ar' ? 'آخر 30 يوماً' : 'Last 30 Days'}</span>
           </div>
 
@@ -84,64 +79,63 @@ export default function AnalyticsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="text-xs border-gold-500/30 text-gold-300 hover:bg-gold-500/10"
+            className="text-xs border-gold-500/30 text-gold-300 hover:bg-gold-500/10 font-brand"
             onClick={() => window.open(api.getExportReportUrl('tickets'), '_blank')}
             title="Download full tickets CSV dataset"
           >
             <Download className="w-3.5 h-3.5 text-gold-400" />
-            <span>{lang === 'ar' ? 'تصدير التذاكر (CSV)' : 'Export Tickets (CSV)'}</span>
+            <span>{t('exportTickets')}</span>
           </Button>
 
           {/* Export Agents CSV */}
           <Button
             variant="outline"
             size="sm"
-            className="text-xs border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10"
+            className="text-xs border-gold-500/30 text-gold-300 hover:bg-gold-500/10 font-brand"
             onClick={() => window.open(api.getExportReportUrl('agents'), '_blank')}
             title="Download agent leaderboard CSV report"
           >
-            <Download className="w-3.5 h-3.5 text-indigo-400" />
-            <span>{lang === 'ar' ? 'تقرير الوكلاء (CSV)' : 'Export Agents (CSV)'}</span>
+            <Download className="w-3.5 h-3.5 text-gold-400" />
+            <span>{t('exportAgents')}</span>
           </Button>
         </div>
       </div>
 
-
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
-          title={lang === 'ar' ? 'إجمالي التذاكر' : 'Total Tickets Ingested'}
+          title={lang === 'ar' ? 'إجمالي التذاكر المستلمة' : 'Total Tickets Ingested'}
           value={stats.totalTickets}
-          subtext={`${stats.openTickets} Active / ${stats.resolvedTickets} Resolved`}
+          subtext={lang === 'ar' ? `${stats.openTickets} قيد المعالجة / ${stats.resolvedTickets} مكتملة` : `${stats.openTickets} Active / ${stats.resolvedTickets} Resolved`}
           icon={Ticket}
-          trend={{ value: '+14% this week', isPositive: true }}
+          trend={{ value: lang === 'ar' ? '+14% هذا الأسبوع' : '+14% this week', isPositive: true }}
           color="indigo"
         />
 
         <KPICard
           title={lang === 'ar' ? 'نسبة الالتزام بـ SLA' : 'SLA Compliance Rate'}
           value={`${stats.slaComplianceRate}%`}
-          subtext="Target Contract: 95.0%"
+          subtext={lang === 'ar' ? 'الهدف التعاقدي: 95.0%' : 'Target Contract: 95.0%'}
           icon={ShieldCheck}
-          trend={{ value: '+1.8% vs SLA Goal', isPositive: true }}
+          trend={{ value: lang === 'ar' ? '+1.8% أعلى من المستهدف' : '+1.8% vs SLA Goal', isPositive: true }}
           color="emerald"
         />
 
         <KPICard
           title={lang === 'ar' ? 'متوسط وقت الإغلاق' : 'Avg Resolution Time'}
           value={stats.avgResolutionTimeHours || '2.4h'}
-          subtext="First Response: 14 mins"
+          subtext={lang === 'ar' ? 'أول رد: 14 دقيقة' : 'First Response: 14 mins'}
           icon={Clock}
-          trend={{ value: '-22 mins improvement', isPositive: true }}
+          trend={{ value: lang === 'ar' ? 'تحسن بمقدار 22 دقيقة' : '-22 mins improvement', isPositive: true }}
           color="cyan"
         />
 
         <KPICard
           title={lang === 'ar' ? 'تقييم رضا العملاء CSAT' : 'Customer CSAT Score'}
           value={`${stats.csatScore} / 5.0`}
-          subtext="Based on verified surveys"
+          subtext={lang === 'ar' ? 'بناءً على تقييمات موثقة' : 'Based on verified surveys'}
           icon={Star}
-          trend={{ value: '+0.12 this month', isPositive: true }}
+          trend={{ value: lang === 'ar' ? '+0.12 هذا الشهر' : '+0.12 this month', isPositive: true }}
           color="amber"
         />
       </div>
