@@ -1,11 +1,15 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting database seed for AZM Customer Support CRM...');
 
+  const defaultPasswordHash = bcrypt.hashSync('Password123!', 10);
+
   // 1. Clear existing data in reverse relation order
+  await prisma.attachment.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.note.deleteMany();
   await prisma.ticket.deleteMany();
@@ -23,6 +27,7 @@ async function main() {
       name: 'Ahmed Osama',
       nameAr: 'أحمد أسامة',
       email: 'admin@azmsquad.com',
+      passwordHash: defaultPasswordHash,
       role: 'ADMIN',
       department: 'Management',
       avatarUrl:
@@ -36,6 +41,7 @@ async function main() {
       name: 'Sara Al-Ghamdi',
       nameAr: 'سارة الغامدي',
       email: 'sara.ghamdi@azmsquad.com',
+      passwordHash: defaultPasswordHash,
       role: 'AGENT',
       department: 'Technical',
       avatarUrl:
@@ -49,6 +55,7 @@ async function main() {
       name: 'Khalid Al-Mansoor',
       nameAr: 'خالد المنصور',
       email: 'khalid.mansoor@azmsquad.com',
+      passwordHash: defaultPasswordHash,
       role: 'AGENT',
       department: 'Billing',
       avatarUrl:
@@ -62,6 +69,7 @@ async function main() {
       name: 'Noura Al-Shehri',
       nameAr: 'نورة الشهري',
       email: 'noura.shehri@azmsquad.com',
+      passwordHash: defaultPasswordHash,
       role: 'AGENT',
       department: 'Support',
       avatarUrl:
@@ -70,7 +78,8 @@ async function main() {
     }
   });
 
-  console.log('✅ Created 4 Users & Agents.');
+  console.log('✅ Created 4 Users & Agents with hashed passwords.');
+
 
   // 3. Seed SLA Policies
   await prisma.sLAConfig.createMany({

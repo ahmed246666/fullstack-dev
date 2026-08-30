@@ -1,14 +1,38 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+export function getAuthToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('azm_auth_token');
+  }
+  return null;
+}
+
+export function setAuthToken(token: string | null): void {
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('azm_auth_token', token);
+    } else {
+      localStorage.removeItem('azm_auth_token');
+    }
+  }
+}
+
 export async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const token = getAuthToken();
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string>)
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   const res = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers
-    }
+    headers
   });
 
   if (!res.ok) {
@@ -21,8 +45,31 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
 
 // Typed API Functions
 export const api = {
+  // Authentication
+  login: (credentials: { email: string; password: string }) =>
+    fetchApi<{ success: boolean; token: string; user: any }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials)
+    }),
+
+  getMe: () => fetchApi<{ success: boolean; user: any }>('/auth/me'),
+
+  register: (data: {
+    name: string;
+    nameAr?: string;
+    email: string;
+    password: string;
+    role?: string;
+    department?: string;
+  }) =>
+    fetchApi<{ success: boolean; token: string; user: any }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+
   // Analytics
   getAnalytics: () => fetchApi<{ success: boolean; data: any }>('/users/analytics'),
+
 
   // Customers
   getCustomers: (params?: { search?: string; tier?: string; page?: number; limit?: number }) => {

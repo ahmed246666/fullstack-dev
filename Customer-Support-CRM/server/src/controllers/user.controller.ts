@@ -129,3 +129,71 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
     res.status(500).json({ success: false, error: 'Failed to generate analytics' });
   }
 }
+
+export async function getAuditLogs(req: Request, res: Response): Promise<void> {
+
+  try {
+    const logs = await prisma.auditLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+      include: {
+        actor: {
+          select: {
+            id: true,
+            name: true,
+            nameAr: true,
+            role: true,
+            avatarUrl: true
+          }
+        }
+      }
+    });
+
+    res.json({ success: true, data: logs });
+  } catch (error: any) {
+    console.error('getAuditLogs error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch audit logs' });
+  }
+}
+
+export async function updateSLAPolicy(req: Request, res: Response): Promise<void> {
+  try {
+    const { priority } = req.params;
+    const { responseTimeHours, resolutionTimeHours, escalationRole } = req.body;
+
+    const updated = await prisma.sLAConfig.upsert({
+      where: { priority: String(priority).toUpperCase() },
+      update: {
+        responseTimeHours: Number(responseTimeHours),
+        resolutionTimeHours: Number(resolutionTimeHours),
+        escalationRole: escalationRole || 'ADMIN'
+      },
+      create: {
+        priority: String(priority).toUpperCase(),
+        responseTimeHours: Number(responseTimeHours),
+        resolutionTimeHours: Number(resolutionTimeHours),
+        escalationRole: escalationRole || 'ADMIN'
+      }
+    });
+
+    // Create Audit Log
+    if (req.user) {
+      await prisma.auditLog.create({
+        data: {
+          actorId: req.user.id,
+          actorName: req.user.name,
+          action: 'UPDATE_SLA_POLICY',
+          entity: 'SLAConfig',
+          entityId: updated.id,
+          details: JSON.stringify({ priority, responseTimeHours, resolutionTimeHours })
+        }
+      });
+    }
+
+    res.json({ success: true, data: updated });
+  } catch (error: any) {
+    console.error('updateSLAPolicy error:', error);
+    res.status(500).json({ success: false, error: 'Failed to update SLA policy' });
+  }
+}
+

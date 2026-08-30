@@ -47,6 +47,7 @@ model User {
   name            String
   nameAr          String?
   email           String         @unique
+  passwordHash    String?        // bcrypt hash for JWT auth
   role            String         @default("AGENT") // ADMIN, AGENT, CUSTOMER
   department      String?        // Support, Billing, Technical
   status          String         @default("ACTIVE") // ACTIVE, INACTIVE
@@ -93,6 +94,7 @@ model Ticket {
   assignedAgent   User?          @relation("AssignedAgent", fields: [assignedAgentId], references: [id], onDelete: SetNull)
   
   notes           Note[]         @relation("TicketNotes")
+  attachments     Attachment[]   @relation("TicketAttachments")
   
   // SLA & Timestamps
   responseDueAt   DateTime?
@@ -120,9 +122,28 @@ model Note {
   content         String
   isInternal      Boolean        @default(false)
   channel         String?        // EMAIL, WHATSAPP, LIVE_CHAT, SMS, INTERNAL
+  attachments     Attachment[]   @relation("NoteAttachments")
   
   createdAt       DateTime       @default(now())
 }
+
+model Attachment {
+  id          String    @id @default(uuid())
+  filename    String
+  originalName String
+  fileUrl     String
+  mimeType    String
+  sizeBytes   Int
+  
+  ticketId    String?
+  ticket      Ticket?   @relation("TicketAttachments", fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  noteId      String?
+  note        Note?     @relation("NoteAttachments", fields: [noteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+}
+
 
 model SLAConfig {
   id                  String     @id @default(uuid())

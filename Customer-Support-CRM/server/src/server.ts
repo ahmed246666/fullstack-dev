@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes';
 import customerRoutes from './routes/customer.routes';
 import ticketRoutes from './routes/ticket.routes';
 import noteRoutes from './routes/note.routes';
@@ -30,11 +31,13 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.use('/api', swaggerRoutes);
 
 // Feature API Routers
+app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/tickets', noteRoutes);
 app.use('/api/knowledge-base', knowledgeRoutes);
 app.use('/api/users', userRoutes);
+
 
 // 404 Catch-All
 app.use((req: Request, res: Response) => {

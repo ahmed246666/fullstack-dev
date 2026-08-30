@@ -25,21 +25,32 @@ Deliver full RBAC & Public Customer Self-Service Portal matching PDF Feature 10 
 
 ## Implementation Tasks
 
-### 1 — RBAC Enhancements
-* Update `client/src/context/AgentContext.tsx` with role checking properties: `isAdmin`, `isAgent`.
-* Add audit log query method to `client/src/lib/api.ts`: `getAuditLogs()`.
-* Create `client/src/components/admin/AuditLogsDrawer.tsx`.
+### 1 — Enterprise JWT Authentication & RBAC Backend
+* Update `server/prisma/schema.prisma` with `passwordHash` on `User` model.
+* Seed default bcrypt password hashes (`Password123!`) in `server/prisma/seed.ts`.
+* Implement `server/src/middlewares/auth.middleware.ts` with `authenticateJWT` and `requireRole`.
+* Create `server/src/controllers/auth.controller.ts` (`login`, `getMe`, `register`) and mount `/api/auth` routes.
+* Protect Admin-only endpoints (`/api/users/audit-logs`, `/api/users/sla-policies/:priority`).
 
-### 2 — Public Self-Service Customer Portal
-* Update `client/src/app/portal/page.tsx` with:
-  * Public lookup search box (Ticket code or Email).
-  * Status timeline and public conversation thread.
-  * Public reply sender.
-  * "+ Submit Inquiry" modal for direct customer ingestion.
+### 2 — Frontend Route Protection & Role AuthGuard
+* Update `client/src/lib/api.ts` to attach `Authorization: Bearer <token>` automatically and add auth endpoints.
+* Update `client/src/context/AgentContext.tsx` with real backend JWT authentication, token storage, and verified `/api/auth/me` profile resolution.
+* Implement `client/src/components/auth/AuthGuard.tsx` to guard private workspace routes and block non-admins from `/analytics`.
+* Connect `client/src/app/login/page.tsx` with 1-click role accounts (`ADMIN`, `AGENT`), form credentials authentication, and error handling.
+
+### 3 — Public Self-Service Customer Portal
+* Accessible without agent login at `/portal`.
+* Search ticket by tracking code (`TCK-1001`) or customer email.
+* View live status, SLA progress, public message thread, and submit replies.
+* "+ Submit Inquiry" modal for direct customer ingestion.
 
 ---
 
 ## Verification Steps
-1. `npm run build` succeeds with 0 TypeScript/ESLint errors.
-2. Verify switching to Support Agent restricts Admin-only controls.
-3. Verify public portal `/portal` searches tickets and displays public timeline without exposing internal agent notes.
+1. Backend `npm run build` succeeds with 0 TypeScript errors.
+2. Frontend `npm run build` generates all static routes with 0 errors.
+3. `POST /api/auth/login` issues valid JWT signed token.
+4. Unauthenticated navigation to `/` or `/tickets` redirects to `/login`.
+5. Non-admin login prevents access to `/analytics` with Access Restricted screen.
+6. Public portal `/portal` searches tickets without exposing internal notes.
+

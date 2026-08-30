@@ -16,35 +16,34 @@ import {
   Crown
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { useAgent, DEFAULT_AGENTS } from '@/context/AgentContext';
+import { useAgent } from '@/context/AgentContext';
 import { Button } from '@/components/ui/Button';
 
 export default function LoginPage() {
   const router = useRouter();
   const { lang, toggleLanguage, t } = useLanguage();
-  const { login, currentAgent } = useAgent();
+  const { login } = useAgent();
   const [email, setEmail] = useState('admin@azmsquad.com');
-  const [password, setPassword] = useState('••••••••••••');
+  const [password, setPassword] = useState('Password123!');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleManualLogin = (e: React.FormEvent) => {
+  const handleManualLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      login(email);
+    setErrorMessage(null);
+    try {
+      await login(email, password);
       router.push('/');
-    }, 600);
-  };
-
-  const handleQuickLogin = (agentId: string) => {
-    setIsLoading(true);
-    login(agentId);
-    setTimeout(() => {
-      router.push('/');
-    }, 400);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Invalid email or password');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
+
     <div className="min-h-screen bg-navy-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(212,175,55,0.15),rgba(255,255,255,0))] text-slate-100 flex flex-col justify-between p-6 md:p-10 font-sans">
       {/* Top Header */}
       <div className="max-w-6xl w-full mx-auto flex items-center justify-between">
@@ -102,45 +101,16 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* 1-Click Fast Profile Switcher / Quick Demo Login */}
-          <div className="space-y-2 pt-2">
-            <div className="text-[11px] uppercase tracking-wider font-bold text-gold-400 text-center">
-              {lang === 'ar' ? 'تسجيل دخول سريع للتجربة (1-Click)' : '⚡ 1-Click Fast Test Sign-In'}
+          {errorMessage && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium text-center">
+              {errorMessage}
             </div>
-            <div className="grid grid-cols-2 gap-2.5">
-              {DEFAULT_AGENTS.slice(0, 2).map((agent) => (
-                <button
-                  key={agent.id}
-                  type="button"
-                  onClick={() => handleQuickLogin(agent.id)}
-                  className="p-3 rounded-2xl border border-navy-750 bg-navy-850/80 hover:bg-navy-800 hover:border-gold-500/50 text-left rtl:text-right transition-all group flex items-center gap-2.5"
-                >
-                  <img
-                    src={agent.avatarUrl}
-                    alt={agent.name}
-                    className="w-8 h-8 rounded-full object-cover ring-1 ring-gold-500/40"
-                  />
-                  <div className="overflow-hidden">
-                    <div className="text-xs font-bold text-white group-hover:text-gold-300 truncate">
-                      {lang === 'ar' ? agent.nameAr : agent.name}
-                    </div>
-                    <div className="text-[10px] text-gold-400 font-mono">{agent.role}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative flex items-center justify-center">
-            <div className="border-t border-navy-750 w-full" />
-            <span className="bg-navy-900 px-3 text-[11px] text-slate-500 uppercase tracking-wider">
-              {lang === 'ar' ? 'أو عبر البريد' : 'or email login'}
-            </span>
-            <div className="border-t border-navy-750 w-full" />
-          </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleManualLogin} className="space-y-4">
+
+
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-gold-400" />

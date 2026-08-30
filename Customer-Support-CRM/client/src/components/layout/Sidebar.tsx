@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+
 import {
   LayoutDashboard,
   Users,
@@ -15,13 +16,17 @@ import {
   Sparkles,
   Layers,
   Crown,
-  LogIn
+  LogOut
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useAgent } from '@/context/AgentContext';
 
 export function Sidebar() {
   const pathname = usePathname();
   const { t, lang } = useLanguage();
+  const { logout } = useAgent();
+
+
 
   const navItems = [
     { labelKey: 'navDashboard', href: '/', icon: LayoutDashboard },
@@ -75,18 +80,18 @@ export function Sidebar() {
           })}
 
           <div className="pt-3 border-t border-navy-800/80">
-            <Link
-              href="/login"
-              className={`flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all ${
-                pathname === '/login'
-                  ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30'
-                  : 'text-slate-400 hover:text-gold-300 hover:bg-navy-900/60'
-              }`}
+            <button
+              onClick={() => {
+                logout();
+                window.location.href = '/login';
+              }}
+              className="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 transition-all text-left rtl:text-right"
             >
-              <LogIn className="w-4 h-4 text-gold-400" />
-              <span>{lang === 'ar' ? 'تسجيل الدخول / الحسابات' : 'Agent Login / Switch'}</span>
-            </Link>
+              <LogOut className="w-4 h-4 text-rose-400" />
+              <span>{lang === 'ar' ? 'تسجيل الخروج' : 'Log Out'}</span>
+            </button>
           </div>
+
         </nav>
       </div>
 

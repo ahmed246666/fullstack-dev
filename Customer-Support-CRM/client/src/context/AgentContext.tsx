@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { api, setAuthToken, getAuthToken } from '@/lib/api';
 
 export interface AgentUser {
   id: string;
@@ -8,8 +9,8 @@ export interface AgentUser {
   nameAr: string;
   email: string;
   role: 'ADMIN' | 'AGENT' | 'CUSTOMER';
-  department: string;
-  avatarUrl: string;
+  department?: string;
+  avatarUrl?: string;
 }
 
 export const DEFAULT_AGENTS: AgentUser[] = [
@@ -59,74 +60,91 @@ interface AgentContextType {
   currentAgent: AgentUser;
   agents: AgentUser[];
   isAdmin: boolean;
+  isAgent: boolean;
   isAuthenticated: boolean;
-  login: (agentIdOrEmail: string) => boolean;
+  isLoadingAuth: boolean;
+  login: (email: string, password?: string) => Promise<boolean>;
   logout: () => void;
-  switchAgent: (agentId: string) => void;
+  switchAgent: (email: string) => Promise<void>;
 }
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
 
 export function AgentProvider({ children }: { children: React.ReactNode }) {
   const [currentAgent, setCurrentAgent] = useState<AgentUser>(DEFAULT_AGENTS[0]);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
 
   useEffect(() => {
-    try {
-      const savedAgentId = localStorage.getItem('azm_active_agent_id');
-      const savedAuth = localStorage.getItem('azm_is_authenticated');
-      if (savedAgentId) {
-        const found = DEFAULT_AGENTS.find((a) => a.id === savedAgentId);
-        if (found) setCurrentAgent(found);
+    async function initAuth() {
+      try {
+        const token = getAuthToken();
+        if (token) {
+          const res = await api.getMe();
+          if (res.success && res.user) {
+            setCurrentAgent({
+              id: res.user.id,
+              name: res.user.name,
+              nameAr: res.user.nameAr || res.user.name,
+              email: res.user.email,
+              role: res.user.role as 'ADMIN' | 'AGENT' | 'CUSTOMER',
+              department: res.user.department || '',
+              avatarUrl: res.user.avatarUrl || DEFAULT_AGENTS[0].avatarUrl
+            });
+            setIsAuthenticated(true);
+          } else {
+            setAuthToken(null);
+            setIsAuthenticated(false);
+          }
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        setAuthToken(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoadingAuth(false);
       }
-      if (savedAuth !== null) {
-        setIsAuthenticated(savedAuth === 'true');
-      }
-    } catch {
-      // LocalStorage fallback for SSR
     }
+
+    initAuth();
   }, []);
 
-  const switchAgent = (agentId: string) => {
-    const found = DEFAULT_AGENTS.find((a) => a.id === agentId);
-    if (found) {
-      setCurrentAgent(found);
-      setIsAuthenticated(true);
-      try {
-        localStorage.setItem('azm_active_agent_id', found.id);
-        localStorage.setItem('azm_is_authenticated', 'true');
-      } catch {}
+  const login = async (email: string, password: string = 'Password123!'): Promise<boolean> => {
+    try {
+      const res = await api.login({ email, password });
+      if (res.success && res.token) {
+        setAuthToken(res.token);
+        setCurrentAgent({
+          id: res.user.id,
+          name: res.user.name,
+          nameAr: res.user.nameAr || res.user.name,
+          email: res.user.email,
+          role: res.user.role as 'ADMIN' | 'AGENT' | 'CUSTOMER',
+          department: res.user.department || '',
+          avatarUrl: res.user.avatarUrl || DEFAULT_AGENTS[0].avatarUrl
+        });
+        setIsAuthenticated(true);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
     }
   };
 
-  const login = (agentIdOrEmail: string): boolean => {
-    const found = DEFAULT_AGENTS.find(
-      (a) =>
-        a.id === agentIdOrEmail || a.email.toLowerCase() === agentIdOrEmail.toLowerCase().trim()
-    );
-    if (found) {
-      setCurrentAgent(found);
-      setIsAuthenticated(true);
-      try {
-        localStorage.setItem('azm_active_agent_id', found.id);
-        localStorage.setItem('azm_is_authenticated', 'true');
-      } catch {}
-      return true;
-    }
-    // Default fallback to first admin
-    setCurrentAgent(DEFAULT_AGENTS[0]);
-    setIsAuthenticated(true);
-    return true;
+  const switchAgent = async (email: string) => {
+    await login(email, 'Password123!');
   };
 
   const logout = () => {
+    setAuthToken(null);
     setIsAuthenticated(false);
-    try {
-      localStorage.setItem('azm_is_authenticated', 'false');
-    } catch {}
   };
 
   const isAdmin = currentAgent.role === 'ADMIN';
+  const isAgent = currentAgent.role === 'AGENT' || currentAgent.role === 'ADMIN';
 
   return (
     <AgentContext.Provider
@@ -134,7 +152,9 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
         currentAgent,
         agents: DEFAULT_AGENTS,
         isAdmin,
+        isAgent,
         isAuthenticated,
+        isLoadingAuth,
         login,
         logout,
         switchAgent
@@ -152,3 +172,4 @@ export function useAgent() {
   }
   return context;
 }
+
