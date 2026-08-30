@@ -13,7 +13,8 @@ export async function getTicketNotes(req: Request, res: Response): Promise<void>
       include: {
         author: {
           select: { id: true, name: true, nameAr: true, role: true, avatarUrl: true }
-        }
+        },
+        attachments: true
       }
     });
 
@@ -34,7 +35,8 @@ export async function addTicketNote(req: Request, res: Response): Promise<void> 
       authorId,
       authorName = 'Agent',
       isInternal = false,
-      channel = 'INTERNAL'
+      channel = 'INTERNAL',
+      attachments = []
     } = req.body;
 
     if (!content || !content.trim()) {
@@ -55,14 +57,29 @@ export async function addTicketNote(req: Request, res: Response): Promise<void> 
         authorId: authorId || null,
         authorName: authorName.trim(),
         isInternal: Boolean(isInternal),
-        channel: channel.toUpperCase()
+        channel: channel.toUpperCase(),
+        ...(attachments && attachments.length > 0
+          ? {
+              attachments: {
+                create: attachments.map((att: any) => ({
+                  filename: att.filename,
+                  originalName: att.originalName || att.filename,
+                  fileUrl: att.fileUrl,
+                  mimeType: att.mimeType || 'application/octet-stream',
+                  sizeBytes: Number(att.sizeBytes || 0)
+                }))
+              }
+            }
+          : {})
       },
       include: {
         author: {
           select: { id: true, name: true, nameAr: true, role: true, avatarUrl: true }
-        }
+        },
+        attachments: true
       }
     });
+
 
     // If ticket is NEW and a reply is sent to customer, update to OPEN and set firstResponseAt
     if (ticket.status === 'NEW' && !isInternal) {

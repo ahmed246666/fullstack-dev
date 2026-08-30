@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 import {
   Users,
   Plus,
@@ -25,8 +26,15 @@ import { CustomerDrawer } from '@/components/customers/CustomerDrawer';
 import { CustomerModal } from '@/components/customers/CustomerModal';
 
 export default function CustomersPage() {
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
   const { lang, t } = useLanguage();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(urlSearch);
+
+  useEffect(() => {
+    if (urlSearch) setSearch(urlSearch);
+  }, [urlSearch]);
+
   const [tier, setTier] = useState('ALL');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 

@@ -16,8 +16,10 @@ import {
   Globe,
   Search,
   CheckCircle2,
-  Star
+  Star,
+  Paperclip
 } from 'lucide-react';
+
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
 import { api } from '@/lib/api';
@@ -34,6 +36,8 @@ import { CannedResponsesBar } from '@/components/workspace/CannedResponsesBar';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
 import { CSATModal } from '@/components/sla/CSATModal';
 import { AICopilotWidget } from '@/components/ai/AICopilotWidget';
+import { FileUploadZone, UploadedFile } from '@/components/common/FileUploadZone';
+import { AgentTasksWidget } from '@/components/agent/AgentTasksWidget';
 
 export default function WorkspacePage() {
   const { lang, t } = useLanguage();
@@ -41,9 +45,11 @@ export default function WorkspacePage() {
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [searchQueue, setSearchQueue] = useState('');
   const [replyText, setReplyText] = useState('');
+  const [attachments, setAttachments] = useState<UploadedFile[]>([]);
   const [isInternal, setIsInternal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCSATOpen, setIsCSATOpen] = useState(false);
+
 
   const {
     data: ticketsData,
@@ -59,17 +65,19 @@ export default function WorkspacePage() {
 
   const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activeTicket || !replyText.trim()) return;
+    if (!activeTicket || (!replyText.trim() && attachments.length === 0)) return;
 
     try {
       setIsSubmitting(true);
       await api.addTicketNote(activeTicket.id, {
-        content: replyText.trim(),
+        content: replyText.trim() || '(Attachment uploaded)',
         authorName: lang === 'ar' ? currentAgent.nameAr : currentAgent.name,
         isInternal,
-        channel: activeTicket.channel
+        channel: activeTicket.channel,
+        attachments: attachments as any
       });
       setReplyText('');
+      setAttachments([]);
       refetch();
     } catch (e: any) {
       alert(e.message || 'Failed to send note');
@@ -77,6 +85,7 @@ export default function WorkspacePage() {
       setIsSubmitting(false);
     }
   };
+
 
   const handleStatusChange = async (newStatus: string) => {
     if (!activeTicket) return;
@@ -117,80 +126,82 @@ export default function WorkspacePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Pane: Assigned Queue (4 cols) */}
-        <Card className="lg:col-span-4 p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-              Inbox Queue ({tickets.length})
-            </h3>
-            <span className="text-[10px] text-indigo-400 font-semibold">Active Queue</span>
-          </div>
+        {/* Left Pane: Assigned Queue & Tasks (4 cols) */}
+        <div className="lg:col-span-4 space-y-4">
+          <Card className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                Inbox Queue ({tickets.length})
+              </h3>
+              <span className="text-[10px] text-indigo-400 font-semibold">Active Queue</span>
+            </div>
 
-          {/* Search Queue */}
-          <div className="relative">
-            <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search queue..."
-              value={searchQueue}
-              onChange={(e) => setSearchQueue(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 rtl:pr-9 rtl:pl-3 py-1.5 text-xs text-slate-100 outline-none focus:border-cyan-500"
-            />
-          </div>
+            {/* Search Queue */}
+            <div className="relative">
+              <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search queue..."
+                value={searchQueue}
+                onChange={(e) => setSearchQueue(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 rtl:pr-9 rtl:pl-3 py-1.5 text-xs text-slate-100 outline-none focus:border-cyan-500"
+              />
+            </div>
 
-          {/* Queue List */}
-          <div className="space-y-2.5 max-h-[620px] overflow-y-auto pr-1">
-            {isLoading ? (
-              <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
-                Loading inbox...
-              </div>
-            ) : (
-              tickets.map((ticket: any) => {
-                const isSelected = activeTicket?.id === ticket.id;
+            {/* Queue List */}
+            <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+              {isLoading ? (
+                <div className="py-12 text-center text-xs text-slate-500">Loading queue...</div>
+              ) : (
+                tickets.map((ticket: any) => {
+                  const isSelected = ticket.id === activeTicket?.id;
+                  return (
+                    <div
+                      key={ticket.id}
+                      onClick={() => setSelectedTicketId(ticket.id)}
+                      className={`p-3 rounded-2xl border transition-all cursor-pointer space-y-2 ${
+                        isSelected
+                          ? 'bg-slate-800/90 border-cyan-500 shadow-md shadow-cyan-500/10'
+                          : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700 hover:bg-slate-900'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold font-mono text-cyan-400">
+                          {ticket.ticketNumber}
+                        </span>
+                        <PriorityBadge priority={ticket.priority} />
+                      </div>
 
-                return (
-                  <div
-                    key={ticket.id}
-                    onClick={() => setSelectedTicketId(ticket.id)}
-                    className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                      isSelected
-                        ? 'bg-indigo-600/15 border-indigo-500/60 shadow-lg shadow-indigo-600/10'
-                        : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700 hover:bg-slate-900'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-[11px] mb-1.5">
-                      <span className="font-mono font-bold text-indigo-400">
-                        {ticket.ticketNumber}
-                      </span>
-                      <PriorityBadge priority={ticket.priority} />
+                      <div className="text-xs font-semibold text-slate-100 line-clamp-1">
+                        {ticket.title}
+                      </div>
+
+                      <div className="text-[11px] text-slate-400 line-clamp-1">
+                        {lang === 'ar' && ticket.customer?.nameAr
+                          ? ticket.customer.nameAr
+                          : ticket.customer?.name}{' '}
+                        ({ticket.customer?.company || 'Direct'})
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 text-[10px]">
+                        <ChannelBadge channel={ticket.channel} />
+                        <SLABadge slaStatus={ticket.slaStatus} />
+                      </div>
                     </div>
+                  );
+                })
+              )}
+              {tickets.length === 0 && (
+                <div className="py-12 text-center text-xs text-slate-500">
+                  No tickets found in queue
+                </div>
+              )}
+            </div>
+          </Card>
 
-                    <h4 className="text-xs font-semibold text-slate-200 line-clamp-1 mb-1.5">
-                      {ticket.title}
-                    </h4>
-
-                    <div className="text-[11px] text-slate-400 mb-2 truncate">
-                      {lang === 'ar'
-                        ? ticket.customer?.nameAr || ticket.customer?.name
-                        : ticket.customer?.name}{' '}
-                      ({ticket.customer?.company || 'Direct'})
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 text-[10px]">
-                      <ChannelBadge channel={ticket.channel} />
-                      <SLABadge slaStatus={ticket.slaStatus} />
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            {tickets.length === 0 && (
-              <div className="py-12 text-center text-xs text-slate-500">
-                No tickets found in queue
-              </div>
-            )}
-          </div>
-        </Card>
+          {/* Agent Tasks & Reminders Widget */}
+          <AgentTasksWidget />
+        </div>
 
         {/* Right Pane: Active Ticket Conversation & Reply Console (8 cols) */}
         <Card className="lg:col-span-8 p-6 flex flex-col justify-between space-y-6">
@@ -291,6 +302,24 @@ export default function WorkspacePage() {
                         </span>
                       </div>
                       <p className="leading-relaxed whitespace-pre-wrap">{note.content}</p>
+
+                      {/* Note Attachments */}
+                      {note.attachments && note.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-2 mt-2 border-t border-slate-800/50">
+                          {note.attachments.map((att: any) => (
+                            <a
+                              key={att.id}
+                              href={att.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-navy-950/80 border border-slate-700 text-[10.5px] text-slate-300 hover:text-gold-300 hover:border-gold-500/40"
+                            >
+                              <Paperclip className="w-3 h-3 text-gold-400" />
+                              <span className="truncate max-w-[120px]">{att.originalName}</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                   {(activeTicket.notes || []).length === 0 && (
@@ -327,7 +356,7 @@ export default function WorkspacePage() {
                   </label>
                 </div>
                 <textarea
-                  rows={4}
+                  rows={3}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder={
@@ -340,9 +369,16 @@ export default function WorkspacePage() {
                       ? 'bg-amber-950/20 border-amber-800/50 text-amber-100 placeholder-amber-400/50'
                       : 'bg-slate-900 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-cyan-500'
                   }`}
-                  required
                 />
-                <div className="flex items-center justify-between">
+
+                {/* File Upload Zone */}
+                <FileUploadZone
+                  attachments={attachments}
+                  onAttachmentsChange={setAttachments}
+                  maxFiles={4}
+                />
+
+                <div className="flex items-center justify-between pt-1">
                   <span className="text-[11px] text-slate-500">
                     Pressing Send updates customer timeline and audit logs.
                   </span>
@@ -352,6 +388,7 @@ export default function WorkspacePage() {
                   </Button>
                 </div>
               </form>
+
             </div>
           ) : (
             <div className="py-24 text-center text-xs text-slate-500">

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 import { Kanban, Search, Plus, Filter, Sparkles, Layers } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
@@ -14,9 +15,16 @@ import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 
 export default function KanbanPage() {
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
   const { lang, t } = useLanguage();
   const { currentAgent } = useAgent();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(urlSearch);
+
+  useEffect(() => {
+    if (urlSearch) setSearch(urlSearch);
+  }, [urlSearch]);
+
   const [channel, setChannel] = useState('ALL');
   const [priority, setPriority] = useState('ALL');
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);

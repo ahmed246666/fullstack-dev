@@ -18,8 +18,11 @@ import {
   ArrowRight,
   HelpCircle,
   Mail,
-  ShieldAlert
+  ShieldAlert,
+  Paperclip,
+  FileText
 } from 'lucide-react';
+
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { api } from '@/lib/api';
@@ -29,6 +32,7 @@ import { StatusBadge, PriorityBadge, ChannelBadge, SLABadge } from '@/components
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
+import { FileUploadZone, UploadedFile } from '@/components/common/FileUploadZone';
 
 export default function PublicPortalPage() {
   const { lang, toggleLanguage, t } = useLanguage();
@@ -44,8 +48,10 @@ export default function PublicPortalPage() {
   const [newEmail, setNewEmail] = useState('');
   const [newName, setNewName] = useState('');
   const [newPriority, setNewPriority] = useState('HIGH');
+  const [portalAttachments, setPortalAttachments] = useState<UploadedFile[]>([]);
   const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
   const [createdSuccessCode, setCreatedSuccessCode] = useState<string | null>(null);
+
 
   // Query Ticket by Search
   const {
@@ -103,7 +109,8 @@ export default function PublicPortalPage() {
         customerId: defaultCustomerId,
         priority: newPriority,
         channel: 'WEB_FORM',
-        department: 'Support'
+        department: 'Support',
+        attachments: portalAttachments
       });
       setCreatedSuccessCode(res.data?.ticketNumber || 'TCK-NEW');
       setTicketSearch(res.data?.ticketNumber || '');
@@ -114,12 +121,14 @@ export default function PublicPortalPage() {
         setCreatedSuccessCode(null);
         setNewTitle('');
         setNewDesc('');
+        setPortalAttachments([]);
       }, 2000);
     } catch (err: any) {
       alert(err.message || 'Failed to submit inquiry');
     } finally {
       setIsSubmittingTicket(false);
     }
+
   };
 
   return (
@@ -265,6 +274,30 @@ export default function PublicPortalPage() {
               <p className="text-xs text-slate-200 leading-relaxed font-sans">
                 {matchedTicket.description}
               </p>
+
+              {/* Portal Ticket Attachments */}
+              {matchedTicket.attachments && matchedTicket.attachments.length > 0 && (
+                <div className="pt-2 border-t border-navy-800">
+                  <div className="text-[10.5px] font-bold text-gold-400 mb-1 flex items-center gap-1">
+                    <Paperclip className="w-3 h-3 text-gold-400" />
+                    <span>{lang === 'ar' ? 'المرفقات المسجلة:' : 'Attached Files:'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {matchedTicket.attachments.map((att: any) => (
+                      <a
+                        key={att.id}
+                        href={att.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-navy-900 border border-gold-500/30 hover:border-gold-500 text-[11px] text-slate-200 hover:text-gold-300 transition-colors"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-gold-400" />
+                        <span className="truncate max-w-[130px]">{att.originalName}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Notes & Messages Stream */}
@@ -312,9 +345,28 @@ export default function PublicPortalPage() {
                         <p className="text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
                           {note.content}
                         </p>
+
+                        {/* Note Attachments */}
+                        {note.attachments && note.attachments.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 pt-2 border-t border-navy-800">
+                            {note.attachments.map((att: any) => (
+                              <a
+                                key={att.id}
+                                href={att.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-navy-900 border border-gold-500/30 text-[10.5px] text-slate-200 hover:text-gold-300"
+                              >
+                                <Paperclip className="w-3 h-3 text-gold-400" />
+                                <span className="truncate max-w-[120px]">{att.originalName}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
+
 
                 {(matchedTicket.notes || []).filter((n: any) => !n.isInternal).length === 0 && (
                   <div className="py-8 text-center text-xs text-slate-400 border border-dashed border-navy-800 rounded-2xl font-sans">
@@ -434,7 +486,15 @@ export default function PublicPortalPage() {
               />
             </div>
 
+            {/* File Upload Zone */}
+            <FileUploadZone
+              attachments={portalAttachments}
+              onAttachmentsChange={setPortalAttachments}
+              maxFiles={3}
+            />
+
             <div className="flex justify-end gap-2 pt-2">
+
               <Button
                 type="button"
                 variant="outline"

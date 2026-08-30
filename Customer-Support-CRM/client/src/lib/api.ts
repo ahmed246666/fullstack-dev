@@ -129,12 +129,19 @@ export const api = {
 
   addTicketNote: (
     ticketId: string,
-    data: { content: string; authorName?: string; isInternal?: boolean; channel?: string }
+    data: {
+      content: string;
+      authorName?: string;
+      isInternal?: boolean;
+      channel?: string;
+      attachments?: any[];
+    }
   ) =>
     fetchApi<{ success: boolean; data: any }>(`/tickets/${ticketId}/notes`, {
       method: 'POST',
       body: JSON.stringify(data)
     }),
+
 
   // Knowledge Base
   getKnowledgeArticles: (params?: { search?: string; category?: string }) => {
@@ -156,11 +163,57 @@ export const api = {
       body: JSON.stringify(data)
     }),
 
+  updateKnowledgeArticle: (id: string, data: any) =>
+    fetchApi<{ success: boolean; data: any }>(`/knowledge-base/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    }),
+
+  deleteKnowledgeArticle: (id: string) =>
+    fetchApi<{ success: boolean; message: string }>(`/knowledge-base/${id}`, {
+      method: 'DELETE'
+    }),
+
   voteKnowledgeArticle: (slug: string, isHelpful: boolean) =>
     fetchApi<{ success: boolean; data: any }>(`/knowledge-base/${slug}/vote`, {
       method: 'POST',
       body: JSON.stringify({ isHelpful })
     }),
+
+  // File Upload Pipeline
+  uploadFile: async (file: File) => {
+    const token = getAuthToken();
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${API_BASE_URL}/upload`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to upload file');
+    }
+
+    return res.json() as Promise<{
+      success: boolean;
+      data: {
+        filename: string;
+        originalName: string;
+        fileUrl: string;
+        mimeType: string;
+        sizeBytes: number;
+      };
+    }>;
+  },
+
 
   // Agents & Canned Responses
   getAgents: () => fetchApi<{ success: boolean; data: any[] }>('/users/agents'),

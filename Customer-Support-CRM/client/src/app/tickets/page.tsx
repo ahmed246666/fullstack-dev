@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 import { Ticket, Search, Filter, Plus, Kanban, User, Clock, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
@@ -12,12 +13,21 @@ import { StatusBadge, PriorityBadge, ChannelBadge, SLABadge } from '@/components
 import { TicketDrawer } from '@/components/tickets/TicketDrawer';
 
 export default function TicketsPage() {
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
   const { lang, t } = useLanguage();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(urlSearch);
   const [status, setStatus] = useState('ALL');
   const [channel, setChannel] = useState('ALL');
   const [priority, setPriority] = useState('ALL');
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (urlSearch) {
+      setSearch(urlSearch);
+    }
+  }, [urlSearch]);
+
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['tickets-table', search, status, channel, priority],

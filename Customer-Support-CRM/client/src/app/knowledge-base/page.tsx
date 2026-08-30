@@ -17,10 +17,11 @@ import { useLanguage } from '@/context/LanguageContext';
 import { api } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { ArticleModal } from '@/components/knowledge/ArticleModal';
+import { ArticleEditorModal } from '@/components/knowledge/ArticleEditorModal';
 import { ArticleViewerModal } from '@/components/knowledge/ArticleViewerModal';
 
 export default function KnowledgeBasePage() {
+
   const { lang, t } = useLanguage();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -175,12 +176,13 @@ export default function KnowledgeBasePage() {
         </div>
       )}
 
-      {/* Article Creation Modal */}
-      <ArticleModal
+      {/* Article Creation & Editing Modal */}
+      <ArticleEditorModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onSuccess={() => refetch()}
       />
+
 
       {/* Article Viewer & Voting Modal */}
       <ArticleViewerModal

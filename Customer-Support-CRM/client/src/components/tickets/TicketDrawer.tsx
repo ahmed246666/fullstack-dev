@@ -17,7 +17,10 @@ import {
   Sparkles,
   Lock,
   Globe,
-  Star
+  Star,
+  Paperclip,
+  FileText,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
@@ -33,6 +36,7 @@ import { Button } from '@/components/ui/Button';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
 import { CSATModal } from '@/components/sla/CSATModal';
 import { AICopilotWidget } from '@/components/ai/AICopilotWidget';
+import { FileUploadZone, UploadedFile } from '@/components/common/FileUploadZone';
 
 interface TicketDrawerProps {
   ticketId: string | null;
@@ -44,8 +48,10 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
   const { lang, t } = useLanguage();
   const { currentAgent } = useAgent();
   const [replyText, setReplyText] = useState('');
+  const [attachments, setAttachments] = useState<UploadedFile[]>([]);
   const [isInternal, setIsInternal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [isCSATOpen, setIsCSATOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -83,17 +89,19 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
 
   const handleSendNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!ticket || !replyText.trim()) return;
+    if (!ticket || (!replyText.trim() && attachments.length === 0)) return;
 
     try {
       setIsSubmitting(true);
       await api.addTicketNote(ticket.id, {
-        content: replyText.trim(),
+        content: replyText.trim() || '(Attachment uploaded)',
         authorName: currentAgent.name,
         isInternal,
-        channel: ticket.channel
+        channel: ticket.channel,
+        attachments: attachments as any
       });
       setReplyText('');
+      setAttachments([]);
       refetch();
       onUpdated?.();
     } catch (err: any) {
@@ -102,6 +110,7 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
       setIsSubmitting(false);
     }
   };
+
 
   return createPortal(
     <div className="fixed inset-0 z-[999999] overflow-hidden">
@@ -230,7 +239,7 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
               ) : null}
 
               {/* Issue Description Box */}
-              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300 space-y-2">
                 <div className="font-bold text-indigo-400 mb-1 flex items-center justify-between">
                   <span>Initial Support Request</span>
                   <span className="text-[10px] text-slate-500">
@@ -238,6 +247,33 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
                   </span>
                 </div>
                 <p className="leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+
+                {/* Ticket Attachments */}
+                {ticket.attachments && ticket.attachments.length > 0 && (
+                  <div className="pt-2 border-t border-slate-800/80">
+                    <div className="text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1">
+                      <Paperclip className="w-3 h-3 text-gold-400" />
+                      <span>Attached Files ({ticket.attachments.length})</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {ticket.attachments.map((att: any) => (
+                        <a
+                          key={att.id}
+                          href={att.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-navy-950 border border-navy-700 hover:border-gold-500/50 text-[11px] text-slate-300 hover:text-gold-300 transition-colors"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-gold-400 shrink-0" />
+                          <span className="truncate max-w-[130px]">{att.originalName}</span>
+                          <span className="text-[9.5px] text-slate-500 font-mono">
+                            {(att.sizeBytes / 1024).toFixed(0)}KB
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Conversation & Notes Activity Thread */}
@@ -278,6 +314,24 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
                         </span>
                       </div>
                       <p className="leading-relaxed whitespace-pre-wrap">{note.content}</p>
+
+                      {/* Note Attachments */}
+                      {note.attachments && note.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-2 mt-2 border-t border-slate-800/50">
+                          {note.attachments.map((att: any) => (
+                            <a
+                              key={att.id}
+                              href={att.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-navy-950/80 border border-slate-700 text-[10.5px] text-slate-300 hover:text-gold-300 hover:border-gold-500/40"
+                            >
+                              <Paperclip className="w-3 h-3 text-gold-400" />
+                              <span className="truncate max-w-[120px]">{att.originalName}</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                   {(ticket.notes || []).length === 0 && (
@@ -319,15 +373,23 @@ export function TicketDrawer({ ticketId, onClose, onUpdated }: TicketDrawerProps
                       ? 'bg-amber-950/20 border-amber-800/50 text-amber-100 placeholder-amber-400/50'
                       : 'bg-slate-900 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-indigo-500'
                   }`}
-                  required
                 />
-                <div className="flex justify-end">
+
+                {/* File Upload Zone */}
+                <FileUploadZone
+                  attachments={attachments}
+                  onAttachmentsChange={setAttachments}
+                  maxFiles={4}
+                />
+
+                <div className="flex justify-end pt-1">
                   <Button type="submit" isLoading={isSubmitting} size="sm">
                     <Send className="w-3.5 h-3.5" />
                     <span>{isInternal ? 'Save Internal Note' : 'Send Public Reply'}</span>
                   </Button>
                 </div>
               </form>
+
             </div>
           ) : (
             <div className="text-center text-xs text-rose-400">Ticket not found</div>

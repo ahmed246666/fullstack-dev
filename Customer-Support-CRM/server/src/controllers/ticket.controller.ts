@@ -28,9 +28,14 @@ export async function getTickets(req: Request, res: Response): Promise<void> {
         { ticketNumber: { contains: q } },
         { title: { contains: q } },
         { description: { contains: q } },
-        { customer: { name: { contains: q } } }
+        { category: { contains: q } },
+        { department: { contains: q } },
+        { customer: { name: { contains: q } } },
+        { customer: { nameAr: { contains: q } } },
+        { customer: { company: { contains: q } } }
       ];
     }
+
 
     if (status && status !== 'ALL') {
       where.status = String(status).toUpperCase();
@@ -85,6 +90,7 @@ export async function getTickets(req: Request, res: Response): Promise<void> {
               avatarUrl: true
             }
           },
+          attachments: true,
           _count: {
             select: { notes: true }
           }
@@ -123,6 +129,7 @@ export async function getTicketById(req: Request, res: Response): Promise<void> 
       },
       include: {
         customer: true,
+        attachments: true,
         assignedAgent: {
           select: {
             id: true,
@@ -139,7 +146,8 @@ export async function getTicketById(req: Request, res: Response): Promise<void> 
           include: {
             author: {
               select: { id: true, name: true, nameAr: true, role: true, avatarUrl: true }
-            }
+            },
+            attachments: true
           }
         }
       }
@@ -175,7 +183,8 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
       channel = 'WEB_FORM',
       category = 'General',
       department = 'Support',
-      assignedAgentId
+      assignedAgentId,
+      attachments = []
     } = req.body;
 
     if (!title || !description || !customerId) {
@@ -192,6 +201,31 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
     if (!customer) {
       res.status(404).json({ success: false, error: 'Customer does not exist' });
       return;
+    }
+
+    // Auto-assign to least-busy active agent if not specified
+    let finalAgentId = assignedAgentId || null;
+    if (!finalAgentId) {
+      const activeAgents = await prisma.user.findMany({
+        where: { role: { in: ['AGENT', 'ADMIN'] }, status: 'ACTIVE' },
+        include: {
+          _count: {
+            select: {
+              assignedTickets: {
+                where: { status: { in: ['NEW', 'OPEN', 'PENDING'] } }
+              }
+            }
+          }
+        },
+        orderBy: {
+          assignedTickets: { _count: 'asc' }
+        },
+        take: 1
+      });
+
+      if (activeAgents.length > 0) {
+        finalAgentId = activeAgents[0].id;
+      }
     }
 
     // Generate ticket number: TCK-<count + 1001>
@@ -212,13 +246,27 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
         category,
         department,
         customerId,
-        assignedAgentId: assignedAgentId || null,
+        assignedAgentId: finalAgentId,
         responseDueAt,
-        resolutionDueAt
+        resolutionDueAt,
+        ...(attachments && attachments.length > 0
+          ? {
+              attachments: {
+                create: attachments.map((att: any) => ({
+                  filename: att.filename,
+                  originalName: att.originalName || att.filename,
+                  fileUrl: att.fileUrl,
+                  mimeType: att.mimeType || 'application/octet-stream',
+                  sizeBytes: Number(att.sizeBytes || 0)
+                }))
+              }
+            }
+          : {})
       },
       include: {
         customer: true,
-        assignedAgent: true
+        assignedAgent: true,
+        attachments: true
       }
     });
 
@@ -229,7 +277,7 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
         action: 'CREATE_TICKET',
         entity: 'Ticket',
         entityId: ticket.id,
-        details: `Ticket ${ticketNumber} created via ${channel} with priority ${priority}`
+        details: `Ticket ${ticketNumber} created via ${channel} with priority ${priority}${finalAgentId ? ` (Auto-assigned to agent)` : ''}`
       }
     });
 
@@ -245,6 +293,7 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
     res.status(500).json({ success: false, error: 'Failed to create ticket' });
   }
 }
+
 
 export async function updateTicketStatus(req: Request, res: Response): Promise<void> {
   try {

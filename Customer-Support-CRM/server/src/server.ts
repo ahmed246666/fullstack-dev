@@ -1,12 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import authRoutes from './routes/auth.routes';
 import customerRoutes from './routes/customer.routes';
 import ticketRoutes from './routes/ticket.routes';
 import noteRoutes from './routes/note.routes';
 import knowledgeRoutes from './routes/knowledge.routes';
 import userRoutes from './routes/user.routes';
+import uploadRoutes from './routes/upload.routes';
 import swaggerRoutes from './openapi/swagger';
 
 dotenv.config();
@@ -17,6 +19,9 @@ const PORT = process.env.PORT || 5000;
 // Middlewares
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+
+// Static File Hosting for Attachments
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Health Check
 app.get('/api/health', (req: Request, res: Response) => {
@@ -32,11 +37,13 @@ app.use('/api', swaggerRoutes);
 
 // Feature API Routers
 app.use('/api/auth', authRoutes);
+app.use('/api/upload', uploadRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/tickets', noteRoutes);
 app.use('/api/knowledge-base', knowledgeRoutes);
 app.use('/api/users', userRoutes);
+
 
 
 // 404 Catch-All
