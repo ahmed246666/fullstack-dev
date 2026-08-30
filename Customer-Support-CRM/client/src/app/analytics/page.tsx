@@ -74,17 +74,38 @@ export default function AnalyticsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center flex-wrap gap-2.5">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
             <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Last 30 Days (30 يوماً)</span>
+            <span>{lang === 'ar' ? 'آخر 30 يوماً' : 'Last 30 Days'}</span>
           </div>
-          <Button variant="outline" size="sm" className="text-xs" onClick={() => window.print()}>
-            <Download className="w-3.5 h-3.5" />
-            <span>{lang === 'ar' ? 'تصدير التقرير' : 'Export Report'}</span>
+
+          {/* Export Tickets CSV */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs border-gold-500/30 text-gold-300 hover:bg-gold-500/10"
+            onClick={() => window.open(api.getExportReportUrl('tickets'), '_blank')}
+            title="Download full tickets CSV dataset"
+          >
+            <Download className="w-3.5 h-3.5 text-gold-400" />
+            <span>{lang === 'ar' ? 'تصدير التذاكر (CSV)' : 'Export Tickets (CSV)'}</span>
+          </Button>
+
+          {/* Export Agents CSV */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10"
+            onClick={() => window.open(api.getExportReportUrl('agents'), '_blank')}
+            title="Download agent leaderboard CSV report"
+          >
+            <Download className="w-3.5 h-3.5 text-indigo-400" />
+            <span>{lang === 'ar' ? 'تقرير الوكلاء (CSV)' : 'Export Agents (CSV)'}</span>
           </Button>
         </div>
       </div>
+
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

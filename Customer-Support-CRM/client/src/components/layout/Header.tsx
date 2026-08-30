@@ -23,8 +23,10 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+
 import { useAgent } from '@/context/AgentContext';
 import { SLAPolicyDrawer } from '@/components/sla/SLAPolicyDrawer';
+
 import { AuditLogsDrawer } from '@/components/admin/AuditLogsDrawer';
 import { api } from '@/lib/api';
 
@@ -34,6 +36,8 @@ export function Header() {
   const { currentAgent, agents, isAdmin, switchAgent, logout } = useAgent();
   const [isSLAPolicyOpen, setIsSLAPolicyOpen] = useState(false);
   const [isAuditLogsOpen, setIsAuditLogsOpen] = useState(false);
+
+
 
   // Global Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -271,7 +275,6 @@ export function Header() {
         )}
       </div>
 
-
       {/* Right Actions: SLA Ticker, Language Toggle, Agent Switcher */}
       <div className="flex items-center gap-3.5">
         {/* Admin Audit Trail Button */}
@@ -282,7 +285,7 @@ export function Header() {
             title="System Audit Log Trail"
           >
             <History className="w-3.5 h-3.5 text-gold-400" />
-            <span className="font-brand">سجل التدقيق</span>
+            <span className="font-brand">{lang === 'ar' ? 'سجل التدقيق' : 'Audit Logs'}</span>
           </button>
         )}
 
@@ -338,16 +341,13 @@ export function Header() {
             logout();
             window.location.href = '/login';
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 hover:text-rose-200 text-xs font-semibold transition-all shadow-sm"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-rose-500/30 bg-rose-950/20 hover:bg-rose-900/40 text-rose-300 hover:text-rose-200 text-xs font-semibold transition-all shadow-sm"
           title="Sign Out / تسجيل الخروج"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span className="hidden sm:inline font-brand">{lang === 'ar' ? 'خروج' : 'Log Out'}</span>
         </button>
       </div>
-
-
-
 
       {/* SLA Policy Config Drawer */}
       <SLAPolicyDrawer isOpen={isSLAPolicyOpen} onClose={() => setIsSLAPolicyOpen(false)} />
@@ -357,3 +357,5 @@ export function Header() {
     </header>
   );
 }
+
+

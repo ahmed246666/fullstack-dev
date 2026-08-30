@@ -438,3 +438,44 @@ export async function submitCSAT(req: Request, res: Response): Promise<void> {
     res.status(500).json({ success: false, error: 'Failed to submit CSAT feedback' });
   }
 }
+
+export async function escalateOverdueTickets(req: Request, res: Response): Promise<void> {
+  try {
+    const now = new Date();
+    const overdueTickets = await prisma.ticket.findMany({
+      where: {
+        status: { in: ['NEW', 'OPEN', 'PENDING'] },
+        resolutionDueAt: { lt: now },
+        priority: { not: 'CRITICAL' }
+      }
+    });
+
+    const escalatedTickets: string[] = [];
+    for (const t of overdueTickets) {
+      await prisma.ticket.update({
+        where: { id: t.id },
+        data: { priority: 'CRITICAL' }
+      });
+      await prisma.auditLog.create({
+        data: {
+          actorName: 'SLA Automation Engine',
+          action: 'ESCALATE_TICKET',
+          entity: 'Ticket',
+          entityId: t.id,
+          details: `Ticket ${t.ticketNumber} automatically escalated to CRITICAL due to SLA resolution deadline breach.`
+        }
+      });
+      escalatedTickets.push(t.ticketNumber);
+    }
+
+    res.json({
+      success: true,
+      message: `Escalated ${escalatedTickets.length} overdue ticket(s) to CRITICAL.`,
+      data: { escalatedCount: escalatedTickets.length, ticketNumbers: escalatedTickets }
+    });
+  } catch (error: any) {
+    console.error('escalateOverdueTickets error:', error);
+    res.status(500).json({ success: false, error: 'Failed to escalate overdue tickets' });
+  }
+}
+

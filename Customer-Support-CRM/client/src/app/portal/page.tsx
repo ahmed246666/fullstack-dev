@@ -33,6 +33,8 @@ import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
 import { FileUploadZone, UploadedFile } from '@/components/common/FileUploadZone';
+import { PortalChatbotWidget } from '@/components/portal/PortalChatbotWidget';
+
 
 export default function PublicPortalPage() {
   const { lang, toggleLanguage, t } = useLanguage();
@@ -494,7 +496,6 @@ export default function PublicPortalPage() {
             />
 
             <div className="flex justify-end gap-2 pt-2">
-
               <Button
                 type="button"
                 variant="outline"
@@ -515,6 +516,15 @@ export default function PublicPortalPage() {
           </form>
         )}
       </Modal>
+
+      {/* Floating AI Chatbot Widget */}
+      <PortalChatbotWidget
+        onEscalateToTicket={(msg) => {
+          setNewDesc(msg);
+          setIsCreateOpen(true);
+        }}
+      />
     </div>
   );
 }
+

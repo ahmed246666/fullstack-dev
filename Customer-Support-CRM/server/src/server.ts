@@ -9,6 +9,7 @@ import noteRoutes from './routes/note.routes';
 import knowledgeRoutes from './routes/knowledge.routes';
 import userRoutes from './routes/user.routes';
 import uploadRoutes from './routes/upload.routes';
+import aiRoutes from './routes/ai.routes';
 import swaggerRoutes from './openapi/swagger';
 
 dotenv.config();
@@ -38,11 +39,13 @@ app.use('/api', swaggerRoutes);
 // Feature API Routers
 app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/tickets', noteRoutes);
 app.use('/api/knowledge-base', knowledgeRoutes);
 app.use('/api/users', userRoutes);
+
 
 
 

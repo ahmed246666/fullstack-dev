@@ -238,5 +238,39 @@ export const api = {
     }),
 
   // Audit Logs
-  getAuditLogs: () => fetchApi<{ success: boolean; data: any[] }>('/users/audit-logs')
+  getAuditLogs: () => fetchApi<{ success: boolean; data: any[] }>('/users/audit-logs'),
+
+  // AI Chatbot
+  chatWithPortalBot: (data: {
+    message: string;
+    history?: Array<{ role: 'user' | 'model'; text: string }>;
+    customerName?: string;
+  }) =>
+    fetchApi<{
+      success: boolean;
+      data: {
+        reply: string;
+        suggestedArticles: Array<{ id: string; title: string; titleAr?: string | null; slug: string }>;
+        escalateToTicket: boolean;
+        confidenceScore: number;
+      };
+    }>('/ai/chatbot', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+
+  // SLA Automation
+  escalateOverdueTickets: () =>
+    fetchApi<{
+      success: boolean;
+      message: string;
+      data: { escalatedCount: number; ticketNumbers: string[] };
+    }>('/tickets/escalate-overdue', {
+      method: 'POST'
+    }),
+
+  // CSV Report Export URL
+  getExportReportUrl: (type: 'tickets' | 'agents' = 'tickets') =>
+    `${API_BASE_URL}/users/export-report?type=${type}`
 };
+

@@ -197,3 +197,55 @@ export async function updateSLAPolicy(req: Request, res: Response): Promise<void
   }
 }
 
+export async function exportReportCSV(req: Request, res: Response): Promise<void> {
+  try {
+    const { type = 'tickets' } = req.query;
+
+    if (type === 'agents') {
+      const agents = await prisma.user.findMany({
+        where: { role: { in: ['AGENT', 'ADMIN'] } },
+        include: {
+          assignedTickets: {
+            select: { id: true, status: true, priority: true }
+          }
+        }
+      });
+
+      let csv = 'Agent ID,Name,Name (Arabic),Email,Role,Department,Status,Assigned Tickets,Open Tickets,Resolved Tickets\n';
+      for (const a of agents) {
+        const open = a.assignedTickets.filter((t) => ['NEW', 'OPEN', 'PENDING'].includes(t.status)).length;
+        const resolved = a.assignedTickets.filter((t) => ['RESOLVED', 'CLOSED'].includes(t.status)).length;
+        csv += `"${a.id}","${a.name}","${a.nameAr || ''}","${a.email}","${a.role}","${a.department}","${a.status}",${a.assignedTickets.length},${open},${resolved}\n`;
+      }
+
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="azm_agents_report.csv"');
+      res.send(csv);
+      return;
+    }
+
+    // Default: Tickets Export
+    const tickets = await prisma.ticket.findMany({
+      include: {
+        customer: true,
+        assignedAgent: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    let csv = 'Ticket Number,Title,Status,Priority,Channel,Category,Department,Customer Name,Customer Email,Customer Company,Assigned Agent,SLA Status,Created At\n';
+    for (const t of tickets) {
+      const sla = computeSLAStatus(t);
+      csv += `"${t.ticketNumber}","${t.title.replace(/"/g, '""')}","${t.status}","${t.priority}","${t.channel}","${t.category}","${t.department}","${t.customer?.name || ''}","${t.customer?.email || ''}","${t.customer?.company || ''}","${t.assignedAgent?.name || 'Unassigned'}","${sla}","${t.createdAt.toISOString()}"\n`;
+    }
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="azm_tickets_report.csv"');
+    res.send(csv);
+  } catch (error: any) {
+    console.error('exportReportCSV error:', error);
+    res.status(500).json({ success: false, error: 'Failed to generate report' });
+  }
+}
+
+
