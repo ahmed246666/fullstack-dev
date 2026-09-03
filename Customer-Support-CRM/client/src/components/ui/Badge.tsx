@@ -1,5 +1,4 @@
 import React from 'react';
-import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import {
   MessageSquare,
@@ -29,12 +28,12 @@ export function StatusBadge({ status }: { status: string }) {
   return (
     <span
       className={twMerge(
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border',
+        'inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold border',
         styles[s] || styles.NEW
       )}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-current mr-1.5 rtl:ml-1.5 rtl:mr-0 animate-pulse" />
-      {t(`status_${s}`)}
+      <span className="w-1.5 h-1.5 rounded-full bg-current mr-1.5 rtl:ml-1.5 rtl:mr-0 animate-pulse shrink-0" />
+      <span className="whitespace-nowrap">{t(`status_${s}`)}</span>
     </span>
   );
 }
@@ -53,12 +52,12 @@ export function PriorityBadge({ priority }: { priority: string }) {
   return (
     <span
       className={twMerge(
-        'inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border',
+        'inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium border',
         styles[p] || styles.MEDIUM
       )}
     >
-      {p === 'URGENT' && <ShieldAlert className="w-3 h-3 mr-1 rtl:ml-1 rtl:mr-0 text-rose-400" />}
-      {t(`priority_${p}`)}
+      {p === 'URGENT' && <ShieldAlert className="w-3.5 h-3.5 mr-1 rtl:ml-1 rtl:mr-0 text-rose-400 shrink-0" />}
+      <span className="whitespace-nowrap">{t(`priority_${p}`)}</span>
     </span>
   );
 }
@@ -84,17 +83,25 @@ export function ChannelBadge({ channel }: { channel: string }) {
   return (
     <span
       className={twMerge(
-        'inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border',
+        'inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium border',
         current.style
       )}
     >
-      <Icon className="w-3 h-3 mr-1 rtl:ml-1 rtl:mr-0" />
-      {t(`channel_${c}`)}
+      <Icon className="w-3.5 h-3.5 mr-1 rtl:ml-1 rtl:mr-0 shrink-0" />
+      <span className="whitespace-nowrap">{t(`channel_${c}`)}</span>
     </span>
   );
 }
 
-export function SLABadge({ slaStatus }: { slaStatus: string }) {
+export function SLABadge({
+  slaStatus,
+  resolutionDueAt,
+  status
+}: {
+  slaStatus?: string | null;
+  resolutionDueAt?: string | Date | null;
+  status?: string | null;
+}) {
   const { t } = useLanguage();
 
   const configs: Record<string, { icon: any; style: string }> = {
@@ -113,21 +120,52 @@ export function SLABadge({ slaStatus }: { slaStatus: string }) {
     RESOLVED_ON_TIME: {
       icon: CheckCircle,
       style: 'bg-slate-500/10 text-slate-400 border-slate-500/30'
+    },
+    RESOLVED_LATE: {
+      icon: AlertTriangle,
+      style: 'bg-rose-500/15 text-rose-400 border-rose-500/30'
     }
   };
 
-  const current = configs[slaStatus] || configs.ON_TRACK;
+  // Determine actual SLA status if not explicitly passed
+  let resolvedStatus = slaStatus;
+  if (!resolvedStatus || !configs[resolvedStatus]) {
+    if (status === 'RESOLVED' || status === 'CLOSED') {
+      resolvedStatus = 'RESOLVED_ON_TIME';
+    } else if (resolutionDueAt) {
+      const now = new Date().getTime();
+      const due = new Date(resolutionDueAt).getTime();
+      const diffHours = (due - now) / (1000 * 60 * 60);
+      if (diffHours < 0) {
+        resolvedStatus = 'BREACHED';
+      } else if (diffHours <= 2) {
+        resolvedStatus = 'APPROACHING_BREACH';
+      } else {
+        resolvedStatus = 'ON_TRACK';
+      }
+    } else {
+      resolvedStatus = 'ON_TRACK';
+    }
+  }
+
+  const current = configs[resolvedStatus] || configs.ON_TRACK;
   const Icon = current.icon;
 
   return (
     <span
       className={twMerge(
-        'inline-flex items-center px-2 py-0.5 rounded-md text-xs border',
+        'inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 px-2.5 py-1 rounded-lg text-xs border',
         current.style
       )}
     >
-      <Icon className="w-3 h-3 mr-1 rtl:ml-1 rtl:mr-0" />
-      {t(`sla_${slaStatus}`)}
+      <Icon className="w-3.5 h-3.5 mr-1 rtl:ml-1 rtl:mr-0 shrink-0" />
+      <span className="whitespace-nowrap">
+        {t(`sla_${resolvedStatus}`) !== `sla_${resolvedStatus}`
+          ? t(`sla_${resolvedStatus}`)
+          : resolvedStatus === 'ON_TRACK'
+          ? 'On Track'
+          : resolvedStatus}
+      </span>
     </span>
   );
 }
@@ -144,11 +182,13 @@ export function TierBadge({ tier }: { tier: string }) {
   return (
     <span
       className={twMerge(
-        'inline-flex items-center px-2 py-0.5 rounded text-[11px] uppercase tracking-wider border',
+        'inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 px-2.5 py-1 rounded text-[11px] uppercase tracking-wider border',
         styles[tVal] || styles.STANDARD
       )}
     >
-      {translate(`tier_${tVal}`) !== `tier_${tVal}` ? translate(`tier_${tVal}`) : tVal}
+      <span className="whitespace-nowrap">
+        {translate(`tier_${tVal}`) !== `tier_${tVal}` ? translate(`tier_${tVal}`) : tVal}
+      </span>
     </span>
   );
 }

@@ -63,9 +63,9 @@ export function CannedResponsesBar({ onSelect }: CannedResponsesBarProps) {
 
   return (
     <div className="space-y-2 font-sans">
-      <div className="flex items-center justify-between text-[11px] font-bold text-gold-300">
-        <div className="flex items-center gap-1.5 text-gold-400 font-brand">
-          <Zap className="w-3.5 h-3.5" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-bold text-gold-300">
+        <div className="flex items-center gap-1.5 text-gold-400 font-brand shrink-0">
+          <Zap className="w-3.5 h-3.5 shrink-0" />
           <span>
             {lang === 'ar'
               ? 'الردود السريعة الجاهزة (1-Click Macros):'
@@ -79,7 +79,7 @@ export function CannedResponsesBar({ onSelect }: CannedResponsesBarProps) {
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5 sm:gap-2">
         {cannedList.map((c: any) => {
           const title = lang === 'ar' ? c.titleAr || c.title : c.title;
           const text = lang === 'ar' ? c.contentAr || c.content : c.content;
@@ -89,13 +89,13 @@ export function CannedResponsesBar({ onSelect }: CannedResponsesBarProps) {
               key={c.id}
               type="button"
               onClick={() => onSelect(text)}
-              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-indigo-600/20 border border-slate-800 hover:border-indigo-500/50 text-slate-300 hover:text-indigo-300 text-xs font-medium transition-all shadow-sm active:scale-95"
+              className="group flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-navy-950/90 hover:bg-gold-500/10 border border-navy-800 hover:border-gold-500/40 text-slate-300 hover:text-gold-200 text-xs font-medium transition-all shadow-sm active:scale-95 shrink-0"
               title={text}
             >
-              <span className="font-mono font-bold text-[10px] text-indigo-400 group-hover:text-indigo-300 bg-indigo-500/10 px-1.5 py-0.5 rounded">
+              <span className="font-mono font-bold text-[10px] text-gold-400 group-hover:text-gold-300 bg-gold-500/10 px-1.5 py-0.5 rounded shrink-0">
                 {c.shortcut}
               </span>
-              <span>{title}</span>
+              <span className="truncate max-w-[170px] sm:max-w-none">{title}</span>
             </button>
           );
         })}

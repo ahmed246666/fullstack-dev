@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
 import {
   LayoutDashboard,
   Users,
@@ -14,19 +13,22 @@ import {
   BarChart3,
   ExternalLink,
   Sparkles,
-  Layers,
   Crown,
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { t, lang } = useLanguage();
   const { logout } = useAgent();
-
-
 
   const navItems = [
     { labelKey: 'navDashboard', href: '/', icon: LayoutDashboard },
@@ -39,22 +41,38 @@ export function Sidebar() {
     { labelKey: 'navPortal', href: '/portal', icon: ExternalLink }
   ];
 
-  return (
-    <aside className="w-68 min-h-screen glass-panel border-r rtl:border-l rtl:border-r-0 border-gold-500/20 bg-navy-950/95 flex flex-col justify-between p-5">
+  const sidebarContent = (
+    <div className="flex flex-col justify-between h-full p-6 space-y-6">
       <div>
-        {/* Brand Logo & Name */}
-        <Link href={`/${lang}`} className="flex items-center gap-3.5 px-3 py-4 mb-6 group cursor-pointer">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-gold-600 via-gold-500 to-gold-400 text-navy-950 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-gold-500/20 group-hover:scale-105 transition-transform font-brand">
-            عزم
-          </div>
-          <div>
-            <h1 className="font-extrabold text-base text-white tracking-tight flex items-center gap-1.5 font-brand">
-              <span>AZM CRM</span>
-              <Crown className="w-3.5 h-3.5 text-gold-400" />
-            </h1>
-            <p className="text-xs text-gold-300/80 font-medium">Customer Support Platform</p>
-          </div>
-        </Link>
+        {/* Brand Logo & Header */}
+        <div className="flex items-center justify-between px-2 py-2 mb-6">
+          <Link
+            href={`/${lang}`}
+            onClick={onClose}
+            className="flex items-center gap-3.5 group cursor-pointer"
+          >
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-gold-600 via-gold-500 to-gold-400 text-navy-950 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-gold-500/20 group-hover:scale-105 transition-transform font-brand shrink-0">
+              عزم
+            </div>
+            <div>
+              <h1 className="font-extrabold text-base text-white tracking-tight flex items-center gap-1.5 font-brand">
+                <span>AZM CRM</span>
+                <Crown className="w-3.5 h-3.5 text-gold-400 shrink-0" />
+              </h1>
+              <p className="text-xs text-gold-300/80 font-medium">Customer Support Platform</p>
+            </div>
+          </Link>
+
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-navy-800 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
 
         {/* Navigation Items */}
         <nav className="space-y-2">
@@ -62,26 +80,34 @@ export function Sidebar() {
             const Icon = item.icon;
             const targetHref = item.href === '/' ? `/${lang}` : `/${lang}${item.href}`;
             const pathWithoutLocale = pathname ? pathname.replace(/^\/(en|ar)/, '') || '/' : '/';
-            
+
             const isActive =
               item.href === '/'
                 ? pathWithoutLocale === '/'
                 : item.href === '/tickets'
-                ? pathWithoutLocale === '/tickets' || (pathWithoutLocale.startsWith('/tickets/') && pathWithoutLocale !== '/tickets/kanban')
-                : pathWithoutLocale === item.href || pathWithoutLocale.startsWith(`${item.href}/`);
+                ? pathWithoutLocale === '/tickets' ||
+                  (pathWithoutLocale.startsWith('/tickets/') &&
+                    pathWithoutLocale !== '/tickets/kanban')
+                : pathWithoutLocale === item.href ||
+                  pathWithoutLocale.startsWith(`${item.href}/`);
 
             return (
               <Link
                 key={item.href}
                 href={targetHref}
+                onClick={onClose}
                 className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold transition-all duration-150 font-sans ${
                   isActive
                     ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold shadow-md shadow-gold-500/20'
                     : 'text-slate-300 hover:text-white hover:bg-navy-900/90 hover:border-gold-500/20 border border-transparent'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-navy-950' : 'text-gold-400/80'}`} />
-                <span className="font-medium tracking-wide">{t(item.labelKey)}</span>
+                <Icon
+                  className={`w-4 h-4 shrink-0 ${
+                    isActive ? 'text-navy-950' : 'text-gold-400/80'
+                  }`}
+                />
+                <span className="font-medium tracking-wide whitespace-nowrap">{t(item.labelKey)}</span>
               </Link>
             );
           })}
@@ -94,24 +120,47 @@ export function Sidebar() {
               }}
               className="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 transition-all text-left rtl:text-right"
             >
-              <LogOut className="w-4 h-4 text-rose-400" />
-              <span className="font-medium">{t('logout')}</span>
+              <LogOut className="w-4 h-4 text-rose-400 shrink-0" />
+              <span className="font-medium whitespace-nowrap">{t('logout')}</span>
             </button>
           </div>
-
         </nav>
       </div>
 
       {/* Footer Info Box */}
       <div className="p-4 rounded-2xl glass-panel bg-navy-900/80 border border-gold-500/20 text-xs space-y-1.5 shadow-lg">
         <div className="flex items-center gap-2 text-gold-300 font-bold font-brand text-xs">
-          <Sparkles className="w-4 h-4 text-gold-400" />
-          <span>AZM AI Copilot Active</span>
+          <Sparkles className="w-4 h-4 text-gold-400 shrink-0" />
+          <span className="whitespace-nowrap">AZM AI Copilot Active</span>
         </div>
         <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
-          Saudi Enterprise Bilingual Support CRM with 99.9% SLA enforcement.
+          {lang === 'ar'
+            ? 'منصة خدمة ودعم عملاء عزم المؤسسية مع الالتزام باتفاقيات SLA بنسبة 99.9%.'
+            : 'Saudi Enterprise Bilingual Support CRM with 99.9% SLA enforcement.'}
         </p>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Persistent Sidebar */}
+      <aside className="hidden lg:flex w-72 min-h-screen sticky top-0 glass-panel border-r rtl:border-l rtl:border-r-0 border-gold-500/20 bg-navy-950/95 flex-col shrink-0 z-30">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Slide-over Drawer */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden overflow-hidden animate-in fade-in duration-200">
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            onClick={onClose}
+          />
+          <aside className="fixed inset-y-0 left-0 rtl:right-0 rtl:left-auto w-72 max-w-[85vw] bg-navy-950 border-r rtl:border-l rtl:border-r-0 border-gold-500/30 shadow-2xl z-50 overflow-y-auto">
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

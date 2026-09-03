@@ -56,24 +56,43 @@ export async function getArticleBySlug(req: Request, res: Response): Promise<voi
 
 export async function voteArticle(req: Request, res: Response): Promise<void> {
   try {
-    const id = String(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
-    const { type } = req.body; // HELPFUL | UNHELPFUL
+    const idParam = String(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
+    const { type, isHelpful } = req.body;
 
-    if (type !== 'HELPFUL' && type !== 'UNHELPFUL') {
+    const voteType =
+      type === 'HELPFUL' || isHelpful === true
+        ? 'HELPFUL'
+        : type === 'UNHELPFUL' || isHelpful === false
+        ? 'UNHELPFUL'
+        : null;
+
+    if (!voteType) {
       res.status(400).json({ success: false, error: 'Vote type must be HELPFUL or UNHELPFUL' });
       return;
     }
 
-    const article = await prisma.knowledgeArticle.update({
-      where: { id },
+    // Find article by id or slug
+    let article = await prisma.knowledgeArticle.findFirst({
+      where: {
+        OR: [{ id: idParam }, { slug: idParam }]
+      }
+    });
+
+    if (!article) {
+      res.status(404).json({ success: false, error: 'Article not found' });
+      return;
+    }
+
+    const updated = await prisma.knowledgeArticle.update({
+      where: { id: article.id },
       data: {
-        ...(type === 'HELPFUL'
+        ...(voteType === 'HELPFUL'
           ? { helpfulVotes: { increment: 1 } }
           : { unhelpfulVotes: { increment: 1 } })
       }
     });
 
-    res.json({ success: true, data: article });
+    res.json({ success: true, data: updated });
   } catch (error: any) {
     console.error('voteArticle error:', error);
     res.status(500).json({ success: false, error: 'Failed to record vote' });

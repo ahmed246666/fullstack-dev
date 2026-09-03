@@ -140,9 +140,9 @@ export function FileUploadZone({
                 <button
                   type="button"
                   onClick={() => handleRemove(idx)}
-                  className="text-slate-500 hover:text-rose-400 transition-colors"
+                  className="text-slate-500 hover:text-rose-400 transition-colors shrink-0"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-3.5 h-3.5 shrink-0" />
                 </button>
               </div>
             );

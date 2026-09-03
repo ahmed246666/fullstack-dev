@@ -5,6 +5,8 @@ import { X, BookOpen, Sparkles, CheckCircle2, AlertCircle, Save } from 'lucide-r
 import { useLanguage } from '@/context/LanguageContext';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
+import { Checkbox } from '@/components/ui/Checkbox';
 
 interface ArticleEditorModalProps {
   isOpen: boolean;
@@ -152,22 +154,12 @@ export function ArticleEditorModal({
 
           {/* Category & Tags Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">
-                {lang === 'ar' ? 'التصنيف' : 'Category'}
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500"
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label={lang === 'ar' ? 'التصنيف' : 'Category'}
+              value={category}
+              onChange={(val) => setCategory(val)}
+              options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+            />
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-slate-300">
@@ -246,19 +238,19 @@ export function ArticleEditorModal({
           </div>
 
           {/* Published Toggle */}
-          <div className="flex items-center gap-2 pt-2">
-            <input
-              type="checkbox"
+          <div className="pt-2">
+            <Checkbox
               id="isPublishedCheck"
               checked={isPublished}
-              onChange={(e) => setIsPublished(e.target.checked)}
-              className="w-4 h-4 rounded text-gold-500 bg-navy-950 border-navy-700 focus:ring-gold-500"
+              onCheckedChange={(val) => setIsPublished(val)}
+              label={
+                <span className="text-xs text-slate-300">
+                  {lang === 'ar'
+                    ? 'نشر فوري في مركز المساعدة وبوابة العملاء'
+                    : 'Publish immediately to Knowledge Center & Portal'}
+                </span>
+              }
             />
-            <label htmlFor="isPublishedCheck" className="text-xs text-slate-300 cursor-pointer">
-              {lang === 'ar'
-                ? 'نشر فوري في مركز المساعدة وبوابة العملاء'
-                : 'Publish immediately to Knowledge Center & Portal'}
-            </label>
           </div>
 
           {/* Footer Buttons */}

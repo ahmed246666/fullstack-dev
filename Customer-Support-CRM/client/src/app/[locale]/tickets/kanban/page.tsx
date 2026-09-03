@@ -13,6 +13,8 @@ import { KanbanBoard } from '@/components/tickets/KanbanBoard';
 import { TicketDrawer } from '@/components/tickets/TicketDrawer';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { toast } from '@/components/ui/Toast';
 
 export default function KanbanPage() {
   const searchParams = useSearchParams();
@@ -72,12 +74,39 @@ export default function KanbanPage() {
       setNewTitle('');
       setNewDesc('');
       refetch();
+      toast.success(
+        lang === 'ar' ? 'تم إنشاء التذكرة بنجاح' : 'Ticket created successfully',
+        lang === 'ar' ? 'تذكرة جديدة' : 'Ticket Created'
+      );
     } catch (err: any) {
-      alert(err.message || 'Failed to create ticket');
+      toast.error(
+        err.message || (lang === 'ar' ? 'فشل إنشاء التذكرة' : 'Failed to create ticket'),
+        lang === 'ar' ? 'خطأ' : 'Error'
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const customerOptions = (customersData?.data || []).map((c: any) => ({
+    value: c.id,
+    label: `${lang === 'ar' && c.nameAr ? c.nameAr : c.name} (${c.company || c.email}) - [${c.tier}]`
+  }));
+
+  const priorityOptions = [
+    { value: 'URGENT', label: lang === 'ar' ? 'عاجل جداً (ساعة واحدة)' : 'Urgent (1h SLA)' },
+    { value: 'HIGH', label: lang === 'ar' ? 'عالية (ساعتان)' : 'High (2h SLA)' },
+    { value: 'MEDIUM', label: lang === 'ar' ? 'متوسطة (4 ساعات)' : 'Medium (4h SLA)' },
+    { value: 'LOW', label: lang === 'ar' ? 'منخفضة (8 ساعات)' : 'Low (8h SLA)' }
+  ];
+
+  const channelOptions = [
+    { value: 'WHATSAPP', label: t('channel_WHATSAPP') },
+    { value: 'EMAIL', label: t('channel_EMAIL') },
+    { value: 'LIVE_CHAT', label: t('channel_LIVE_CHAT') },
+    { value: 'SMS', label: t('channel_SMS') },
+    { value: 'WEB_FORM', label: t('channel_WEB_FORM') }
+  ];
 
   return (
     <div className="space-y-6">
@@ -85,7 +114,7 @@ export default function KanbanPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-white flex items-center gap-2 font-brand">
-            <Kanban className="w-6 h-6 text-gold-400" />
+            <Kanban className="w-6 h-6 text-gold-400 shrink-0" />
             <span>{t('navKanban')}</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -95,17 +124,20 @@ export default function KanbanPage() {
           </p>
         </div>
 
-        <Button onClick={() => setIsCreateOpen(true)} className="text-xs bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold hover:opacity-95 shadow-lg shadow-gold-500/20">
-          <Plus className="w-4 h-4" />
-          <span>{t('newTicketBtn')}</span>
+        <Button
+          onClick={() => setIsCreateOpen(true)}
+          className="text-xs bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold hover:opacity-95 shadow-lg shadow-gold-500/20 shrink-0"
+        >
+          <Plus className="w-4 h-4 shrink-0" />
+          <span className="whitespace-nowrap">{t('newTicketBtn')}</span>
         </Button>
       </div>
 
       {/* Filters Bar */}
-      <Card className="p-4 space-y-3 border-gold-500/20 bg-navy-900/80">
+      <Card className="p-4 space-y-3 border-gold-500/20 bg-navy-900/80 rounded-2xl">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-3.5 rtl:right-3.5 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3.5 rtl:right-3.5 rtl:left-auto top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 shrink-0" />
             <input
               type="text"
               placeholder={
@@ -115,7 +147,7 @@ export default function KanbanPage() {
               }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-navy-950 border border-navy-800 rounded-xl pl-10 pr-4 rtl:pr-10 rtl:pl-4 py-2 text-xs text-slate-100 outline-none focus:border-gold-500"
+              className="w-full bg-navy-950/90 border border-navy-800 rounded-xl pl-10 pr-4 rtl:pr-10 rtl:pl-4 py-2 text-xs text-slate-100 outline-none focus:border-gold-500 font-sans"
             />
           </div>
 
@@ -125,7 +157,7 @@ export default function KanbanPage() {
               <button
                 key={chan}
                 onClick={() => setChannel(chan)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 ${
                   channel === chan
                     ? 'bg-gold-500 text-navy-950 border-gold-400 font-bold shadow-md shadow-gold-500/20'
                     : 'bg-navy-950 text-slate-300 border-navy-800 hover:text-white'
@@ -174,57 +206,28 @@ export default function KanbanPage() {
             required
           />
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              {lang === 'ar' ? 'اختيار العميل' : 'Select Customer'}
-            </label>
-            <select
-              value={selectedCustomerId}
-              onChange={(e) => setSelectedCustomerId(e.target.value)}
-              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500 rounded-xl px-4 py-2 text-xs text-slate-100 outline-none"
-              required
-            >
-              <option value="">{lang === 'ar' ? '-- اختر ملف العميل --' : '-- Choose Customer Profile --'}</option>
-              {(customersData?.data || []).map((c: any) => (
-                <option key={c.id} value={c.id}>
-                  {lang === 'ar' && c.nameAr ? c.nameAr : c.name} ({c.company || c.email}) - [{c.tier}]
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label={lang === 'ar' ? 'اختيار العميل' : 'Select Customer'}
+            placeholder={lang === 'ar' ? '-- اختر ملف العميل --' : '-- Choose Customer Profile --'}
+            value={selectedCustomerId}
+            onChange={(val) => setSelectedCustomerId(val)}
+            options={customerOptions}
+          />
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                {lang === 'ar' ? 'مستوى الأولوية' : 'Priority'}
-              </label>
-              <select
-                value={newPriority}
-                onChange={(e) => setNewPriority(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
-              >
-                <option value="URGENT">{lang === 'ar' ? 'عاجل جداً (ساعة واحدة)' : 'Urgent (1h SLA)'}</option>
-                <option value="HIGH">{lang === 'ar' ? 'عالية (ساعتان)' : 'High (2h SLA)'}</option>
-                <option value="MEDIUM">{lang === 'ar' ? 'متوسطة (4 ساعات)' : 'Medium (4h SLA)'}</option>
-                <option value="LOW">{lang === 'ar' ? 'منخفضة (8 ساعات)' : 'Low (8h SLA)'}</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                {lang === 'ar' ? 'قناة التواصل' : 'Ingestion Channel'}
-              </label>
-              <select
-                value={newChannel}
-                onChange={(e) => setNewChannel(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
-              >
-                <option value="WHATSAPP">{t('channel_WHATSAPP')}</option>
-                <option value="EMAIL">{t('channel_EMAIL')}</option>
-                <option value="LIVE_CHAT">{t('channel_LIVE_CHAT')}</option>
-                <option value="SMS">{t('channel_SMS')}</option>
-                <option value="WEB_FORM">{t('channel_WEB_FORM')}</option>
-              </select>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Select
+              label={lang === 'ar' ? 'مستوى الأولوية' : 'Priority'}
+              value={newPriority}
+              onChange={(val) => setNewPriority(val)}
+              options={priorityOptions}
+            />
+
+            <Select
+              label={lang === 'ar' ? 'قناة التواصل' : 'Ingestion Channel'}
+              value={newChannel}
+              onChange={(val) => setNewChannel(val)}
+              options={channelOptions}
+            />
           </div>
 
           <div>
@@ -233,7 +236,7 @@ export default function KanbanPage() {
             </label>
             <textarea
               rows={3}
-              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-500 outline-none"
+              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none"
               placeholder={lang === 'ar' ? 'شرح مفصل للمشكلة والطلب...' : 'Detailed explanation of the issue...'}
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}

@@ -65,19 +65,19 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={toggleLanguage}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-navy-700 bg-navy-900/80 hover:border-gold-500/40 text-gold-300 text-xs font-semibold transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-navy-750 bg-navy-900 text-xs font-semibold text-gold-300 hover:text-gold-200 transition-colors font-brand shrink-0"
           >
-            <Globe className="w-3.5 h-3.5 text-gold-400" />
+            <Globe className="w-3.5 h-3.5 text-gold-400 shrink-0" />
             <span>{lang === 'en' ? 'العربية' : 'English'}</span>
           </button>
           <Link href={`/${lang}/portal`}>
             <Button
               variant="outline"
               size="sm"
-              className="text-xs border-navy-700 hover:border-gold-500/50 text-slate-300 hover:text-gold-200"
+              className="text-xs border-navy-700 hover:border-gold-500/50 text-slate-300 hover:text-gold-200 shrink-0"
             >
               {lang === 'ar' ? 'بوابة العملاء' : 'Customer Portal'}
             </Button>

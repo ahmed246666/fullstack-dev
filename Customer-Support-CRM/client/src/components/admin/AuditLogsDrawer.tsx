@@ -39,8 +39,8 @@ export function AuditLogsDrawer({ isOpen, onClose }: AuditLogsDrawerProps) {
         onClick={onClose}
       />
 
-      <div className="absolute inset-y-0 right-0 rtl:left-0 rtl:right-auto max-w-full flex pl-10 rtl:pl-0 rtl:pr-10 z-[999999]">
-        <div className="w-screen max-w-xl glass-panel bg-navy-950/95 border-l rtl:border-r rtl:border-l-0 border-gold-500/30 p-6 md:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right rtl:slide-in-from-left duration-200">
+      <div className="fixed inset-y-0 right-0 rtl:left-0 rtl:right-auto w-full max-w-full sm:max-w-xl flex z-[999999]">
+        <div className="w-full h-full glass-panel bg-navy-950/95 border-l rtl:border-r rtl:border-l-0 border-gold-500/30 p-4 sm:p-6 md:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right rtl:slide-in-from-left duration-200">
           <div className="space-y-6">
             <div className="flex items-start justify-between pb-4 border-b border-navy-800">
               <div>

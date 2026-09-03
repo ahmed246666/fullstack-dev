@@ -7,6 +7,7 @@ import { useAgent } from '@/context/AgentContext';
 import { api } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { PriorityBadge, ChannelBadge, SLABadge } from '@/components/ui/Badge';
+import { toast } from '@/components/ui/Toast';
 
 interface KanbanBoardProps {
   tickets: any[];
@@ -78,8 +79,15 @@ export function KanbanBoard({ tickets, onSelectTicket, onUpdated }: KanbanBoardP
     try {
       await api.updateTicketStatus(ticketId, targetStatus, currentAgent.name);
       onUpdated();
+      toast.success(
+        lang === 'ar' ? 'تم نقل التذكرة وتحديث مسار العمل' : 'Ticket workflow updated',
+        lang === 'ar' ? 'لوحة كانبان' : 'Kanban Board'
+      );
     } catch (err: any) {
-      alert(err.message || 'Failed to update ticket status');
+      toast.error(
+        err.message || (lang === 'ar' ? 'فشل تحديث حالة التذكرة' : 'Failed to update ticket status'),
+        lang === 'ar' ? 'خطأ' : 'Error'
+      );
     }
   };
 
@@ -120,7 +128,7 @@ export function KanbanBoard({ tickets, onSelectTicket, onUpdated }: KanbanBoardP
                   className="p-3.5 glass-panel-hover border-slate-800/80 cursor-grab active:cursor-grabbing hover:border-indigo-500/50 shadow-md group transition-all"
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="font-mono text-[11px] font-bold text-indigo-400 group-hover:underline">
+                    <span className="font-mono text-[11px] font-bold text-indigo-400 group-hover:underline whitespace-nowrap shrink-0">
                       {ticket.ticketNumber}
                     </span>
                     <PriorityBadge priority={ticket.priority} />
@@ -139,7 +147,7 @@ export function KanbanBoard({ tickets, onSelectTicket, onUpdated }: KanbanBoardP
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[10px]">
+                  <div className="flex items-center justify-between gap-1.5 flex-wrap pt-2 border-t border-navy-800 text-[10px]">
                     <ChannelBadge channel={ticket.channel} />
                     <SLABadge slaStatus={ticket.slaStatus} />
                   </div>

@@ -11,7 +11,7 @@ interface SLACountdownTimerProps {
 }
 
 export function SLACountdownTimer({ resolutionDueAt, status, className }: SLACountdownTimerProps) {
-  const { lang, t } = useLanguage();
+  const { lang } = useLanguage();
   const [timeLeft, setTimeLeft] = useState<{
     hours: number;
     minutes: number;
@@ -47,19 +47,19 @@ export function SLACountdownTimer({ resolutionDueAt, status, className }: SLACou
   if (status === 'RESOLVED' || status === 'CLOSED') {
     return (
       <span
-        className={`inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 ${className}`}
+        className={`inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 gap-1 text-[11px] font-semibold text-slate-400 ${className}`}
       >
-        <CheckCircle className="w-3 h-3 text-slate-400" />
-        <span>Resolved</span>
+        <CheckCircle className="w-3 h-3 text-slate-400 shrink-0" />
+        <span className="whitespace-nowrap">{lang === 'ar' ? 'تم الحل' : 'Resolved'}</span>
       </span>
     );
   }
 
   if (!timeLeft) {
     return (
-      <span className={`inline-flex items-center gap-1 text-[11px] text-slate-400 ${className}`}>
-        <Clock className="w-3 h-3" />
-        <span>No Due Date</span>
+      <span className={`inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 gap-1 text-[11px] text-slate-400 ${className}`}>
+        <Clock className="w-3 h-3 shrink-0" />
+        <span className="whitespace-nowrap">{lang === 'ar' ? 'بدون موعد' : 'No Due Date'}</span>
       </span>
     );
   }
@@ -67,10 +67,10 @@ export function SLACountdownTimer({ resolutionDueAt, status, className }: SLACou
   if (timeLeft.isBreached) {
     return (
       <span
-        className={`inline-flex items-center gap-1 text-[11px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/30 animate-pulse ${className}`}
+        className={`inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 gap-1 text-[11px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/30 animate-pulse ${className}`}
       >
-        <ShieldAlert className="w-3 h-3" />
-        <span>SLA Breached</span>
+        <ShieldAlert className="w-3 h-3 shrink-0" />
+        <span className="whitespace-nowrap">{lang === 'ar' ? 'تجاوز وقت الـ SLA' : 'SLA Breached'}</span>
       </span>
     );
   }
@@ -79,17 +79,19 @@ export function SLACountdownTimer({ resolutionDueAt, status, className }: SLACou
 
   return (
     <span
-      className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md border ${
+      className={`inline-flex items-center flex-nowrap whitespace-nowrap shrink-0 gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md border ${
         isUrgent
           ? 'bg-amber-500/15 text-amber-400 border-amber-500/30 font-bold'
-          : 'bg-slate-900 text-slate-300 border-slate-800'
+          : 'bg-navy-900 text-slate-300 border-navy-800'
       } ${className}`}
     >
       <Clock
-        className={`w-3 h-3 ${isUrgent ? 'text-amber-400 animate-spin-slow' : 'text-slate-400'}`}
+        className={`w-3 h-3 shrink-0 ${isUrgent ? 'text-amber-400 animate-spin-slow' : 'text-slate-400'}`}
       />
-      <span>
-        {timeLeft.hours}h {timeLeft.minutes}m left
+      <span className="whitespace-nowrap">
+        {lang === 'ar'
+          ? `متبقي ${timeLeft.hours}س ${timeLeft.minutes}د`
+          : `${timeLeft.hours}h ${timeLeft.minutes}m left`}
       </span>
     </span>
   );

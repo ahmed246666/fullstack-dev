@@ -133,7 +133,7 @@ export default function KnowledgeBasePage() {
                     </span>
                     <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
                       <ThumbsUp className="w-3 h-3 text-gold-400" />
-                      <span>{article.helpfulCount ?? 0}</span>
+                      <span>{article.helpfulVotes ?? article.helpfulCount ?? 0}</span>
                     </div>
                   </div>
 
@@ -144,18 +144,18 @@ export default function KnowledgeBasePage() {
                   <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed font-sans">{content}</p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-navy-800 flex items-center justify-between text-xs font-brand">
+                <div className="pt-4 mt-4 border-t border-navy-800 flex items-center justify-between text-xs font-brand gap-2 flex-wrap">
                   <div className="flex items-center gap-1 flex-wrap">
                     {tagsList.slice(0, 2).map((tag: string, idx: number) => (
-                      <span key={idx} className="text-[10px] text-slate-500 font-mono">
+                      <span key={idx} className="text-[10px] text-slate-500 font-mono shrink-0">
                         #{tag}
                       </span>
                     ))}
                   </div>
 
-                  <span className="font-semibold text-gold-400 flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
+                  <span className="font-semibold text-gold-400 flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform shrink-0">
                     <span>{lang === 'ar' ? 'قراءة الدليل' : 'Read Guide'}</span>
-                    <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+                    <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180 shrink-0" />
                   </span>
                 </div>
               </Card>

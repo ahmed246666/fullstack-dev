@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { api } from '@/lib/api';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
+import { toast } from '@/components/ui/Toast';
 
 interface CSATModalProps {
   isOpen: boolean;
@@ -33,13 +34,20 @@ export function CSATModal({ isOpen, ticket, onClose, onSuccess }: CSATModalProps
         feedback: feedback.trim() || undefined
       });
       setIsSuccess(true);
+      toast.success(
+        lang === 'ar' ? 'شكراً لتقييمك! تم تسجيل رضا العميل بنجاح.' : 'Thank you! CSAT rating recorded.',
+        lang === 'ar' ? 'استطلاع الرضا' : 'CSAT Survey'
+      );
       setTimeout(() => {
         setIsSuccess(false);
         onSuccess();
         onClose();
       }, 1200);
     } catch (err: any) {
-      alert(err.message || 'Failed to submit CSAT rating');
+      toast.error(
+        err.message || (lang === 'ar' ? 'فشل حفظ تقييم الخدمة' : 'Failed to submit CSAT rating'),
+        lang === 'ar' ? 'خطأ' : 'Error'
+      );
     } finally {
       setIsSubmitting(false);
     }

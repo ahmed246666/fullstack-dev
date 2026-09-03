@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
 
 interface ArticleModalProps {
   isOpen: boolean;
@@ -109,31 +110,29 @@ export function ArticleModal({ isOpen, onClose, onSuccess }: ArticleModalProps) 
             onChange={(e) => setSlug(e.target.value)}
             required
           />
-          <div>
-            <label className="block text-xs font-bold text-gold-300 uppercase tracking-wider mb-1.5 font-brand">
-              {lang === 'ar' ? 'القسم / التصنيف' : 'Category'}
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500/50 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
-            >
-              <option value="Getting Started">
-                {lang === 'ar' ? 'البدء السريع (Getting Started)' : 'Getting Started'}
-              </option>
-              <option value="API & Integrations">
-                {lang === 'ar'
-                  ? 'واجهات البرمجة والربط (API & Integrations)'
-                  : 'API & Integrations'}
-              </option>
-              <option value="Account & Billing">
-                {lang === 'ar' ? 'الحسابات والاشتراكات (Account & Billing)' : 'Account & Billing'}
-              </option>
-              <option value="Troubleshooting">
-                {lang === 'ar' ? 'استكشاف الأخطاء وحلها (Troubleshooting)' : 'Troubleshooting'}
-              </option>
-            </select>
-          </div>
+          <Select
+            label={lang === 'ar' ? 'القسم / التصنيف' : 'Category'}
+            value={category}
+            onChange={(val) => setCategory(val)}
+            options={[
+              {
+                value: 'Getting Started',
+                label: lang === 'ar' ? 'البدء السريع (Getting Started)' : 'Getting Started'
+              },
+              {
+                value: 'API & Integrations',
+                label: lang === 'ar' ? 'واجهات البرمجة والربط (API & Integrations)' : 'API & Integrations'
+              },
+              {
+                value: 'Account & Billing',
+                label: lang === 'ar' ? 'الحسابات والاشتراكات (Account & Billing)' : 'Account & Billing'
+              },
+              {
+                value: 'Troubleshooting',
+                label: lang === 'ar' ? 'استكشاف الأخطاء وحلها (Troubleshooting)' : 'Troubleshooting'
+              }
+            ]}
+          />
           <Input
             label={lang === 'ar' ? 'الوسوم (مفصولة بفواصل)' : 'Tags (Comma separated)'}
             placeholder="WhatsApp, API, Integration"

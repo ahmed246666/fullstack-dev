@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
 
 interface CustomerModalProps {
   isOpen: boolean;
@@ -14,7 +15,7 @@ interface CustomerModalProps {
 }
 
 export function CustomerModal({ isOpen, onClose, onSuccess }: CustomerModalProps) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const [name, setName] = useState('');
   const [nameAr, setNameAr] = useState('');
   const [email, setEmail] = useState('');
@@ -63,10 +64,10 @@ export function CustomerModal({ isOpen, onClose, onSuccess }: CustomerModalProps
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={lang === 'ar' ? 'إضافة عميل جديد' : 'Add New Customer'}
+      title={lang === 'ar' ? 'إضافة ملف عميل جديد' : 'Add New Customer Profile'}
       maxWidth="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 font-sans">
         {error && (
           <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs">
             {error}
@@ -75,15 +76,15 @@ export function CustomerModal({ isOpen, onClose, onSuccess }: CustomerModalProps
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
-            label="Full Name (English)"
-            placeholder="e.g. Tariq Al-Otaibi"
+            label={lang === 'ar' ? 'الاسم بالإنجليزية' : 'Full Name (English)'}
+            placeholder={lang === 'ar' ? 'مثال: Tariq Al-Otaibi' : 'e.g. Tariq Al-Otaibi'}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
           <Input
-            label="الاسم الكامل (بالعربية)"
-            placeholder="مثال: طارق العتيبي"
+            label={lang === 'ar' ? 'الاسم بالعربية' : 'Full Name (Arabic)'}
+            placeholder={lang === 'ar' ? 'مثال: طارق العتيبي' : 'e.g. طارق العتيبي'}
             value={nameAr}
             onChange={(e) => setNameAr(e.target.value)}
           />
@@ -92,7 +93,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess }: CustomerModalProps
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
             type="email"
-            label="Work Email"
+            label={lang === 'ar' ? 'البريد الإلكتروني للعمل' : 'Work Email'}
             placeholder="tariq@client.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -100,7 +101,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess }: CustomerModalProps
           />
           <Input
             type="tel"
-            label="Phone Number"
+            label={lang === 'ar' ? 'رقم الهاتف المباشر' : 'Direct Phone Number'}
             placeholder="+966 50 123 4567"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -109,40 +110,36 @@ export function CustomerModal({ isOpen, onClose, onSuccess }: CustomerModalProps
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
-            label="Company Name"
-            placeholder="e.g. Riyadh Tech Corp"
+            label={lang === 'ar' ? 'اسم الشركة / المؤسسة' : 'Company / Organization'}
+            placeholder={lang === 'ar' ? 'مثال: شركة الرياض للتقنية' : 'e.g. Riyadh Tech Corp'}
             value={company}
             onChange={(e) => setCompany(e.target.value)}
           />
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Service Tier
-            </label>
-            <select
-              value={tier}
-              onChange={(e) => setTier(e.target.value)}
-              className="w-full bg-slate-900/80 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
-            >
-              <option value="STANDARD">Standard Tier</option>
-              <option value="VIP">VIP Priority (2h SLA)</option>
-              <option value="ENTERPRISE">Enterprise Dedicated (1h SLA)</option>
-            </select>
-          </div>
+          <Select
+            label={lang === 'ar' ? 'باقة خدمة العميل (Tier)' : 'Service Level Tier'}
+            value={tier}
+            onChange={(val) => setTier(val)}
+            options={[
+              { value: 'STANDARD', label: t('tier_STANDARD') },
+              { value: 'VIP', label: t('tier_VIP') },
+              { value: 'ENTERPRISE', label: t('tier_ENTERPRISE') }
+            ]}
+          />
         </div>
 
         <Input
-          label="Avatar Image URL (Optional)"
+          label={lang === 'ar' ? 'رابط صورة الملف الشخصي (اختياري)' : 'Avatar Image URL (Optional)'}
           placeholder="https://images.unsplash.com/..."
           value={avatarUrl}
           onChange={(e) => setAvatarUrl(e.target.value)}
         />
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-navy-800 flex-wrap">
           <Button type="button" variant="outline" onClick={onClose} size="sm">
-            Cancel
+            {t('cancel')}
           </Button>
           <Button type="submit" isLoading={isLoading} size="sm">
-            Save Customer Profile
+            {lang === 'ar' ? 'حفظ ملف العميل' : 'Save Customer Profile'}
           </Button>
         </div>
       </form>

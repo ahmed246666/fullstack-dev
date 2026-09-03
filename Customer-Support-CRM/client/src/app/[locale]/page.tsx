@@ -28,6 +28,8 @@ import {
 } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { toast } from '@/components/ui/Toast';
 
 export default function DashboardPage() {
   const { lang, t } = useLanguage();
@@ -87,34 +89,61 @@ export default function DashboardPage() {
       setNewTitle('');
       setNewDesc('');
       refetchTickets();
+      toast.success(
+        lang === 'ar' ? 'تم إنشاء التذكرة بنجاح' : 'Ticket created successfully',
+        lang === 'ar' ? 'تذكرة جديدة' : 'Ticket Created'
+      );
     } catch (err: any) {
-      alert(err.message || 'Failed to create ticket');
+      toast.error(
+        err.message || (lang === 'ar' ? 'فشل إنشاء التذكرة' : 'Failed to create ticket'),
+        lang === 'ar' ? 'خطأ' : 'Error'
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const customerOptions = (customersData?.data || []).map((c: any) => ({
+    value: c.id,
+    label: `${lang === 'ar' && c.nameAr ? c.nameAr : c.name} (${c.company || c.email}) - [${c.tier}]`
+  }));
+
+  const priorityOptions = [
+    { value: 'URGENT', label: lang === 'ar' ? 'عاجل جداً (ساعة واحدة)' : 'Urgent (1h SLA)' },
+    { value: 'HIGH', label: lang === 'ar' ? 'عالية (ساعتان)' : 'High (2h SLA)' },
+    { value: 'MEDIUM', label: lang === 'ar' ? 'متوسطة (4 ساعات)' : 'Medium (4h SLA)' },
+    { value: 'LOW', label: lang === 'ar' ? 'منخفضة (8 ساعات)' : 'Low (8h SLA)' }
+  ];
+
+  const channelOptions = [
+    { value: 'WEB_FORM', label: lang === 'ar' ? 'بوابة الدعم' : 'Web Form' },
+    { value: 'WHATSAPP', label: lang === 'ar' ? 'واتساب' : 'WhatsApp' },
+    { value: 'EMAIL', label: lang === 'ar' ? 'البريد الإلكتروني' : 'Email' },
+    { value: 'LIVE_CHAT', label: lang === 'ar' ? 'المحادثة المباشرة' : 'Live Chat' },
+    { value: 'SMS', label: lang === 'ar' ? 'الرسائل النصية' : 'SMS' }
+  ];
+
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-8 md:space-y-10 max-w-7xl mx-auto w-full">
       {/* Welcome Banner */}
-      <div className="glass-panel p-8 md:p-10 rounded-3xl border border-gold-500/25 bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 relative overflow-hidden shadow-2xl">
+      <div className="glass-panel p-8 sm:p-10 md:p-12 rounded-3xl border border-gold-500/25 bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 relative overflow-hidden shadow-2xl">
         <div className="absolute -right-20 -top-20 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs font-semibold">
-              <Crown className="w-4 h-4 text-gold-400" />
-              <span>
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-8">
+          <div className="space-y-3 max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs font-semibold shrink-0">
+              <Crown className="w-4 h-4 text-gold-400 shrink-0" />
+              <span className="whitespace-nowrap">
                 {lang === 'ar'
                   ? 'منصة خدمة ودعم عملاء عزم المؤسسية'
                   : 'AZM Squad Customer Support CRM • Enterprise'}
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight font-brand">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight font-brand leading-tight">
               {lang === 'ar'
                 ? `أهلاً بك، ${currentAgent.nameAr}`
                 : `Welcome back, ${currentAgent.name}`}
             </h1>
-            <p className="text-sm text-gold-100/70 font-sans max-w-2xl">
+            <p className="text-sm sm:text-base text-gold-100/75 font-sans leading-relaxed">
               {lang === 'ar'
                 ? `لوحة التحكم التنفيذية الشاملة بنسبة التزام SLA تبلغ ${stats.slaComplianceRate}% ومعدل رضا عملاء ${stats.csatScore || 4.9} / 5.`
                 : `Executive Command Center with ${stats.slaComplianceRate}% overall SLA compliance and ${stats.csatScore || 4.9} / 5 customer satisfaction.`}
@@ -122,104 +151,104 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Action Button */}
-          <div className="flex items-center gap-3">
-            <Link href={`/${lang}/tickets/kanban`}>
+          <div className="flex items-center gap-3 w-full sm:w-auto shrink-0 flex-wrap">
+            <Link href={`/${lang}/tickets/kanban`} className="flex-1 sm:flex-initial">
               <Button
                 variant="outline"
-                className="text-xs border-navy-700 hover:border-gold-500/40 text-slate-200"
+                className="w-full sm:w-auto text-xs border-navy-700 hover:border-gold-500/40 text-slate-200 px-4 py-2.5"
               >
-                <Kanban className="w-4 h-4 text-gold-400" />
-                <span>{t('navKanban')}</span>
+                <Kanban className="w-4 h-4 text-gold-400 shrink-0" />
+                <span className="whitespace-nowrap">{t('navKanban')}</span>
               </Button>
             </Link>
             <Button
               onClick={() => setIsCreateOpen(true)}
-              className="text-xs bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold hover:opacity-95 shadow-lg shadow-gold-500/20"
+              className="flex-1 sm:flex-initial text-xs bg-gradient-to-r from-gold-500 to-gold-600 text-navy-950 font-bold hover:opacity-95 shadow-lg shadow-gold-500/20 px-5 py-2.5"
             >
-              <Plus className="w-4 h-4" />
-              <span>{t('newTicketBtn')}</span>
+              <Plus className="w-4 h-4 shrink-0" />
+              <span className="whitespace-nowrap">{t('newTicketBtn')}</span>
             </Button>
           </div>
         </div>
       </div>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* KPI 1 */}
-        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 rounded-2xl space-y-2">
+        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 sm:p-7 rounded-3xl space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
+            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand whitespace-nowrap">
               {t('kpiTotalTickets')}
             </span>
-            <div className="w-9 h-9 rounded-xl bg-gold-500/10 text-gold-400 flex items-center justify-center border border-gold-500/20">
-              <Ticket className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center border border-gold-500/20 shrink-0">
+              <Ticket className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2 pt-1">
-            <span className="text-3xl font-extrabold text-white font-brand">
+          <div className="flex items-baseline gap-2.5 pt-1">
+            <span className="text-3xl sm:text-4xl font-extrabold text-white font-brand">
               {stats.totalTickets}
             </span>
-            <span className="text-xs text-emerald-400 font-semibold">
+            <span className="text-xs text-emerald-400 font-semibold whitespace-nowrap">
               {lang === 'ar' ? '+14% هذا الأسبوع' : '+14% this sprint'}
             </span>
           </div>
         </Card>
 
         {/* KPI 2 */}
-        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 rounded-2xl space-y-2">
+        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 sm:p-7 rounded-3xl space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
+            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand whitespace-nowrap">
               {t('kpiOpenTickets')}
             </span>
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
-              <Clock className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 shrink-0">
+              <Clock className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2 pt-1">
-            <span className="text-3xl font-extrabold text-amber-300 font-brand">
+          <div className="flex items-baseline gap-2.5 pt-1">
+            <span className="text-3xl sm:text-4xl font-extrabold text-amber-300 font-brand">
               {stats.openTickets}
             </span>
-            <span className="text-xs text-slate-400 font-medium">
+            <span className="text-xs text-slate-400 font-medium whitespace-nowrap">
               {lang === 'ar' ? 'طابور نشط' : 'Active queue'}
             </span>
           </div>
         </Card>
 
         {/* KPI 3 */}
-        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 rounded-2xl space-y-2">
+        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 sm:p-7 rounded-3xl space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
+            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand whitespace-nowrap">
               {t('kpiSLACompliance')}
             </span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-              <CheckCircle2 className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 shrink-0">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2 pt-1">
-            <span className="text-3xl font-extrabold text-emerald-400 font-brand">
+          <div className="flex items-baseline gap-2.5 pt-1">
+            <span className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-brand">
               {stats.slaComplianceRate}%
             </span>
-            <span className="text-xs text-emerald-400 font-medium">
+            <span className="text-xs text-emerald-400 font-medium whitespace-nowrap">
               {lang === 'ar' ? 'المستهدف >90%' : 'Guaranteed >90%'}
             </span>
           </div>
         </Card>
 
         {/* KPI 4 */}
-        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 rounded-2xl space-y-2">
+        <Card className="glass-panel-hover border-gold-500/20 bg-navy-900/80 p-6 sm:p-7 rounded-3xl space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand">
+            <span className="text-xs font-bold text-gold-300 uppercase tracking-wider font-brand whitespace-nowrap">
               {t('kpiCSATAverage')}
             </span>
-            <div className="w-9 h-9 rounded-xl bg-gold-500/10 text-gold-400 flex items-center justify-center border border-gold-500/20">
-              <TrendingUp className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center border border-gold-500/20 shrink-0">
+              <TrendingUp className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2 pt-1">
-            <span className="text-3xl font-extrabold text-gold-300 font-brand">
+          <div className="flex items-baseline gap-2.5 pt-1">
+            <span className="text-3xl sm:text-4xl font-extrabold text-gold-300 font-brand">
               {stats.csatScore || 4.9} / 5.0
             </span>
-            <span className="text-xs text-gold-300 font-semibold">
+            <span className="text-xs text-gold-300 font-semibold whitespace-nowrap">
               {lang === 'ar' ? '⭐ 99% نسبة الرضا' : '⭐ 99% Satisfaction'}
             </span>
           </div>
@@ -227,12 +256,12 @@ export default function DashboardPage() {
       </div>
 
       {/* Omnichannel Distribution & Quick Access */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Channel Ingestion Breakdown */}
-        <Card className="lg:col-span-1 p-6 space-y-4 border-gold-500/20 bg-navy-900/80">
-          <CardHeader className="p-0 pb-2">
+        <Card className="lg:col-span-1 p-6 sm:p-7 space-y-5 border-gold-500/20 bg-navy-900/80 rounded-3xl">
+          <CardHeader className="p-0 pb-1">
             <CardTitle className="text-sm font-brand text-gold-300 flex items-center gap-2">
-              <Headphones className="w-4 h-4 text-gold-400" />
+              <Headphones className="w-4 h-4 text-gold-400 shrink-0" />
               <span>{lang === 'ar' ? 'قنوات التواصل الشاملة' : 'Omnichannel Ingestion'}</span>
             </CardTitle>
           </CardHeader>
@@ -240,10 +269,12 @@ export default function DashboardPage() {
             {Object.entries(stats.channelDistribution || {}).map(([chan, count]) => (
               <div
                 key={chan}
-                className="flex items-center justify-between p-3 rounded-2xl bg-navy-950 border border-navy-800"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-navy-950 border border-navy-800 gap-2"
               >
-                <ChannelBadge channel={chan} />
-                <span className="text-xs font-bold text-gold-200">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <ChannelBadge channel={chan} />
+                </div>
+                <span className="text-xs font-bold text-gold-200 whitespace-nowrap shrink-0">
                   {lang === 'ar' ? `${count} تذاكر` : `${count} tickets`}
                 </span>
               </div>
@@ -252,43 +283,43 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Access Modules */}
-        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Link href={`/${lang}/customers`} className="block group">
-            <Card className="glass-panel-hover h-full flex flex-col justify-between p-6 border-gold-500/20 bg-navy-900/80">
+            <Card className="glass-panel-hover h-full flex flex-col justify-between p-7 border-gold-500/20 bg-navy-900/80 rounded-3xl">
               <div>
-                <div className="w-11 h-11 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform border border-gold-500/20">
-                  <Users className="w-5 h-5" />
+                <div className="w-12 h-12 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform border border-gold-500/20">
+                  <Users className="w-6 h-6" />
                 </div>
                 <h4 className="font-bold text-white text-base font-brand">{t('navCustomers')}</h4>
-                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed font-sans">
+                <p className="text-xs text-slate-400 mt-2 leading-relaxed font-sans">
                   {lang === 'ar'
                     ? 'استعراض نقاط تفاعل العملاء الشاملة 360، وفئات الحسابات (مؤسسي/VIP)، وسجل التذاكر.'
                     : 'Inspect customer 360 touchpoints, tier levels (Enterprise/VIP), contact profiles, and ticket history.'}
                 </p>
               </div>
-              <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-gold-400 group-hover:underline font-brand">
+              <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-gold-400 group-hover:underline font-brand">
                 <span>{lang === 'ar' ? 'استعراض العملاء' : 'Explore Customers'}</span>
-                <ArrowUpRight className="w-3.5 h-3.5 rtl:rotate-180" />
+                <ArrowUpRight className="w-4 h-4 rtl:rotate-180" />
               </div>
             </Card>
           </Link>
 
           <Link href={`/${lang}/workspace`} className="block group">
-            <Card className="glass-panel-hover h-full flex flex-col justify-between p-6 border-gold-500/20 bg-navy-900/80">
+            <Card className="glass-panel-hover h-full flex flex-col justify-between p-7 border-gold-500/20 bg-navy-900/80 rounded-3xl">
               <div>
-                <div className="w-11 h-11 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform border border-gold-500/20">
-                  <Headphones className="w-5 h-5" />
+                <div className="w-12 h-12 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform border border-gold-500/20">
+                  <Headphones className="w-6 h-6" />
                 </div>
                 <h4 className="font-bold text-white text-base font-brand">{t('navWorkspace')}</h4>
-                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed font-sans">
+                <p className="text-xs text-slate-400 mt-2 leading-relaxed font-sans">
                   {lang === 'ar'
                     ? 'منصة الردود التفاعلية مع قوالب الردود السريعة بنقرة واحدة، والملاحظات الخاصة، والمساعد الذكي.'
                     : 'Agent interactive reply console with 1-click canned responses, internal private notes, and AI Copilot.'}
                 </p>
               </div>
-              <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-gold-400 group-hover:underline font-brand">
+              <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-gold-400 group-hover:underline font-brand">
                 <span>{lang === 'ar' ? 'فتح منصة الردود' : 'Open Workspace'}</span>
-                <ArrowUpRight className="w-3.5 h-3.5 rtl:rotate-180" />
+                <ArrowUpRight className="w-4 h-4 rtl:rotate-180" />
               </div>
             </Card>
           </Link>
@@ -296,49 +327,49 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Omnichannel Tickets Feed */}
-      <Card className="p-6 border-gold-500/20 bg-navy-900/80 space-y-4">
-        <CardHeader className="p-0 pb-2 flex items-center justify-between">
+      <Card className="p-6 sm:p-8 border-gold-500/20 bg-navy-900/80 space-y-5 rounded-3xl">
+        <CardHeader className="p-0 pb-1 flex flex-row items-center justify-between">
           <CardTitle className="text-base font-brand text-gold-300 flex items-center gap-2">
-            <Ticket className="w-4 h-4 text-gold-400" />
+            <Ticket className="w-5 h-5 text-gold-400 shrink-0" />
             <span>{t('recentTicketsTitle')}</span>
           </CardTitle>
           <Link
             href={`/${lang}/tickets`}
-            className="text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1 font-brand"
+            className="text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1 font-brand whitespace-nowrap"
           >
             <span>{lang === 'ar' ? 'عرض الكل' : 'View All'}</span>
-            <ArrowUpRight className="w-3.5 h-3.5 rtl:rotate-180" />
+            <ArrowUpRight className="w-4 h-4 rtl:rotate-180 shrink-0" />
           </Link>
         </CardHeader>
 
         {isTicketsLoading ? (
-          <div className="py-8 text-center text-xs text-slate-400 animate-pulse">
+          <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
             {lang === 'ar' ? 'جاري تحميل التذاكر المباشرة...' : 'Loading live tickets...'}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left rtl:text-right text-xs">
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-left rtl:text-right text-xs min-w-[760px]">
               <thead className="text-[11px] text-gold-300/80 uppercase border-b border-navy-800 bg-navy-950 font-brand">
                 <tr>
-                  <th className="px-4 py-3.5">{lang === 'ar' ? 'التذكرة' : 'Ticket'}</th>
-                  <th className="px-4 py-3.5">{lang === 'ar' ? 'العميل' : 'Customer'}</th>
-                  <th className="px-4 py-3.5">{lang === 'ar' ? 'القناة' : 'Channel'}</th>
-                  <th className="px-4 py-3.5">{lang === 'ar' ? 'الأولوية' : 'Priority'}</th>
-                  <th className="px-4 py-3.5">{lang === 'ar' ? 'الحالة' : 'Status'}</th>
-                  <th className="px-4 py-3.5">{lang === 'ar' ? 'اتفاقية SLA' : 'SLA Status'}</th>
-                  <th className="px-4 py-3.5 text-right rtl:text-left">{lang === 'ar' ? 'الموظف المسؤول' : 'Assigned Agent'}</th>
+                  <th className="px-4 py-4 whitespace-nowrap">{lang === 'ar' ? 'التذكرة' : 'Ticket'}</th>
+                  <th className="px-4 py-4 whitespace-nowrap">{lang === 'ar' ? 'العميل' : 'Customer'}</th>
+                  <th className="px-4 py-4 whitespace-nowrap">{lang === 'ar' ? 'القناة' : 'Channel'}</th>
+                  <th className="px-4 py-4 whitespace-nowrap">{lang === 'ar' ? 'الأولوية' : 'Priority'}</th>
+                  <th className="px-4 py-4 whitespace-nowrap">{lang === 'ar' ? 'الحالة' : 'Status'}</th>
+                  <th className="px-4 py-4 whitespace-nowrap">{lang === 'ar' ? 'اتفاقية SLA' : 'SLA Status'}</th>
+                  <th className="px-4 py-4 text-right rtl:text-left whitespace-nowrap">{lang === 'ar' ? 'الموظف المسؤول' : 'Assigned Agent'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-navy-800/60 font-sans">
                 {(ticketsData?.data || []).map((ticket: any) => (
                   <tr key={ticket.id} className="hover:bg-navy-850/80 transition-colors">
-                    <td className="px-4 py-3.5 font-semibold text-slate-200">
-                      <div className="font-bold text-gold-300 font-mono">{ticket.ticketNumber}</div>
-                      <div className="truncate max-w-xs text-slate-300 font-normal">
+                    <td className="px-4 py-4 font-semibold text-slate-200 whitespace-nowrap">
+                      <div className="font-bold text-gold-300 font-mono text-xs">{ticket.ticketNumber}</div>
+                      <div className="truncate max-w-[200px] text-slate-300 font-normal text-[11px]">
                         {ticket.title}
                       </div>
                     </td>
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <div className="font-semibold text-white">
                         {lang === 'ar'
                           ? ticket.customer?.nameAr || ticket.customer?.name
@@ -346,19 +377,27 @@ export default function DashboardPage() {
                       </div>
                       <div className="text-[10.5px] text-slate-400">{ticket.customer?.company}</div>
                     </td>
-                    <td className="px-4 py-3.5">
-                      <ChannelBadge channel={ticket.channel} />
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <ChannelBadge channel={ticket.channel} />
+                      </div>
                     </td>
-                    <td className="px-4 py-3.5">
-                      <PriorityBadge priority={ticket.priority} />
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <PriorityBadge priority={ticket.priority} />
+                      </div>
                     </td>
-                    <td className="px-4 py-3.5">
-                      <StatusBadge status={ticket.status} />
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <StatusBadge status={ticket.status} />
+                      </div>
                     </td>
-                    <td className="px-4 py-3.5">
-                      <SLABadge slaStatus={ticket.slaStatus} />
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <SLABadge slaStatus={ticket.slaStatus} />
+                      </div>
                     </td>
-                    <td className="px-4 py-3.5 text-right rtl:text-left">
+                    <td className="px-4 py-4 text-right rtl:text-left whitespace-nowrap">
                       <span className="text-slate-300 font-medium font-brand">
                         {ticket.assignedAgent
                           ? lang === 'ar'
@@ -391,57 +430,28 @@ export default function DashboardPage() {
             required
           />
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              {lang === 'ar' ? 'اختيار العميل' : 'Select Customer'}
-            </label>
-            <select
-              value={selectedCustomerId}
-              onChange={(e) => setSelectedCustomerId(e.target.value)}
-              className="w-full bg-navy-950 border border-navy-800 focus:border-gold-500 rounded-xl px-4 py-2.5 text-xs text-slate-100 outline-none"
-              required
-            >
-              <option value="">{lang === 'ar' ? '-- اختر العميل --' : '-- Choose Customer --'}</option>
-              {(customersData?.data || []).map((c: any) => (
-                <option key={c.id} value={c.id}>
-                  {lang === 'ar' && c.nameAr ? c.nameAr : c.name} ({c.company || c.email}) - {c.tier}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label={lang === 'ar' ? 'اختيار العميل' : 'Select Customer'}
+            placeholder={lang === 'ar' ? '-- اختر العميل --' : '-- Choose Customer --'}
+            value={selectedCustomerId}
+            onChange={(val) => setSelectedCustomerId(val)}
+            options={customerOptions}
+          />
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                {lang === 'ar' ? 'مستوى الأولوية' : 'Priority'}
-              </label>
-              <select
-                value={newPriority}
-                onChange={(e) => setNewPriority(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
-              >
-                <option value="URGENT">{lang === 'ar' ? 'عاجل جداً (ساعة واحدة)' : 'Urgent (1h SLA)'}</option>
-                <option value="HIGH">{lang === 'ar' ? 'عالية (ساعتان)' : 'High (2h SLA)'}</option>
-                <option value="MEDIUM">{lang === 'ar' ? 'متوسطة (4 ساعات)' : 'Medium (4h SLA)'}</option>
-                <option value="LOW">{lang === 'ar' ? 'منخفضة (8 ساعات)' : 'Low (8h SLA)'}</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                {lang === 'ar' ? 'قناة التواصل' : 'Channel'}
-              </label>
-              <select
-                value={newChannel}
-                onChange={(e) => setNewChannel(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none"
-              >
-                <option value="WEB_FORM">{lang === 'ar' ? 'بوابة الدعم' : 'Web Form'}</option>
-                <option value="WHATSAPP">{lang === 'ar' ? 'واتساب' : 'WhatsApp'}</option>
-                <option value="EMAIL">{lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</option>
-                <option value="LIVE_CHAT">{lang === 'ar' ? 'المحادثة المباشرة' : 'Live Chat'}</option>
-                <option value="SMS">{lang === 'ar' ? 'الرسائل النصية' : 'SMS'}</option>
-              </select>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Select
+              label={lang === 'ar' ? 'مستوى الأولوية' : 'Priority'}
+              value={newPriority}
+              onChange={(val) => setNewPriority(val)}
+              options={priorityOptions}
+            />
+
+            <Select
+              label={lang === 'ar' ? 'قناة التواصل' : 'Channel'}
+              value={newChannel}
+              onChange={(val) => setNewChannel(val)}
+              options={channelOptions}
+            />
           </div>
 
           <div>
@@ -458,7 +468,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-navy-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-navy-800 flex-wrap">
             <Button
               type="button"
               variant="outline"

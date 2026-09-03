@@ -60,7 +60,7 @@ export default function CustomersPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {/* View Mode Toggle */}
           <div className="flex items-center p-1 rounded-xl bg-navy-900 border border-navy-800">
             <button
@@ -155,7 +155,7 @@ export default function CustomersPage() {
                         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
                       }
                       alt={customer.name}
-                      className="w-12 h-12 rounded-2xl object-cover ring-2 ring-gold-500/20 group-hover:scale-105 transition-transform"
+                      className="w-12 h-12 rounded-2xl object-cover ring-2 ring-gold-500/20 group-hover:scale-105 transition-transform shrink-0"
                     />
                     <div>
                       <h4 className="font-bold text-slate-100 text-sm group-hover:text-gold-300 transition-colors font-brand">
@@ -240,12 +240,12 @@ export default function CustomersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-300">{customer.company || '—'}</td>
-                    <td className="px-4 py-3 text-slate-300 font-mono">{customer.email}</td>
-                    <td className="px-4 py-3 text-slate-400 font-mono">{customer.phone || '—'}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-slate-300 font-mono whitespace-nowrap">{customer.email}</td>
+                    <td className="px-4 py-3 text-slate-400 font-mono whitespace-nowrap">{customer.phone || '—'}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <TierBadge tier={customer.tier} />
                     </td>
-                    <td className="px-4 py-3 font-bold text-gold-300">
+                    <td className="px-4 py-3 font-bold text-gold-300 font-mono whitespace-nowrap">
                       {customer._count?.tickets || customer.tickets?.length || 0}
                     </td>
                     <td className="px-4 py-3 text-right rtl:text-left">
@@ -262,7 +262,13 @@ export default function CustomersPage() {
       )}
 
       {/* Slide-over Customer 360 Profile Drawer */}
-      <CustomerDrawer customerId={selectedCustomerId} onClose={() => setSelectedCustomerId(null)} />
+      <CustomerDrawer
+        customerId={selectedCustomerId}
+        onClose={() => {
+          setSelectedCustomerId(null);
+          refetch();
+        }}
+      />
 
       {/* Add New Customer Modal */}
       <CustomerModal

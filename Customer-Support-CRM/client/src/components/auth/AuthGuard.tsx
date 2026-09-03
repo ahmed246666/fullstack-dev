@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAgent } from '@/context/AgentContext';
-import { ShieldAlert, Loader2 } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Button } from '@/components/ui/Button';
 
@@ -32,30 +32,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
       router.push(`/${lang}/login`);
     }
   }, [isAuthenticated, isLoadingAuth, isPublicRoute, router, lang]);
-
-  // Loading Screen while verifying JWT token
-  if (isLoadingAuth && !isPublicRoute) {
-    return (
-      <div className="min-h-screen bg-navy-950 flex flex-col items-center justify-center text-white space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-gold-600 via-gold-500 to-gold-400 text-navy-950 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-gold-500/20 font-brand animate-pulse">
-          عزم
-        </div>
-        <div className="flex items-center gap-2 text-gold-400 text-xs font-semibold">
-          <Loader2 className="w-4 h-4 animate-spin" />
-          <span>
-            {lang === 'ar'
-              ? 'جاري التحقق من بيانات الأمان المؤسسي...'
-              : 'Verifying Enterprise Security Credentials...'}
-          </span>
-        </div>
-      </div>
-    );
-  }
-
-  // If on protected route and not authenticated, render nothing while redirecting
-  if (!isAuthenticated && !isPublicRoute) {
-    return null;
-  }
 
   // Admin-only Route Check for /analytics
   if (pathWithoutLocale.startsWith('/analytics') && !isAdmin && isAuthenticated) {

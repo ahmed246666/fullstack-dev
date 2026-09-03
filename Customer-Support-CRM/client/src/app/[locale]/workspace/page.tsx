@@ -22,6 +22,9 @@ import {
   SLABadge,
   StatusBadge
 } from '@/components/ui/Badge';
+import { Select } from '@/components/ui/Select';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { toast } from '@/components/ui/Toast';
 import { CannedResponsesBar } from '@/components/workspace/CannedResponsesBar';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
 import { CSATModal } from '@/components/sla/CSATModal';
@@ -68,8 +71,15 @@ export default function WorkspacePage() {
       setReplyText('');
       setAttachments([]);
       refetch();
+      toast.success(
+        lang === 'ar' ? 'تم إرسال الرد بنجاح' : 'Response submitted successfully',
+        lang === 'ar' ? 'منصة الردود' : 'Reply Sent'
+      );
     } catch (e: any) {
-      alert(e.message || 'Failed to send note');
+      toast.error(
+        e.message || (lang === 'ar' ? 'فشل إرسال الرد' : 'Failed to send note'),
+        lang === 'ar' ? 'خطأ' : 'Error'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -80,11 +90,18 @@ export default function WorkspacePage() {
     try {
       await api.updateTicketStatus(activeTicket.id, newStatus, currentAgent.name);
       refetch();
+      toast.success(
+        lang === 'ar' ? 'تم تغيير حالة التذكرة' : 'Ticket status updated',
+        lang === 'ar' ? 'الحالة' : 'Status Changed'
+      );
       if (newStatus === 'RESOLVED') {
         setIsCSATOpen(true);
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to update status');
+      toast.error(
+        err.message || (lang === 'ar' ? 'فشل تحديث الحالة' : 'Failed to update status'),
+        lang === 'ar' ? 'خطأ' : 'Error'
+      );
     }
   };
 
@@ -156,7 +173,7 @@ export default function WorkspacePage() {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold font-mono text-gold-300">
+                        <span className="text-[11px] font-bold font-mono text-gold-300 whitespace-nowrap shrink-0">
                           {ticket.ticketNumber}
                         </span>
                         <PriorityBadge priority={ticket.priority} />
@@ -173,7 +190,7 @@ export default function WorkspacePage() {
                         ({ticket.customer?.company || (lang === 'ar' ? 'مباشر' : 'Direct')})
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-navy-800 text-[10px]">
+                      <div className="flex items-center justify-between gap-1.5 flex-wrap pt-2 border-t border-navy-800 text-[10px]">
                         <ChannelBadge channel={ticket.channel} />
                         <SLABadge slaStatus={ticket.slaStatus} />
                       </div>
@@ -215,8 +232,8 @@ export default function WorkspacePage() {
                   <h2 className="text-xl font-bold text-white leading-snug">
                     {activeTicket.title}
                   </h2>
-                  <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                    <span>
+                  <div className="flex items-center gap-2 text-xs text-slate-400 mt-1 flex-wrap min-w-0">
+                    <span className="truncate">
                       {lang === 'ar' ? 'العميل: ' : 'Customer: '}
                       <strong className="text-slate-200">
                         {lang === 'ar'
@@ -225,23 +242,26 @@ export default function WorkspacePage() {
                       </strong>
                     </span>
                     <span>•</span>
-                    <span>{activeTicket.customer?.email}</span>
+                    <span className="break-all sm:truncate text-gold-300/80 font-mono text-[11px]">
+                      {activeTicket.customer?.email}
+                    </span>
                   </div>
                 </div>
 
                 {/* Status Quick Select */}
-                <div className="flex items-center gap-2">
-                  <select
+                <div className="w-44">
+                  <Select
+                    size="sm"
                     value={activeTicket.status}
-                    onChange={(e) => handleStatusChange(e.target.value)}
-                    className="bg-navy-950 border border-navy-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 font-semibold outline-none focus:border-gold-500"
-                  >
-                    <option value="NEW">{t('status_NEW')}</option>
-                    <option value="OPEN">{t('status_OPEN')}</option>
-                    <option value="PENDING">{t('status_PENDING')}</option>
-                    <option value="RESOLVED">{t('status_RESOLVED')}</option>
-                    <option value="CLOSED">{t('status_CLOSED')}</option>
-                  </select>
+                    onChange={(val) => handleStatusChange(val)}
+                    options={[
+                      { value: 'NEW', label: t('status_NEW') },
+                      { value: 'OPEN', label: t('status_OPEN') },
+                      { value: 'PENDING', label: t('status_PENDING') },
+                      { value: 'RESOLVED', label: t('status_RESOLVED') },
+                      { value: 'CLOSED', label: t('status_CLOSED') }
+                    ]}
+                  />
                 </div>
               </div>
 
@@ -337,21 +357,19 @@ export default function WorkspacePage() {
 
               {/* Composer Box */}
               <form onSubmit={handleSendReply} className="space-y-3 pt-3 border-t border-navy-800">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="text-xs font-bold text-slate-300 font-brand">
                     {lang === 'ar' ? 'محرر الردود والملاحظات' : 'Message Composer'}
                   </span>
-                  <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={isInternal}
-                      onChange={(e) => setIsInternal(e.target.checked)}
-                      className="rounded bg-navy-950 border-navy-700 text-gold-500 focus:ring-0"
-                    />
-                    <span className="text-amber-400 font-semibold font-brand">
-                      {t('internalNoteLabel')}
-                    </span>
-                  </label>
+                  <Checkbox
+                    checked={isInternal}
+                    onCheckedChange={(val) => setIsInternal(val)}
+                    label={
+                      <span className="text-amber-400 font-semibold font-brand">
+                        {t('internalNoteLabel')}
+                      </span>
+                    }
+                  />
                 </div>
                 <textarea
                   rows={3}

@@ -176,10 +176,13 @@ export const api = {
       method: 'DELETE'
     }),
 
-  voteKnowledgeArticle: (slug: string, isHelpful: boolean) =>
-    fetchApi<{ success: boolean; data: any }>(`/knowledge-base/${slug}/vote`, {
+  voteKnowledgeArticle: (idOrSlug: string, isHelpful: boolean) =>
+    fetchApi<{ success: boolean; data: any }>(`/knowledge-base/${idOrSlug}/vote`, {
       method: 'POST',
-      body: JSON.stringify({ isHelpful })
+      body: JSON.stringify({
+        type: isHelpful ? 'HELPFUL' : 'UNHELPFUL',
+        isHelpful
+      })
     }),
 
   // File Upload Pipeline

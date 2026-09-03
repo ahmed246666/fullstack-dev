@@ -10,6 +10,7 @@ import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { SLABreachBanner } from '@/components/sla/SLABreachBanner';
+import { ToastContainer } from '@/components/ui/Toast';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -19,6 +20,7 @@ interface AppShellProps {
 
 export function AppShell({ children, initialLocale }: AppShellProps) {
   const [queryClient] = useState(() => getQueryClient());
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const pathname = usePathname();
 
   const isPublicStandalone =
@@ -35,16 +37,22 @@ export function AppShell({ children, initialLocale }: AppShellProps) {
               <div className="min-h-screen bg-navy-950 text-slate-100">{children}</div>
             ) : (
               <div className="flex min-h-screen bg-slate-950 text-slate-100 selection:bg-gold-500 selection:text-navy-950">
-                <Sidebar />
+                <Sidebar
+                  isOpen={isMobileSidebarOpen}
+                  onClose={() => setIsMobileSidebarOpen(false)}
+                />
                 <div className="flex-1 flex flex-col min-w-0">
-                  <Header />
-                  <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto animate-in fade-in duration-200">
+                  <Header
+                    onToggleMobileSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
+                  />
+                  <main className="flex-1 p-6 sm:p-8 md:p-10 lg:p-12 max-w-7xl w-full mx-auto animate-in fade-in duration-200 space-y-8">
                     <SLABreachBanner />
                     {children}
                   </main>
                 </div>
               </div>
             )}
+            <ToastContainer />
           </AuthGuard>
         </AgentProvider>
       </LanguageProvider>

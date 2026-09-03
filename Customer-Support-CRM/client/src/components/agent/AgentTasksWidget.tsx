@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { CheckSquare, Square, Plus, Trash2, Clock, AlertCircle, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAgent } from '@/context/AgentContext';
+import { Select } from '@/components/ui/Select';
 
 interface AgentTask {
   id: string;
@@ -136,18 +137,16 @@ export function AgentTasksWidget() {
             className="w-full px-3 py-1.5 rounded-xl bg-navy-900 border border-navy-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500"
           />
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <label className="text-[10.5px] text-slate-400">
-                {lang === 'ar' ? 'الأولوية:' : 'Priority:'}
-              </label>
-              <select
+            <div className="w-32">
+              <Select
+                size="sm"
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as any)}
-                className="bg-navy-900 border border-navy-700 rounded-lg px-2 py-0.5 text-[11px] text-slate-200"
-              >
-                <option value="NORMAL">{lang === 'ar' ? 'عادية' : 'Normal'}</option>
-                <option value="HIGH">{lang === 'ar' ? 'عاجلة' : 'High'}</option>
-              </select>
+                onChange={(val) => setPriority(val as any)}
+                options={[
+                  { value: 'NORMAL', label: lang === 'ar' ? 'عادية' : 'Normal' },
+                  { value: 'HIGH', label: lang === 'ar' ? 'عاجلة' : 'High' }
+                ]}
+              />
             </div>
             <div className="flex items-center gap-1.5">
               <button

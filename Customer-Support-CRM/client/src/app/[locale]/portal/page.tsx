@@ -34,6 +34,7 @@ import { Input } from '@/components/ui/Input';
 import { SLACountdownTimer } from '@/components/sla/SLACountdownTimer';
 import { FileUploadZone, UploadedFile } from '@/components/common/FileUploadZone';
 import { PortalChatbotWidget } from '@/components/portal/PortalChatbotWidget';
+import { toast } from '@/components/ui/Toast';
 
 
 export default function PublicPortalPage() {
@@ -91,8 +92,15 @@ export default function PublicPortalPage() {
       });
       setCustomerReply('');
       refetch();
+      toast.success(
+        lang === 'ar' ? 'تم إرسال ردك إلى فريق الدعم بنجاح' : 'Reply sent to support team',
+        lang === 'ar' ? 'بوابة العملاء' : 'Customer Portal'
+      );
     } catch (err: any) {
-      alert(err.message || 'Failed to send reply');
+      toast.error(
+        err.message || (lang === 'ar' ? 'فشل إرسال الرد' : 'Failed to send reply'),
+        lang === 'ar' ? 'خطأ' : 'Error'
+      );
     } finally {
       setIsSubmittingReply(false);
     }
@@ -118,6 +126,10 @@ export default function PublicPortalPage() {
       setTicketSearch(res.data?.ticketNumber || '');
       setQueriedCode(res.data?.ticketNumber || '');
       refetch();
+      toast.success(
+        lang === 'ar' ? 'تم تقديم طلب الدعم بنجاح' : 'Inquiry submitted successfully',
+        lang === 'ar' ? 'طلب جديد' : 'Ticket Created'
+      );
       setTimeout(() => {
         setIsCreateOpen(false);
         setCreatedSuccessCode(null);
@@ -126,7 +138,10 @@ export default function PublicPortalPage() {
         setPortalAttachments([]);
       }, 2000);
     } catch (err: any) {
-      alert(err.message || 'Failed to submit inquiry');
+      toast.error(
+        err.message || (lang === 'ar' ? 'فشل تقديم الطلب' : 'Failed to submit inquiry'),
+        lang === 'ar' ? 'خطأ' : 'Error'
+      );
     } finally {
       setIsSubmittingTicket(false);
     }
